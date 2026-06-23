@@ -1,0 +1,26 @@
+{
+  "labels": ["renovate"],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "rebaseWhen": "conflicted",
+  "prConcurrentLimit": 5,
+  "prCreation": "not-pending",
+  "internalChecksFilter": "strict",
+  "dependencyDashboard": true,
+  "minimumReleaseAge": "3 days",
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "automerge": true
+    }
+  ]
+}
