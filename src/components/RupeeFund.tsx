@@ -190,9 +190,9 @@ const RupeeFund = () => {
       {/* How It Works + Seasons - Combined */}
       <section className="py-12 bg-paper">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-10 md:grid-cols-3">
+          <div className="grid gap-10 md:grid-cols-2">
             {/* How It Works */}
-            <div className="flex flex-col md:col-span-2">
+            <div className="flex flex-col">
               <h3 className="text-2xl font-bold text-ink mb-5 tracking-tight">
                 How It Works
               </h3>
@@ -226,34 +226,28 @@ const RupeeFund = () => {
               <h3 className="text-2xl font-bold text-ink mb-5 tracking-tight">
                 Funding Seasons
               </h3>
-              <div className="flex flex-1 flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {SEASON_ART.map((s) => (
                   <div
                     key={s.key}
-                    className="relative flex items-center gap-4 overflow-hidden rounded-xl border border-ink/10 bg-white p-4 shadow-soft transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card"
+                    className="relative flex flex-col items-center gap-2 overflow-hidden rounded-xl border border-ink/10 bg-white p-4 text-center shadow-soft transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card"
                     style={{ backgroundImage: s.grad }}
                   >
-                    <div className="grid h-20 w-20 shrink-0 place-items-center rounded-lg border border-ink/10 bg-card">
+                    <div className="grid h-16 w-16 shrink-0 place-items-center rounded-lg border border-ink/10 bg-card">
                       <PixelSprite
                         rows={s.sprite}
                         shades={s.shades}
-                        className="h-14 w-14"
+                        className="h-11 w-11"
                       />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
-                        {s.name}
-                      </h4>
-                      <div
-                        className="my-2 h-1 w-10 rounded-full"
-                        style={{ backgroundColor: s.accent }}
-                      />
-                      <p className="text-xs font-medium uppercase tracking-wider text-ink-3">
-                        {s.months}
-                      </p>
-                    </div>
+                    <h4 className="text-sm font-extrabold tracking-tight text-ink">
+                      {s.name}
+                    </h4>
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-ink-3">
+                      {s.months}
+                    </p>
                     <span
-                      className="self-start rounded-md px-2.5 py-1 text-xs font-semibold text-white"
+                      className="mt-auto rounded-md px-2 py-0.5 text-[11px] font-semibold text-white"
                       style={{ backgroundColor: s.accent }}
                     >
                       {s.duration}
