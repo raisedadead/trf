@@ -52,7 +52,7 @@ const RupeeFund = () => {
   );
 
   const eyebrow = (text: string) => (
-    <span className="inline-flex items-center gap-2 border border-ink/15 bg-card px-3 py-1.5 text-xs leading-none font-mono font-bold uppercase tracking-wider text-brand">
+    <span className="inline-flex items-center gap-2 border border-ink/15 bg-card px-3 py-1.5 text-xs leading-none font-mono font-bold tracking-wider text-brand">
       <span className="w-2 h-2 bg-brand inline-block" />
       {text}
     </span>
@@ -101,7 +101,7 @@ const RupeeFund = () => {
 
             {/* FOSS United track record - attributed by heading */}
             <div>
-              <p className="mb-3 text-xs font-mono font-bold uppercase tracking-wider text-ink-3">
+              <p className="mb-3 text-xs font-mono font-bold tracking-wider text-ink-3">
                 <a
                   href="https://fossunited.org/grants"
                   target="_blank"
