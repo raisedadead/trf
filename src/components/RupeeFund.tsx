@@ -142,7 +142,7 @@ const RupeeFund = () => {
       {/* Launch ribbon */}
       <div className="bg-brand-50 border-b border-brand-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-center text-xs font-medium text-brand-800">
-          Season 1 opens at IndiaFOSS 2026 · Pool starts at ₹0 · Be founding
+          Season 1 opens at IndiaFOSS 2026 — 26–27 Sep, Bengaluru · Be founding
           contributor #1
         </div>
       </div>
@@ -282,9 +282,9 @@ const RupeeFund = () => {
                 </span>
               </summary>
               <p className="mt-3 text-ink-2 text-xs leading-relaxed border-t border-ink/10 pt-3">
-                Not yet — we launch at IndiaFOSS 2026. Founding contributors who
-                join now seed Season 1's pool and lock in early voting
-                eligibility.
+                Not yet — we launch at IndiaFOSS 2026, on 26–27 September in
+                Bengaluru. Founding contributors who join now seed Season 1's
+                pool and lock in early voting eligibility.
               </p>
             </details>
             <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
@@ -574,8 +574,8 @@ const RupeeFund = () => {
                       No payment yet
                     </p>
                     <p>
-                      We'll email you when Season 1 opens at IndiaFOSS 2026, so
-                      you can set up UPI AutoPay first.
+                      We'll email you when Season 1 opens at IndiaFOSS 2026
+                      (26–27 September), so you can set up UPI AutoPay first.
                     </p>
                   </div>
                 </div>
@@ -791,7 +791,7 @@ const RupeeFund = () => {
           </h2>
           <p className="text-sm text-ink-2">
             The Rupee Fund hasn't disbursed yet — Season 1 opens at IndiaFOSS
-            2026. Here's how funding will work.
+            2026 (26–27 September, Bengaluru). Here's how funding will work.
           </p>
         </div>
 
@@ -802,7 +802,7 @@ const RupeeFund = () => {
                 Season 1 — opens at IndiaFOSS 2026
               </h3>
               <p className="text-ink-3 text-xs">
-                Be the first rupee in the pool
+                26–27 September · Bengaluru · be the first rupee
               </p>
             </div>
             <div className="bg-brand-50 px-6 py-3 rounded-lg border border-brand-200">
@@ -870,7 +870,7 @@ const RupeeFund = () => {
                 </h3>
                 <p className="text-xs text-ink-2">
                   This is a preview of what you'll manage once you join. The
-                  Rupee Fund launches at IndiaFOSS 2026.
+                  Rupee Fund launches at IndiaFOSS 2026 (26–27 September).
                 </p>
               </div>
             </div>
