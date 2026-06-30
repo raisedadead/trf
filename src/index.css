@@ -97,16 +97,14 @@
 @keyframes screen-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @utility screen-enter {
-  animation: screen-enter 260ms ease-out;
+  animation: screen-enter 220ms ease-out;
 }
 
 /* Animate native <details> disclosure (FAQ). Progressive: browsers without
