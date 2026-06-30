@@ -102,7 +102,14 @@ const RupeeFund = () => {
             {/* FOSS United track record - attributed by heading */}
             <div>
               <p className="mb-3 text-xs font-mono font-bold uppercase tracking-wider text-ink-3">
-                What FOSS United has funded
+                <a
+                  href="https://fossunited.org/grants"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-brand transition-colors"
+                >
+                  What FOSS United has funded
+                </a>
               </p>
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
@@ -488,6 +495,40 @@ const RupeeFund = () => {
             </div>
           </div>
           <div className="border-t border-white/10 pt-6 text-center text-xs text-gray-500">
+            <div className="mb-3 flex flex-wrap justify-center gap-x-4 gap-y-1">
+              <a
+                href="https://fossunited.org/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="https://fossunited.org/terms-of-service"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand transition-colors"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="https://fossunited.org/refund-transfer-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand transition-colors"
+              >
+                Refund Policy
+              </a>
+              <a
+                href="https://fossunited.org/code-of-conduct"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand transition-colors"
+              >
+                Code of Conduct
+              </a>
+            </div>
             <p>© 2026 The Rupee Fund. A FOSS United Foundation initiative.</p>
           </div>
         </div>
@@ -739,8 +780,35 @@ const RupeeFund = () => {
                   htmlFor="terms"
                   className="text-xs text-ink-2 leading-relaxed"
                 >
-                  I agree to authorize The Rupee Fund to process my recurring
-                  payment via UPI AutoPay.
+                  I authorize The Rupee Fund to process my recurring payment via
+                  UPI AutoPay, and accept the{" "}
+                  <a
+                    href="https://fossunited.org/terms-of-service"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand hover:underline"
+                  >
+                    Terms
+                  </a>
+                  ,{" "}
+                  <a
+                    href="https://fossunited.org/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand hover:underline"
+                  >
+                    Privacy Policy
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    href="https://fossunited.org/refund-transfer-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand hover:underline"
+                  >
+                    Refund Policy
+                  </a>
+                  .
                 </label>
               </div>
 

@@ -140,4 +140,25 @@ describe("The Rupee Fund — branding & content", () => {
       screen.getByRole("link", { name: "About FOSS United" }),
     ).toHaveAttribute("href", "https://fossunited.org/about");
   });
+
+  it("links the credibility stats to the FOSS United grants page", () => {
+    render(<App />);
+    expect(
+      screen.getByRole("link", { name: /what FOSS United has funded/i }),
+    ).toHaveAttribute("href", "https://fossunited.org/grants");
+  });
+
+  it("exposes the legal policy links in the footer", () => {
+    render(<App />);
+    expect(
+      screen.getByRole("link", { name: "Privacy Policy" }),
+    ).toHaveAttribute("href", "https://fossunited.org/privacy-policy");
+    expect(
+      screen.getByRole("link", { name: "Terms of Service" }),
+    ).toHaveAttribute("href", "https://fossunited.org/terms-of-service");
+    expect(screen.getByRole("link", { name: "Refund Policy" })).toHaveAttribute(
+      "href",
+      "https://fossunited.org/refund-transfer-policy",
+    );
+  });
 });
