@@ -661,36 +661,33 @@ const RupeeFund = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-ink-2 mb-1">
-                    PAN Number *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="ABCDE1234F"
-                    className="w-full px-3 py-2 text-sm border border-ink/15 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none uppercase font-mono"
-                    maxLength={10}
-                    required
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-ink-2 mb-1">
+                  PAN Number *
+                </label>
+                <input
+                  type="text"
+                  placeholder="ABCDE1234F"
+                  className="w-full px-3 py-2 text-sm border border-ink/15 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none uppercase font-mono"
+                  maxLength={10}
+                  required
+                />
+              </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-ink-2 mb-1">
-                    Aadhaar Number *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="1234 5678 9012"
-                    className="w-full px-3 py-2 text-sm border border-ink/15 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none font-mono"
-                    maxLength={14}
-                    required
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-ink-2 mb-1">
+                  Contact Address *
+                </label>
+                <textarea
+                  placeholder="Street, City, State, PIN"
+                  rows={2}
+                  className="w-full px-3 py-2 text-sm border border-ink/15 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none resize-none"
+                  required
+                />
               </div>
               <p className="text-xs text-ink-3">
-                Required for statutory compliance. Stored securely, never
-                shared.
+                PAN and address are required for statutory compliance and tax
+                receipts. Stored securely, never shared.
               </p>
 
               <div>

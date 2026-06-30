@@ -104,6 +104,15 @@ describe("The Rupee Fund — dual subscribe path", () => {
       screen.getByRole("button", { name: /set up upi autopay/i }),
     ).toBeInTheDocument();
   });
+
+  it("collects PAN and address but never Aadhaar in AutoPay mode", () => {
+    render(<App />);
+    clickButton(/^subscribe$/i);
+    clickButton(/set up autopay now/i);
+    expect(screen.getByText("PAN Number *")).toBeInTheDocument();
+    expect(screen.getByText("Contact Address *")).toBeInTheDocument();
+    expect(screen.queryByText(/Aadhaar/i)).not.toBeInTheDocument();
+  });
 });
 
 describe("The Rupee Fund — branding & content", () => {
