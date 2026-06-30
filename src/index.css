@@ -93,3 +93,52 @@
     ),
     linear-gradient(to bottom, oklch(0.27 0 0) 0%, oklch(0.2 0 0) 100%);
 }
+
+@keyframes screen-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility screen-enter {
+  animation: screen-enter 260ms ease-out;
+}
+
+/* Animate native <details> disclosure (FAQ). Progressive: browsers without
+   ::details-content / interpolate-size fall back to instant open. */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  details::details-content {
+    overflow: hidden;
+    block-size: 0;
+    opacity: 0;
+    transition:
+      block-size 220ms ease-out,
+      opacity 220ms ease-out,
+      content-visibility 220ms ease-out allow-discrete;
+  }
+
+  details[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
