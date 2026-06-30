@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, AlertCircle, Bell } from "lucide-react";
+import { Heart, AlertCircle, Bell, Menu, X } from "lucide-react";
 import { PixelSprite } from "./PixelArt.tsx";
 import { SEASON_ART } from "./seasonArt.ts";
 
@@ -9,6 +9,7 @@ const RupeeFund = () => {
   const [currentScreen, setCurrentScreen] = useState("home");
   const [amount, setAmount] = useState("100");
   const [subscribeMode, setSubscribeMode] = useState<SubscribeMode>("waitlist");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const goSubscribe = (mode: SubscribeMode) => {
     setSubscribeMode(mode);
@@ -17,8 +18,11 @@ const RupeeFund = () => {
 
   const navLink = (screen: string, label: string) => (
     <button
-      onClick={() => setCurrentScreen(screen)}
-      className={`font-medium transition-[color,box-shadow] duration-150 ease-out text-sm pb-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 ${currentScreen === screen ? "text-ink marker-underline" : "text-ink-2 hover:text-brand"}`}
+      onClick={() => {
+        setCurrentScreen(screen);
+        setMenuOpen(false);
+      }}
+      className={`font-medium transition-[color,box-shadow] duration-150 ease-out text-sm px-2 py-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 ${currentScreen === screen ? "text-ink marker-underline" : "text-ink-2 hover:text-brand"}`}
     >
       {label}
     </button>
@@ -35,7 +39,7 @@ const RupeeFund = () => {
               className="h-9 w-auto"
             />
           </div>
-          <nav className="flex gap-6 items-center">
+          <nav className="hidden md:flex gap-6 items-center">
             {navLink("home", "Home")}
             {navLink("projects", "Projects")}
             {navLink("manage", "Manage")}
@@ -46,13 +50,37 @@ const RupeeFund = () => {
               Subscribe
             </button>
           </nav>
+          <button
+            className="md:hidden inline-flex items-center justify-center w-11 h-11 -mr-2 rounded-lg text-ink transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
+        {menuOpen && (
+          <nav className="md:hidden mt-3 flex flex-col gap-1 border-t border-ink/10 pt-3">
+            {navLink("home", "Home")}
+            {navLink("projects", "Projects")}
+            {navLink("manage", "Manage")}
+            <button
+              onClick={() => {
+                goSubscribe("autopay");
+                setMenuOpen(false);
+              }}
+              className="w-full bg-brand text-white px-5 py-2 rounded-lg hover:bg-brand-700 font-semibold transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white text-sm"
+            >
+              Subscribe
+            </button>
+          </nav>
+        )}
       </div>
     </header>
   );
 
   const eyebrow = (text: string) => (
-    <span className="inline-flex items-center gap-2 border border-ink/15 bg-card px-3 py-1.5 text-xs leading-none font-mono font-bold tracking-wider text-brand">
+    <span className="inline-flex items-center gap-2 border border-ink/15 bg-card px-3 py-1.5 text-xs leading-snug font-mono font-bold tracking-wider text-brand">
       <span className="w-2 h-2 bg-brand inline-block" />
       {text}
     </span>
@@ -70,7 +98,7 @@ const RupeeFund = () => {
           </div>
           <div className="grid md:grid-cols-2 gap-8 items-start">
             <div>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-ink mb-4 leading-[1.05] tracking-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink mb-4 leading-[1.05] tracking-tight">
                 Keep Indian open source alive — one rupee at a time
               </h2>
               <div className="flex flex-wrap gap-3">
@@ -103,21 +131,21 @@ const RupeeFund = () => {
                   What FOSS United has funded
                 </a>
               </p>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
-                  <div className="text-2xl font-mono font-bold text-brand mb-1">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <div className="bg-card p-3 sm:p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
+                  <div className="text-xl sm:text-2xl font-mono font-bold text-brand mb-1">
                     ₹3cr+
                   </div>
                   <div className="text-xs text-ink-3">disbursed</div>
                 </div>
-                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
-                  <div className="text-2xl font-mono font-bold text-brand mb-1">
+                <div className="bg-card p-3 sm:p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
+                  <div className="text-xl sm:text-2xl font-mono font-bold text-brand mb-1">
                     27+
                   </div>
                   <div className="text-xs text-ink-3">projects</div>
                 </div>
-                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
-                  <div className="text-2xl font-mono font-bold text-brand mb-1">
+                <div className="bg-card p-3 sm:p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
+                  <div className="text-xl sm:text-2xl font-mono font-bold text-brand mb-1">
                     83+
                   </div>
                   <div className="text-xs text-ink-3">events</div>
@@ -394,7 +422,7 @@ const RupeeFund = () => {
                 <li>
                   <button
                     onClick={() => setCurrentScreen("projects")}
-                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                    className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     How Funding Works
                   </button>
@@ -404,7 +432,7 @@ const RupeeFund = () => {
                     href="https://fossunited.org/about"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                    className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     About FOSS United
                   </a>
@@ -414,7 +442,7 @@ const RupeeFund = () => {
                     href="https://forum.fossunited.org"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                    className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Community Forum
                   </a>
@@ -424,7 +452,7 @@ const RupeeFund = () => {
                     href="https://github.com/fossunited/fossunited"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                    className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Source on GitHub
                   </a>
@@ -501,7 +529,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Privacy Policy
               </a>
@@ -509,7 +537,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/terms-of-service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Terms of Service
               </a>
@@ -517,7 +545,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/refund-transfer-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Refund Policy
               </a>
@@ -525,7 +553,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/code-of-conduct"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                className="py-1 hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Code of Conduct
               </a>
@@ -713,35 +741,35 @@ const RupeeFund = () => {
                   <button
                     type="button"
                     onClick={() => setAmount("10")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                    className="px-3 py-2 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹10
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("50")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                    className="px-3 py-2 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹50
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("100")}
-                    className="px-3 py-1 text-xs font-mono border border-brand bg-brand-50 text-brand-700 rounded-md transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                    className="px-3 py-2 text-xs font-mono border border-brand bg-brand-50 text-brand-700 rounded-md transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹100
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("500")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                    className="px-3 py-2 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹500
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("1000")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                    className="px-3 py-2 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹1000
                   </button>
@@ -840,7 +868,7 @@ const RupeeFund = () => {
     <div className="min-h-screen bg-paper screen-enter">
       {renderHeader()}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-ink mb-2 tracking-tight">
             Where your rupees will go
