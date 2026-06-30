@@ -75,7 +75,7 @@ const RupeeFund = () => {
   );
 
   const eyebrow = (text: string) => (
-    <span className="inline-flex items-center gap-2 border border-ink/15 bg-card px-3 py-1.5 text-[11px] leading-none font-mono font-bold uppercase tracking-wider text-brand">
+    <span className="inline-flex items-center gap-2 border border-ink/15 bg-card px-3 py-1.5 text-xs leading-none font-mono font-bold uppercase tracking-wider text-brand">
       <span className="w-2 h-2 bg-brand inline-block" />
       {text}
     </span>
@@ -93,7 +93,7 @@ const RupeeFund = () => {
               <div className="mb-4">
                 {eyebrow("Growing India's FOSS Ecosystem")}
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-ink mb-3 leading-[1.1] tracking-tight">
+              <h2 className="text-4xl sm:text-5xl font-extrabold text-ink mb-4 leading-[1.05] tracking-tight">
                 Support Open Source, One Rupee at a Time
               </h2>
               <p className="text-base text-ink-2 mb-5 leading-relaxed">
