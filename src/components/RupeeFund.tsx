@@ -18,7 +18,7 @@ const RupeeFund = () => {
   const navLink = (screen: string, label: string) => (
     <button
       onClick={() => setCurrentScreen(screen)}
-      className={`font-medium transition-colors text-sm pb-1 ${currentScreen === screen ? "text-ink marker-underline" : "text-ink-2 hover:text-brand"}`}
+      className={`font-medium transition-[color,box-shadow] duration-150 ease-out text-sm pb-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 ${currentScreen === screen ? "text-ink marker-underline" : "text-ink-2 hover:text-brand"}`}
     >
       {label}
     </button>
@@ -41,7 +41,7 @@ const RupeeFund = () => {
             {navLink("manage", "Manage")}
             <button
               onClick={() => goSubscribe("autopay")}
-              className="bg-brand text-white px-5 py-2 rounded-lg hover:bg-brand-700 font-semibold transition-colors text-sm"
+              className="bg-brand text-white px-5 py-2 rounded-lg hover:bg-brand-700 font-semibold transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white text-sm"
             >
               Subscribe
             </button>
@@ -59,39 +59,31 @@ const RupeeFund = () => {
   );
 
   const renderHome = () => (
-    <div className="bg-paper">
+    <div className="bg-paper screen-enter">
       {renderHeader()}
 
       {/* Hero Section - Compact */}
       <section className="bg-white hero-glow border-b border-ink/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="mb-4">
+            {eyebrow("A FOSS United Initiative · Launching at IndiaFOSS 2026")}
+          </div>
+          <div className="grid md:grid-cols-2 gap-8 items-start">
             <div>
-              <div className="mb-4">
-                {eyebrow(
-                  "A FOSS United Initiative · Launching at IndiaFOSS 2026",
-                )}
-              </div>
               <h2 className="text-4xl sm:text-5xl font-extrabold text-ink mb-4 leading-[1.05] tracking-tight">
                 Keep Indian open source alive — one rupee at a time
               </h2>
-              <p className="text-base text-ink-2 mb-5 leading-relaxed">
-                Free software isn't free. The Rupee Fund pools small monthly UPI
-                contributions — from just ₹10 — and routes them to indie FOSS
-                maintainers and builders across India. Not charity. Membership
-                in a commons.
-              </p>
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => goSubscribe("autopay")}
-                  className="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-700 transition-colors inline-flex items-center gap-2"
+                  className="bg-brand text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-700 transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white inline-flex items-center gap-2"
                 >
                   <Heart size={18} />
                   Become a Founding Contributor
                 </button>
                 <button
                   onClick={() => goSubscribe("waitlist")}
-                  className="bg-white text-ink border border-ink/20 px-6 py-3 rounded-lg font-semibold hover:border-brand hover:text-brand transition-colors inline-flex items-center gap-2"
+                  className="bg-white text-ink border border-ink/20 px-6 py-3 rounded-lg font-semibold hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white inline-flex items-center gap-2"
                 >
                   <Bell size={18} />
                   Notify me at launch
@@ -106,30 +98,40 @@ const RupeeFund = () => {
                   href="https://fossunited.org/grants"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   What FOSS United has funded
                 </a>
               </p>
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
+                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
                     ₹3cr+
                   </div>
                   <div className="text-xs text-ink-3">disbursed</div>
                 </div>
-                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
+                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
                     27+
                   </div>
                   <div className="text-xs text-ink-3">projects</div>
                 </div>
-                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
+                <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
                     83+
                   </div>
                   <div className="text-xs text-ink-3">events</div>
                 </div>
+              </div>
+              <div>
+                <p className="text-base text-ink-2 my-5 leading-relaxed">
+                  Free software isn't free. The Rupee Fund pools small monthly
+                  UPI contributions and routes them to indie FOSS maintainers
+                  and builders across India.
+                </p>
+                <p className="text-base text-ink-2 mb-5 leading-relaxed">
+                  Not charity — Membership in a commons.
+                </p>
               </div>
             </div>
           </div>
@@ -139,8 +141,8 @@ const RupeeFund = () => {
       {/* Launch ribbon */}
       <div className="bg-brand-50 border-b border-brand-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-center text-xs font-medium text-brand-800">
-          Season 1 opens at IndiaFOSS 2026 — 26–27 Sep, Bengaluru · Be founding
-          contributor #1
+          First season opens at IndiaFOSS 2026 — 26–27 Sep, Bengaluru · Become a
+          founding contributor
         </div>
       </div>
 
@@ -165,8 +167,7 @@ const RupeeFund = () => {
                       Subscribe
                     </h4>
                     <p className="text-ink-3 text-xs">
-                      Set up monthly UPI AutoPay from ₹10. Founding contributors
-                      lock in from Season 1.
+                      Set up monthly UPI AutoPay from ₹10.
                     </p>
                   </div>
                 </div>
@@ -228,7 +229,7 @@ const RupeeFund = () => {
                 {SEASON_ART.map((s) => (
                   <div
                     key={s.key}
-                    className="relative flex items-center gap-4 overflow-hidden rounded-xl border border-ink/10 bg-white p-4 shadow-soft transition-transform hover:-translate-y-0.5"
+                    className="relative flex items-center gap-4 overflow-hidden rounded-xl border border-ink/10 bg-white p-4 shadow-soft transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card"
                     style={{ backgroundImage: s.grad }}
                   >
                     <div className="grid h-20 w-20 shrink-0 place-items-center rounded-lg border border-ink/10 bg-card">
@@ -271,10 +272,10 @@ const RupeeFund = () => {
             Frequently Asked Questions
           </h3>
           <div className="space-y-2">
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>Is the fund live yet?</span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -284,10 +285,10 @@ const RupeeFund = () => {
                 pool and lock in early voting eligibility.
               </p>
             </details>
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>Why this fund?</span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -297,12 +298,12 @@ const RupeeFund = () => {
                 even most students can afford.
               </p>
             </details>
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>
                   How is this different from FOSS United grants or FLOSS/fund?
                 </span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -313,10 +314,10 @@ const RupeeFund = () => {
                 and voted on by contributors like you.
               </p>
             </details>
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>Who will be funded?</span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -325,10 +326,10 @@ const RupeeFund = () => {
                 get voting rights for each season.
               </p>
             </details>
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>Will this fund international projects?</span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -337,10 +338,10 @@ const RupeeFund = () => {
                 projects.
               </p>
             </details>
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>Can I donate anonymously?</span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -349,10 +350,10 @@ const RupeeFund = () => {
                 donations are not supported.
               </p>
             </details>
-            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group">
-              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center">
+            <details className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft group transition-colors duration-150 ease-out hover:border-ink/20">
+              <summary className="font-semibold text-sm cursor-pointer text-ink flex justify-between items-center transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 <span>How are costs handled?</span>
-                <span className="text-brand text-xl group-open:rotate-45 transition-transform">
+                <span className="text-brand text-xl group-open:rotate-45 transition-transform duration-200 ease-out">
                   +
                 </span>
               </summary>
@@ -393,7 +394,7 @@ const RupeeFund = () => {
                 <li>
                   <button
                     onClick={() => setCurrentScreen("projects")}
-                    className="hover:text-brand transition-colors"
+                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     How Funding Works
                   </button>
@@ -403,7 +404,7 @@ const RupeeFund = () => {
                     href="https://fossunited.org/about"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-brand transition-colors"
+                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     About FOSS United
                   </a>
@@ -413,7 +414,7 @@ const RupeeFund = () => {
                     href="https://forum.fossunited.org"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-brand transition-colors"
+                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Community Forum
                   </a>
@@ -423,7 +424,7 @@ const RupeeFund = () => {
                     href="https://github.com/fossunited/fossunited"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-brand transition-colors"
+                    className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Source on GitHub
                   </a>
@@ -435,7 +436,7 @@ const RupeeFund = () => {
               <p className="text-xs mb-2 text-gray-400">
                 <a
                   href="mailto:foundation@fossunited.org"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   foundation@fossunited.org
                 </a>
@@ -455,7 +456,7 @@ const RupeeFund = () => {
                   href="https://x.com/fossunited"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   X
                 </a>
@@ -463,7 +464,7 @@ const RupeeFund = () => {
                   href="https://mas.to/@fossunited"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   Mastodon
                 </a>
@@ -471,7 +472,7 @@ const RupeeFund = () => {
                   href="https://in.linkedin.com/company/fossunited"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   LinkedIn
                 </a>
@@ -479,7 +480,7 @@ const RupeeFund = () => {
                   href="https://www.youtube.com/c/fossunited"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   YouTube
                 </a>
@@ -487,7 +488,7 @@ const RupeeFund = () => {
                   href="https://t.me/fossunited"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand transition-colors"
+                  className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                 >
                   Telegram
                 </a>
@@ -500,7 +501,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors"
+                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Privacy Policy
               </a>
@@ -508,7 +509,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/terms-of-service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors"
+                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Terms of Service
               </a>
@@ -516,7 +517,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/refund-transfer-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors"
+                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Refund Policy
               </a>
@@ -524,7 +525,7 @@ const RupeeFund = () => {
                 href="https://fossunited.org/code-of-conduct"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand transition-colors"
+                className="hover:text-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
               >
                 Code of Conduct
               </a>
@@ -537,7 +538,7 @@ const RupeeFund = () => {
   );
 
   const renderSubscribe = () => (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-paper screen-enter">
       {renderHeader()}
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -560,14 +561,14 @@ const RupeeFund = () => {
             <button
               type="button"
               onClick={() => setSubscribeMode("waitlist")}
-              className={`py-2 rounded-md text-sm font-semibold transition-colors ${subscribeMode === "waitlist" ? "bg-brand text-white" : "text-ink-2 hover:text-brand"}`}
+              className={`py-2 rounded-md text-sm font-semibold transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white ${subscribeMode === "waitlist" ? "bg-brand text-white" : "text-ink-2 hover:text-brand"}`}
             >
               Notify me at launch
             </button>
             <button
               type="button"
               onClick={() => setSubscribeMode("autopay")}
-              className={`py-2 rounded-md text-sm font-semibold transition-colors ${subscribeMode === "autopay" ? "bg-brand text-white" : "text-ink-2 hover:text-brand"}`}
+              className={`py-2 rounded-md text-sm font-semibold transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white ${subscribeMode === "autopay" ? "bg-brand text-white" : "text-ink-2 hover:text-brand"}`}
             >
               Set up AutoPay now
             </button>
@@ -613,7 +614,7 @@ const RupeeFund = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition-colors"
+                className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition duration-150 ease-out active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
                 Join the Waitlist
               </button>
@@ -712,35 +713,35 @@ const RupeeFund = () => {
                   <button
                     type="button"
                     onClick={() => setAmount("10")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition-colors"
+                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹10
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("50")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition-colors"
+                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹50
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("100")}
-                    className="px-3 py-1 text-xs font-mono border border-brand bg-brand-50 text-brand-700 rounded-md"
+                    className="px-3 py-1 text-xs font-mono border border-brand bg-brand-50 text-brand-700 rounded-md transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹100
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("500")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition-colors"
+                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹500
                   </button>
                   <button
                     type="button"
                     onClick={() => setAmount("1000")}
-                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition-colors"
+                    className="px-3 py-1 text-xs font-mono border border-ink/20 rounded-md hover:border-brand hover:text-brand transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                   >
                     ₹1000
                   </button>
@@ -783,7 +784,7 @@ const RupeeFund = () => {
                     href="https://fossunited.org/terms-of-service"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand underline decoration-transparent hover:decoration-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Terms
                   </a>
@@ -792,7 +793,7 @@ const RupeeFund = () => {
                     href="https://fossunited.org/privacy-policy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand underline decoration-transparent hover:decoration-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Privacy Policy
                   </a>{" "}
@@ -801,7 +802,7 @@ const RupeeFund = () => {
                     href="https://fossunited.org/refund-transfer-policy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand underline decoration-transparent hover:decoration-brand transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                   >
                     Refund Policy
                   </a>
@@ -811,7 +812,7 @@ const RupeeFund = () => {
 
               <button
                 type="submit"
-                className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition-colors"
+                className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition duration-150 ease-out active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
                 Set Up UPI AutoPay
               </button>
@@ -825,7 +826,7 @@ const RupeeFund = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => setCurrentScreen("manage")}
-              className="text-xs text-ink-2 hover:text-brand font-medium"
+              className="text-xs text-ink-2 hover:text-brand font-medium transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
             >
               See what you'll manage → Preview
             </button>
@@ -836,7 +837,7 @@ const RupeeFund = () => {
   );
 
   const renderProjects = () => (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-paper screen-enter">
       {renderHeader()}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -867,7 +868,7 @@ const RupeeFund = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-ink/10 border-dashed p-8 text-center">
+        <div className="bg-white rounded-lg border border-ink/10 border-dashed p-8 text-center transition-colors duration-150 ease-out hover:border-ink/25">
           <h3 className="text-lg font-bold text-ink mb-2">
             No disbursements yet
           </h3>
@@ -879,7 +880,7 @@ const RupeeFund = () => {
           </p>
           <button
             onClick={() => goSubscribe("autopay")}
-            className="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700 text-sm transition-colors"
+            className="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700 text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Become a Founding Contributor
           </button>
@@ -893,7 +894,7 @@ const RupeeFund = () => {
             Once you're a contributor with 10+ months, you can vote and suggest
             projects.
           </p>
-          <button className="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700 text-sm transition-colors">
+          <button className="bg-brand text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-700 text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white">
             Submit Suggestion
           </button>
         </div>
@@ -902,7 +903,7 @@ const RupeeFund = () => {
   );
 
   const renderManage = () => (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-paper screen-enter">
       {renderHeader()}
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -954,7 +955,7 @@ const RupeeFund = () => {
 
           <button
             onClick={() => goSubscribe("autopay")}
-            className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-700 text-sm transition-colors"
+            className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-700 text-sm transition duration-150 ease-out active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Become a Founding Contributor
           </button>
@@ -968,7 +969,7 @@ const RupeeFund = () => {
               Contributions up to cancellation count toward voting eligibility.
             </p>
             <details className="mb-3">
-              <summary className="text-xs text-ink-2 cursor-pointer font-medium">
+              <summary className="text-xs text-ink-2 cursor-pointer font-medium transition-colors duration-150 ease-out hover:text-brand rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
                 How to cancel via UPI
               </summary>
               <div className="mt-2 text-xs text-ink-2 space-y-2 pl-3">
