@@ -6,7 +6,7 @@
   --font-mono: "Space Mono", ui-monospace, monospace;
 
   /* Type scale tuned to fossunited.org: 16px body, large editorial headings */
-  --text-xs: 0.875rem;
+  --text-xs: 1rem;
   --text-xs--line-height: 1.5;
   --text-sm: 1rem;
   --text-sm--line-height: 1.6;
@@ -38,10 +38,11 @@
   --color-brand-700: #07a849;
   --color-brand-800: #06853a;
   --color-brand-900: #044f20;
+  --color-brand-fg: #057a33;
 
   --color-ink: #141414;
   --color-ink-2: #4a4a4a;
-  --color-ink-3: #666666;
+  --color-ink-3: #595959;
   --color-paper: #f0f0f0;
   --color-card: #fafafa;
   --color-line: #e6e6e6;
@@ -86,11 +87,7 @@
 
 @utility footer-glow {
   background-image:
-    linear-gradient(
-      to bottom,
-      oklch(0.84 0.18 152 / 0.14) 0%,
-      oklch(0.84 0.18 152 / 0) 55%
-    ),
+    linear-gradient(to bottom, oklch(0.84 0.18 152 / 0.14) 0%, oklch(0.84 0.18 152 / 0) 55%),
     linear-gradient(to bottom, oklch(0.27 0 0) 0%, oklch(0.2 0 0) 100%);
 }
 

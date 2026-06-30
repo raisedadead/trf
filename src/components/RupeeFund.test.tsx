@@ -1,11 +1,14 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import App from "../App";
 
+beforeEach(() => window.history.pushState({}, "", "/"));
 afterEach(cleanup);
 
 const clickButton = (name: RegExp | string) =>
   fireEvent.click(screen.getByRole("button", { name }));
+
+const clickLink = (name: RegExp | string) => fireEvent.click(screen.getByRole("link", { name }));
 
 const HERO_HEADLINE = "Keep Indian open source alive — one rupee at a time";
 
@@ -17,23 +20,22 @@ describe("The Rupee Fund — navigation", () => {
 
   it("routes to each screen from the nav", () => {
     render(<App />);
-    const routes: Array<[RegExp, string]> = [
+    const linkRoutes: Array<[RegExp, string]> = [
       [/^projects$/i, "Where your rupees will go"],
       [/^manage$/i, "Manage Subscription"],
-      [/^subscribe$/i, "Become a Founding Contributor"],
     ];
-    for (const [nav, heading] of routes) {
-      clickButton(nav);
+    for (const [nav, heading] of linkRoutes) {
+      clickLink(nav);
       expect(screen.getByText(heading)).toBeInTheDocument();
     }
+    clickButton(/^subscribe$/i);
+    expect(screen.getByText("Become a Founding Contributor")).toBeInTheDocument();
   });
 
   it("opens Subscribe from the hero CTA", () => {
     render(<App />);
     clickButton(/become a founding contributor/i);
-    expect(
-      screen.getByText("Become a Founding Contributor"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Become a Founding Contributor")).toBeInTheDocument();
   });
 });
 
@@ -42,13 +44,9 @@ describe("The Rupee Fund — subscribe flow", () => {
     render(<App />);
     clickButton(/^subscribe$/i);
     clickButton(/notify me at launch/i);
-    expect(
-      screen.getByRole("button", { name: /join the waitlist/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /join the waitlist/i })).toBeInTheDocument();
     clickButton(/set up autopay now/i);
-    expect(
-      screen.getByRole("button", { name: /set up upi autopay/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /set up upi autopay/i })).toBeInTheDocument();
   });
 
   it("sets the contribution amount from a preset", () => {
@@ -62,13 +60,13 @@ describe("The Rupee Fund — subscribe flow", () => {
 describe("The Rupee Fund — pre-launch honesty", () => {
   it("shows no disbursements on the Projects screen", () => {
     render(<App />);
-    clickButton(/^projects$/i);
+    clickLink(/^projects$/i);
     expect(screen.getByText(/No disbursements yet/i)).toBeInTheDocument();
   });
 
   it("shows no active subscription on the Manage screen", () => {
     render(<App />);
-    clickButton(/^manage$/i);
+    clickLink(/^manage$/i);
     expect(screen.getByText(/No active subscription yet/i)).toBeInTheDocument();
   });
 });
@@ -76,19 +74,22 @@ describe("The Rupee Fund — pre-launch honesty", () => {
 describe("The Rupee Fund — attribution & compliance", () => {
   it("links the credibility stats to the FOSS United grants page", () => {
     render(<App />);
-    expect(
-      screen.getByRole("link", { name: /what FOSS United has funded/i }),
-    ).toHaveAttribute("href", "https://fossunited.org/grants");
+    expect(screen.getByRole("link", { name: /strong history in grantmaking/i })).toHaveAttribute(
+      "href",
+      "https://fossunited.org/grants",
+    );
   });
 
   it("links the Privacy, Terms and Refund policies in the footer", () => {
     render(<App />);
-    expect(
-      screen.getByRole("link", { name: "Privacy Policy" }),
-    ).toHaveAttribute("href", "https://fossunited.org/privacy-policy");
-    expect(
-      screen.getByRole("link", { name: "Terms of Service" }),
-    ).toHaveAttribute("href", "https://fossunited.org/terms-of-service");
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+      "href",
+      "https://fossunited.org/privacy-policy",
+    );
+    expect(screen.getByRole("link", { name: "Terms of Service" })).toHaveAttribute(
+      "href",
+      "https://fossunited.org/terms-of-service",
+    );
     expect(screen.getByRole("link", { name: "Refund Policy" })).toHaveAttribute(
       "href",
       "https://fossunited.org/refund-transfer-policy",

@@ -1,5 +1,10 @@
+import { BrowserRouter } from "react-router";
 import RupeeFund from "./components/RupeeFund.tsx";
 
 export default function App() {
-  return <RupeeFund />;
+  return (
+    <BrowserRouter>
+      <RupeeFund />
+    </BrowserRouter>
+  );
 }

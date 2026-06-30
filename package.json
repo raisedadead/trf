@@ -1,24 +1,30 @@
 {
   "name": "trf",
   "version": "0.0.0",
+  "private": true,
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "pnpm build && vite preview",
     "typecheck": "tsc -b",
     "deploy": "pnpm build && wrangler deploy",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "check": "oxlint && tsc -b && vitest run"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "private": true,
   "dependencies": {
     "lucide-react": "^1.21.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-router": "^8.0.1"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.42.1",
@@ -29,6 +35,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "jsdom": "^29.1.1",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",

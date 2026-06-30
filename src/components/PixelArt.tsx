@@ -26,11 +26,7 @@ interface PixelSpriteProps {
   className?: string;
 }
 
-export function PixelSprite({
-  rows,
-  shades,
-  className,
-}: PixelSpriteProps): ReactElement {
+export function PixelSprite({ rows, shades, className }: PixelSpriteProps): ReactElement {
   const h = rows.length;
   const w = rows[0]?.length ?? 0;
   const rects: ReactElement[] = [];
@@ -44,22 +40,10 @@ export function PixelSprite({
         continue;
       }
       let run = 1;
-      while (
-        x + run < row.length &&
-        tokenColor(row[x + run], shades) === color
-      ) {
+      while (x + run < row.length && tokenColor(row[x + run], shades) === color) {
         run += 1;
       }
-      rects.push(
-        <rect
-          key={`${x}-${y}`}
-          x={x}
-          y={y}
-          width={run}
-          height={1}
-          fill={color}
-        />,
-      );
+      rects.push(<rect key={`${x}-${y}`} x={x} y={y} width={run} height={1} fill={color} />);
       x += run;
     }
   });
@@ -69,7 +53,6 @@ export function PixelSprite({
       viewBox={`0 0 ${w} ${h}`}
       className={className}
       shapeRendering="crispEdges"
-      role="img"
       aria-hidden="true"
     >
       {rects}

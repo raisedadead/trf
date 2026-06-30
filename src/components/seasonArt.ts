@@ -22,19 +22,19 @@ export const PIXEL_INK = "#141414";
 
 export const SEASON_ART: readonly SeasonArt[] = [
   {
-    "key": "winter",
-    "name": "WINTER",
-    "months": "DEC – FEB",
-    "duration": "3 MO",
-    "shades": {
-      "l": "#7dd3fc",
-      "b": "#0ea5e9",
-      "d": "#0369a1",
-      "h": "#e0f2fe"
+    key: "winter",
+    name: "WINTER",
+    months: "DEC – FEB",
+    duration: "3 MO",
+    shades: {
+      l: "#7dd3fc",
+      b: "#0ea5e9",
+      d: "#0369a1",
+      h: "#e0f2fe",
     },
-    "accent": "oklch(0.55 0.13 235)",
-    "grad": "linear-gradient(to bottom, oklch(0.72 0.14 235 / 0.16) 0%, oklch(0.78 0.10 235 / 0.04) 55%, oklch(0.85 0.06 235 / 0) 100%)",
-    "sprite": [
+    accent: "oklch(0.55 0.13 235)",
+    grad: "linear-gradient(to bottom, oklch(0.72 0.14 235 / 0.16) 0%, oklch(0.78 0.10 235 / 0.04) 55%, oklch(0.85 0.06 235 / 0) 100%)",
+    sprite: [
       "55500000055555000000555",
       "52550000051215000005525",
       "55255000055255000055255",
@@ -57,23 +57,23 @@ export const SEASON_ART: readonly SeasonArt[] = [
       "05525500055255000552550",
       "55255000055255000055255",
       "52550000051215000005525",
-      "55500000055555000000555"
-    ]
+      "55500000055555000000555",
+    ],
   },
   {
-    "key": "summer",
-    "name": "SUMMER",
-    "months": "MAR – MAY",
-    "duration": "3 MO",
-    "shades": {
-      "l": "#fcd34d",
-      "b": "#f59e0b",
-      "d": "#b45309",
-      "h": "#fffbeb"
+    key: "summer",
+    name: "SUMMER",
+    months: "MAR – MAY",
+    duration: "3 MO",
+    shades: {
+      l: "#fcd34d",
+      b: "#f59e0b",
+      d: "#b45309",
+      h: "#fffbeb",
     },
-    "accent": "oklch(0.62 0.15 60)",
-    "grad": "linear-gradient(to bottom, oklch(0.72 0.14 72 / 0.16) 0%, oklch(0.78 0.10 72 / 0.04) 55%, oklch(0.85 0.06 72 / 0) 100%)",
-    "sprite": [
+    accent: "oklch(0.62 0.15 60)",
+    grad: "linear-gradient(to bottom, oklch(0.72 0.14 72 / 0.16) 0%, oklch(0.78 0.10 72 / 0.04) 55%, oklch(0.85 0.06 72 / 0) 100%)",
+    sprite: [
       "00000000005550000000000",
       "00000000005150000000000",
       "00000000005150000000000",
@@ -96,23 +96,23 @@ export const SEASON_ART: readonly SeasonArt[] = [
       "00055500005150000555000",
       "00000000005150000000000",
       "00000000005150000000000",
-      "00000000005550000000000"
-    ]
+      "00000000005550000000000",
+    ],
   },
   {
-    "key": "monsoon",
-    "name": "MONSOON",
-    "months": "JUN – SEP",
-    "duration": "4 MO",
-    "shades": {
-      "l": "#e2e8f0",
-      "b": "#cbd5e1",
-      "d": "#94a3b8",
-      "h": "#f8fafc"
+    key: "monsoon",
+    name: "MONSOON",
+    months: "JUN – SEP",
+    duration: "4 MO",
+    shades: {
+      l: "#e2e8f0",
+      b: "#cbd5e1",
+      d: "#94a3b8",
+      h: "#f8fafc",
     },
-    "accent": "oklch(0.58 0.15 152)",
-    "grad": "linear-gradient(to bottom, oklch(0.72 0.15 152 / 0.16) 0%, oklch(0.78 0.10 152 / 0.04) 55%, oklch(0.85 0.06 152 / 0) 100%)",
-    "sprite": [
+    accent: "oklch(0.58 0.15 152)",
+    grad: "linear-gradient(to bottom, oklch(0.72 0.15 152 / 0.16) 0%, oklch(0.78 0.10 152 / 0.04) 55%, oklch(0.85 0.06 152 / 0) 100%)",
+    sprite: [
       "00000555455500000000",
       "00005544244555500000",
       "00055422222454555000",
@@ -127,23 +127,23 @@ export const SEASON_ART: readonly SeasonArt[] = [
       "00000000000000000000",
       "00006000600060006000",
       "00000600060006000600",
-      "00000060006000600060"
-    ]
+      "00000060006000600060",
+    ],
   },
   {
-    "key": "post-monsoon",
-    "name": "POST-MONSOON",
-    "months": "OCT – NOV",
-    "duration": "2 MO",
-    "shades": {
-      "l": "#e2e8f0",
-      "b": "#f59e0b",
-      "d": "#cbd5e1",
-      "h": "#fff7ed"
+    key: "post-monsoon",
+    name: "POST-MONSOON",
+    months: "OCT – NOV",
+    duration: "2 MO",
+    shades: {
+      l: "#e2e8f0",
+      b: "#f59e0b",
+      d: "#cbd5e1",
+      h: "#fff7ed",
     },
-    "accent": "oklch(0.55 0.22 330)",
-    "grad": "linear-gradient(to bottom, oklch(0.72 0.18 330 / 0.16) 0%, oklch(0.78 0.13 330 / 0.04) 55%, oklch(0.85 0.07 330 / 0) 100%)",
-    "sprite": [
+    accent: "oklch(0.55 0.22 330)",
+    grad: "linear-gradient(to bottom, oklch(0.72 0.18 330 / 0.16) 0%, oklch(0.78 0.13 330 / 0.04) 55%, oklch(0.85 0.07 330 / 0) 100%)",
+    sprite: [
       "00000000000005550525055500",
       "00000000000005255525552500",
       "00000000000005552422255500",
@@ -159,7 +159,7 @@ export const SEASON_ART: readonly SeasonArt[] = [
       "51111111111111111111500000",
       "51311311311311311311500000",
       "55551555555555551555500000",
-      "00055500000000055500000000"
-    ]
-  }
+      "00055500000000055500000000",
+    ],
+  },
 ];
