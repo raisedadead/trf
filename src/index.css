@@ -77,19 +77,19 @@
 }
 
 @utility hero-glow {
-  background-image: radial-gradient(
-    120% 80% at 85% -10%,
-    rgba(8, 183, 79, 0.1) 0%,
-    rgba(8, 183, 79, 0) 60%
+  background-image: linear-gradient(
+    to bottom,
+    oklch(0.66 0.18 154 / 0.1) 0%,
+    oklch(0.66 0.18 154 / 0) 70%
   );
 }
 
 @utility footer-glow {
   background-image:
-    radial-gradient(
-      90% 120% at 88% 0%,
-      rgba(62, 233, 138, 0.12) 0%,
-      rgba(62, 233, 138, 0) 55%
+    linear-gradient(
+      to bottom,
+      oklch(0.84 0.18 152 / 0.14) 0%,
+      oklch(0.84 0.18 152 / 0) 55%
     ),
-    linear-gradient(102deg, #1f1f1f 0%, var(--color-ink) 100%);
+    linear-gradient(to bottom, oklch(0.27 0 0) 0%, oklch(0.2 0 0) 100%);
 }

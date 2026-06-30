@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Heart, CheckCircle, AlertCircle } from "lucide-react";
+import { PixelSprite } from "./PixelArt.tsx";
+import { SEASON_ART } from "./seasonArt.ts";
 
 const RupeeFund = () => {
   const [currentScreen, setCurrentScreen] = useState("home");
@@ -214,35 +216,41 @@ const RupeeFund = () => {
               <h3 className="text-2xl font-bold text-ink mb-5 tracking-tight">
                 Funding Seasons
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-card p-3 rounded-lg border border-ink/10 shadow-soft border-l-4 border-l-sky-500">
-                  <h4 className="font-semibold text-sm mb-1 text-ink">
-                    Winter
-                  </h4>
-                  <p className="text-xs text-ink-3">Dec-Feb (3 months)</p>
-                </div>
-                <div className="bg-card p-3 rounded-lg border border-ink/10 shadow-soft border-l-4 border-l-amber-500">
-                  <h4 className="font-semibold text-sm mb-1 text-ink">
-                    Summer
-                  </h4>
-                  <p className="text-xs text-ink-3">Mar-May (3 months)</p>
-                </div>
-                <div className="bg-card p-3 rounded-lg border border-ink/10 shadow-soft border-l-4 border-l-brand">
-                  <h4 className="font-semibold text-sm mb-1 text-ink">
-                    Monsoon
-                  </h4>
-                  <p className="text-xs text-ink-3">Jun-Sep (4 months)</p>
-                </div>
-                <div className="bg-card p-3 rounded-lg border border-ink/10 shadow-soft border-l-4 border-l-orange-500">
-                  <h4 className="font-semibold text-sm mb-1 text-ink">
-                    Post-Monsoon
-                  </h4>
-                  <p className="text-xs text-ink-3">Oct-Nov (2 months)</p>
-                </div>
+              <div className="space-y-3">
+                {SEASON_ART.map((s) => (
+                  <div
+                    key={s.key}
+                    className="relative flex items-center gap-4 overflow-hidden rounded-xl border border-ink/10 bg-white p-4 shadow-soft transition-transform hover:-translate-y-0.5"
+                    style={{ backgroundImage: s.grad }}
+                  >
+                    <div className="grid h-20 w-20 shrink-0 place-items-center rounded-lg border border-ink/10 bg-card">
+                      <PixelSprite
+                        rows={s.sprite}
+                        shades={s.shades}
+                        className="h-14 w-14"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
+                        {s.name}
+                      </h4>
+                      <div
+                        className="my-2 h-1 w-10 rounded-full"
+                        style={{ backgroundColor: s.accent }}
+                      />
+                      <p className="text-xs font-medium uppercase tracking-wider text-ink-3">
+                        {s.months}
+                      </p>
+                    </div>
+                    <span
+                      className="self-start rounded-md px-2.5 py-1 text-xs font-semibold text-white"
+                      style={{ backgroundColor: s.accent }}
+                    >
+                      {s.duration}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <p className="text-xs text-ink-3 mt-3">
-                Aligned with IMD seasonal definitions
-              </p>
             </div>
           </div>
         </div>
