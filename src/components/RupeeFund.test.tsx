@@ -78,10 +78,14 @@ describe("The Rupee Fund — pre-launch honesty", () => {
     expect(screen.getByText(/No active subscription yet/i)).toBeInTheDocument();
   });
 
-  it("attributes borrowed credibility stats to their separate programs", () => {
+  it("attributes credibility stats to FOSS United, not the fund itself", () => {
     render(<App />);
-    expect(screen.getByText(/separate programs/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/FLOSS\/fund/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(/FOSS United's grant numbers/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/funded by you, not the foundation/i),
+    ).toBeInTheDocument();
   });
 });
 

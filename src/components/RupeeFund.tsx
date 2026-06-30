@@ -123,16 +123,16 @@ const RupeeFund = () => {
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
-                    $1M/yr
+                    83+
                   </div>
                   <div className="text-xs text-ink-3">
-                    committed by Zerodha's FLOSS/fund
+                    FOSS events funded by FOSS United
                   </div>
                 </div>
               </div>
               <p className="mt-3 text-xs text-ink-3 leading-relaxed">
-                FOSS United grants and FLOSS/fund are separate programs. The
-                Rupee Fund is the community-pooled layer — funded by you.
+                Those are FOSS United's grant numbers. The Rupee Fund is the new
+                community-pooled layer — funded by you, not the foundation.
               </p>
             </div>
           </div>
