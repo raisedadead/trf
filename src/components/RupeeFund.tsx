@@ -115,18 +115,18 @@ const RupeeFund = () => {
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
-                    $1M/yr
+                    27+
                   </div>
                   <div className="text-xs text-ink-3">
-                    committed by Zerodha's FLOSS/fund
+                    projects funded by FOSS United grants
                   </div>
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
-                    ₹10/mo
+                    $1M/yr
                   </div>
                   <div className="text-xs text-ink-3">
-                    your minimum to join the Rupee Fund
+                    committed by Zerodha's FLOSS/fund
                   </div>
                 </div>
               </div>
