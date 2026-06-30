@@ -5,6 +5,19 @@ import { SEASON_ART } from "./seasonArt.ts";
 
 type SubscribeMode = "waitlist" | "autopay";
 
+const HOW_IT_WORKS: ReadonlyArray<{ title: string; desc: string }> = [
+  { title: "Subscribe", desc: "Set up monthly UPI AutoPay from ₹10." },
+  { title: "Pool Funds", desc: "Your contributions pool through the season." },
+  {
+    title: "Vote",
+    desc: "Contribute 10+ months and help vote on who gets funded.",
+  },
+  {
+    title: "Disburse",
+    desc: "Funds go to indie FOSS maintainers and builders across India.",
+  },
+];
+
 const RupeeFund = () => {
   const [currentScreen, setCurrentScreen] = useState("home");
   const [amount, setAmount] = useState("100");
@@ -177,83 +190,43 @@ const RupeeFund = () => {
       {/* How It Works + Seasons - Combined */}
       <section className="py-12 bg-paper">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-10">
+          <div className="grid gap-10 md:grid-cols-3">
             {/* How It Works */}
-            <div>
+            <div className="flex flex-col md:col-span-2">
               <h3 className="text-2xl font-bold text-ink mb-5 tracking-tight">
                 How It Works
               </h3>
-              <div className="space-y-3">
-                <div className="flex gap-3 items-start">
-                  <div className="bg-brand w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-mono font-bold text-sm">
-                      1
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm mb-1 text-ink">
-                      Subscribe
-                    </h4>
-                    <p className="text-ink-3 text-xs">
-                      Set up monthly UPI AutoPay from ₹10.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-start">
-                  <div className="bg-brand w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-mono font-bold text-sm">
-                      2
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm mb-1 text-ink">
-                      Pool Funds
-                    </h4>
-                    <p className="text-ink-3 text-xs">
-                      Your contributions pool through the season.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-start">
-                  <div className="bg-brand w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-mono font-bold text-sm">
-                      3
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm mb-1 text-ink">
-                      Vote
-                    </h4>
-                    <p className="text-ink-3 text-xs">
-                      Contribute 10+ months and help vote on who gets funded.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-start">
-                  <div className="bg-brand w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-mono font-bold text-sm">
-                      4
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm mb-1 text-ink">
-                      Disburse
-                    </h4>
-                    <p className="text-ink-3 text-xs">
-                      Funds go to indie FOSS maintainers and builders across
-                      India.
-                    </p>
-                  </div>
-                </div>
+              <div className="relative flex-1">
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-4 left-4 top-4 w-px -translate-x-1/2 bg-ink/15"
+                />
+                <ol className="relative flex h-full flex-col justify-between gap-6">
+                  {HOW_IT_WORKS.map((step, i) => (
+                    <li key={step.title} className="flex gap-4">
+                      <div className="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand">
+                        <span className="font-mono text-sm font-bold text-white">
+                          {i + 1}
+                        </span>
+                      </div>
+                      <div className="pt-0.5">
+                        <h4 className="mb-1 text-sm font-semibold text-ink">
+                          {step.title}
+                        </h4>
+                        <p className="text-xs text-ink-3">{step.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
               </div>
             </div>
 
             {/* Funding Seasons */}
-            <div>
+            <div className="flex flex-col">
               <h3 className="text-2xl font-bold text-ink mb-5 tracking-tight">
                 Funding Seasons
               </h3>
-              <div className="space-y-3">
+              <div className="flex flex-1 flex-col gap-3">
                 {SEASON_ART.map((s) => (
                   <div
                     key={s.key}
