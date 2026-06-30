@@ -99,41 +99,31 @@ const RupeeFund = () => {
               </div>
             </div>
 
-            {/* Ecosystem credibility - attributed, not claimed */}
+            {/* FOSS United track record - attributed by heading */}
             <div>
               <p className="mb-3 text-xs font-mono font-bold uppercase tracking-wider text-ink-3">
-                Part of India's FOSS funding movement
+                What FOSS United has funded
               </p>
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
                     ₹3cr+
                   </div>
-                  <div className="text-xs text-ink-3">
-                    disbursed by FOSS United grants
-                  </div>
+                  <div className="text-xs text-ink-3">disbursed</div>
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
                     27+
                   </div>
-                  <div className="text-xs text-ink-3">
-                    projects funded by FOSS United grants
-                  </div>
+                  <div className="text-xs text-ink-3">projects</div>
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-ink/10 shadow-soft text-center">
                   <div className="text-2xl font-mono font-bold text-brand mb-1">
                     83+
                   </div>
-                  <div className="text-xs text-ink-3">
-                    FOSS events funded by FOSS United
-                  </div>
+                  <div className="text-xs text-ink-3">events</div>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-ink-3 leading-relaxed">
-                Those are FOSS United's grant numbers. The Rupee Fund is the new
-                community-pooled layer — funded by you, not the foundation.
-              </p>
             </div>
           </div>
         </div>
