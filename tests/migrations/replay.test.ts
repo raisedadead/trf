@@ -103,14 +103,10 @@ describe("each environment has its own migrations directory", () => {
 
   it("keeps the payment and voting tables out of the launch database", () => {
     const launch = tablesOf(replay("launch"));
-    for (const table of [
-      "contributors",
-      "metrics_cache",
-      "processed_events",
-      "proposals",
-      "ballots",
-      "vote_tokens",
-    ]) {
+    const postLaunchOnly = POST_LAUNCH_TABLES.filter((t) => !LAUNCH_TABLES.includes(t));
+    expect(postLaunchOnly.length).toBeGreaterThan(0);
+    expect(launch).toEqual(LAUNCH_TABLES);
+    for (const table of postLaunchOnly) {
       expect(launch).not.toContain(table);
     }
   });
