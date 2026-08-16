@@ -8,5 +8,14 @@
   "rules": {
     "react/react-in-jsx-scope": "off"
   },
-  "ignorePatterns": ["dist", ".wrangler"]
+  "overrides": [
+    {
+      "files": ["src/site/**/*.tsx"],
+      "rules": {
+        "react/jsx-key": "off",
+        "jsx-a11y/label-has-associated-control": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist", ".astro", ".wrangler"]
 }

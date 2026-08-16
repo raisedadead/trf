@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+      - uses: pnpm/action-setup@fdbc4fdcf7d143a5d0a39e9a02e103b13e309024 # v6.0.4
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Reject pre-launch vocabulary in shipped files
+        run: |
+          if git grep -In -i -e 'phase2' -e 'phase 2' -e 'phase-2' -- . ':(exclude).github/workflows/ci.yml' ; then
+            echo "::error::Use 'post-launch', never 'phase 2', in tracked files."
+            exit 1
+          fi
+      - run: pnpm format:check
+      - run: pnpm check
+      - run: pnpm build
+
+  post-launch-still-compiles:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+      - uses: pnpm/action-setup@fdbc4fdcf7d143a5d0a39e9a02e103b13e309024 # v6.0.4
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build the post-launch surface so it cannot rot while gated off
+        run: pnpm build
+        env:
+          PUBLIC_LAUNCH_LIVE: "true"
+
+  e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+      - uses: pnpm/action-setup@fdbc4fdcf7d143a5d0a39e9a02e103b13e309024 # v6.0.4
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Create the local D1 schema the signup path writes to
+        run: pnpm wrangler d1 migrations apply trf-rupeefund --local
+      - run: pnpm test:e2e
