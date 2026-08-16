@@ -20,6 +20,19 @@ pnpm check                    # oxlint + tsc + vitest
 pnpm format                   # oxfmt — run this before you commit
 ```
 
+## How to deliver a change
+
+Do not commit to `main`. A merge into `main` deploys `rupeefund.org` immediately, through Cloudflare Workers Builds.
+
+1. Make a branch.
+1. Commit your work. Run `pnpm check` and `pnpm format` first.
+1. Open a pull request. GitHub CI runs the gate, and Workers Builds makes a build for the branch.
+1. Get a review. Then merge. The merge deploys.
+
+**If your change needs a new migration, apply it to the remote database before you merge.** There is no gap between the merge and the deployment. Refer to `docs/deploy.md` section 2.
+
+Preview URLs are not available yet. `wrangler.jsonc` does not set `preview_urls`, and the default value is `false`. A preview URL would use the **production** database, because a versioned preview keeps the bindings of the Worker. The `preview_database_id` key does not help, because wrangler uses it only for `wrangler dev`. The post-launch Worker is the correct place for previews.
+
 ## Conventions
 
 - **TypeScript strict.** Write an explicit return type on each exported function. Use `unknown` with a type guard in place of `any`. If you must use `any`, write a `// reason:` comment.

@@ -79,9 +79,20 @@ The second path uses status 303. Because of this, the browser does not send the 
 
 **Known limitation.** Turnstile needs JavaScript. Therefore the Worker does not examine a token on the second path. A client that sets that `Content-Type` header can avoid the examination. The `Origin` comparison, the hidden field, and the rate limiter continue to give protection. The maximum damage is unwanted rows in a mailing list that a person exports manually.
 
-## 5. The database
+## 5. The databases
 
-The database has one migration file, `migrations/0001_init.sql`. It makes all seven tables.
+Each stage has its own database and its own migrations directory. The `migrations_dir` key in `wrangler.jsonc` selects the directory for each stage.
+
+| Directory                | Database                    | Tables                |
+| ------------------------ | --------------------------- | --------------------- |
+| `migrations/launch`      | `trf-rupeefund`             | `waitlist`            |
+| `migrations/post-launch` | `trf-rupeefund-post-launch` | `waitlist` and 6 more |
+
+The launch Worker never reads or writes a payment table or a voting table, therefore the launch database does not have them.
+
+Each directory holds one file, `0001_init.sql`. The two files have the same name and different content. This is correct, because each database has its own ledger.
+
+Both files contain the `waitlist` table. The two copies must stay the same. Marker comments (`-- >>> shared: waitlist`) delimit the block, and `tests/migrations/replay.test.ts` fails the build if the two copies are different.
 
 Wrangler compares only the file names of the migrations with the names in the `d1_migrations` table. Wrangler does not calculate a hash of the content. Two results follow:
 
@@ -142,13 +153,10 @@ The test `tests/site/csp.test.ts` reads the policy and the HTML files. The test 
 
 Refer to `docs/deploy.md` for the full procedure and the commands.
 
-The important sequence:
+Cloudflare Workers Builds watches the repository. A merge into `main` starts a build, and the build deploys the Worker. Nobody runs a deploy command.
 
-1. Apply the migration to the database.
-1. Deploy the Worker.
-1. Clear the cache of the zone.
-1. Examine the site.
+The build command is `pnpm run build:launch`. It examines the configuration first. It stops the build if `PUBLIC_TURNSTILE_SITEKEY` has no value, if it holds the test sitekey from Cloudflare, or if `TURNSTILE_HOSTNAMES` or `TURNSTILE_ACTION` is empty. Wrangler stops the deployment if `TURNSTILE_SECRET` has no value. Without a correct sitekey and secret, the Worker refuses each signup that uses JavaScript.
 
-Apply the migration first, because `/api/waitlist` is available immediately after the deployment.
+**Apply a migration to the remote database before you merge the code that uses it.** A merge deploys immediately, therefore there is no gap between the merge and the deployment. Make each migration additive, so that the Worker which operates before the migration continues to operate after it.
 
-`pnpm deploy` examines the configuration before it makes the build. It stops if `PUBLIC_TURNSTILE_SITEKEY` has no value or has the example value from Cloudflare. Wrangler stops the deployment if `TURNSTILE_SECRET` has no value. Without these two values, the Worker refuses each signup that uses JavaScript.
+After the deployment, clear the cache of the zone. Then examine the site.

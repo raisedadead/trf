@@ -4,66 +4,68 @@ This document uses ASD-STE100 Simplified Technical English.
 
 The system runs on the Workers Free plan. A paid plan is not necessary. Refer to [architecture](architecture.md).
 
-Read "Start here" for the procedure that you do now. The other sections are reference material.
+## 1. How a deployment happens
 
-## Start here
+Cloudflare Workers Builds watches the repository. A merge into `main` starts a build, and the build deploys the Worker. You do not run a deploy command.
 
-The state of the account, read on 2026-08-15:
+| Setting        | Value                   |
+| -------------- | ----------------------- |
+| Build command  | `pnpm run build:launch` |
+| Deploy command | `npx wrangler deploy`   |
+| Trigger        | A merge into `main`     |
 
-| Item                 | State                                                                |
-| -------------------- | -------------------------------------------------------------------- |
-| Worker `trf`         | Live. It has 10 deployments. The most recent one is from 2026-06-30. |
-| `rupeefund.org`      | A custom domain. Cloudflare connects it to the Worker `trf`.         |
-| Launch database      | Migrated. It has 7 tables and 0 signups.                             |
-| Post-launch database | `trf-rupeefund-post-launch`. Created and migrated.                   |
-| `TURNSTILE_SECRET`   | Uploaded to the Worker `trf`                                         |
-| Turnstile widget     | Created. The sitekey is in `.env`.                                   |
+`pnpm run build:launch` examines the configuration before it makes the build. It stops the build if `PUBLIC_TURNSTILE_SITEKEY` has no value, if it holds the test sitekey, or if `TURNSTILE_HOSTNAMES` or `TURNSTILE_ACTION` is empty.
 
-The most recent deployment contains the old React build.
+Work on a branch. Open a pull request. CI runs the gate. A merge deploys the result.
 
-**Do not delete the Worker.** Deploy the new code on top of it. If you delete the Worker, Cloudflare disconnects `rupeefund.org`. You also lose the 10 deployments, and those deployments are your only targets for a rollback. The site stays unavailable until you deploy again. A deployment replaces every file. Nothing from the old build stays, but the edge cache keeps copies. Step 3 removes them.
+`pnpm deploy` does the same steps from your machine. Use it only when the automatic path does not operate.
 
-**The database needs no work.** The migration is applied. The `waitlist` table exists and has 0 rows.
+**Do not delete the Worker.** Deploy new code on top of it. If you delete the Worker, Cloudflare disconnects `rupeefund.org`, and you lose all the earlier deployments. Those deployments are your only targets for a rollback.
 
-```sh
-pnpm check && pnpm preview     # 1. complete the form one time at localhost:8787
-pnpm deploy                    # 2. examines the config, makes the build, deploys
-                               # 3. purge the zone cache in the dashboard — necessary
-```
+To go back to an earlier version, run `pnpm wrangler rollback`. Then purge the cache of the zone.
 
-Purge the cache, because the live site answers with `cf-cache-status: HIT`. If you do not purge the cache, the new build can look absent.
+## 2. Apply a migration before you merge the code
 
-Then examine the site:
+A merge deploys immediately. Therefore you cannot apply a migration between the merge and the deployment. There is no gap.
 
-```sh
-curl -s https://rupeefund.org/api/health                              # {"ok":true}
-curl -s -o /dev/null -w '%{http_code}\n' https://rupeefund.org/vote   # 404 — gated
-curl -sI https://rupeefund.org/ | grep -i -e content-security-policy -e strict-transport
-```
+**Apply the migration to the remote database before you merge the code that uses it.** The migration and the code can be in the same pull request. The sequence is what is important, not the number of pull requests.
 
-Open the site. Look for `/_astro/` in the source of the page. The new build contains this text. The old React build does not contain it. Complete the form one time. Then make sure that the database has the row:
+Make each migration additive. The Worker that operates before the migration must continue to operate after it. If you add a column, give it a default value or permit NULL.
 
-```sh
-pnpm wrangler d1 execute trf-rupeefund --remote --command "SELECT email, consent_at FROM waitlist"
-```
+A change that is not additive needs two pull requests: one that adds the new shape, and a later one that removes the old shape after all the code stops using it.
 
-If a problem occurs, run `pnpm wrangler rollback`. Then purge the cache again.
+## 3. The two environments
 
-Deploy the post-launch stage later, after the launch site operates correctly. Refer to section 6.
+| Item                 | Launch              | Post-launch                 |
+| -------------------- | ------------------- | --------------------------- |
+| Address              | `rupeefund.org`     | `preview.rupeefund.org`     |
+| Worker               | `trf`               | `trf-post-launch`           |
+| Database             | `trf-rupeefund`     | `trf-rupeefund-post-launch` |
+| Migrations directory | `migrations/launch` | `migrations/post-launch`    |
+| Tables               | `waitlist`          | `waitlist` and 6 more       |
+| Worker secrets       | 1                   | 9                           |
 
-## Reference
+The Worker `trf-post-launch` does not exist yet. The post-launch developers create it.
 
-Background information and the procedures that you need less often.
-
-## 1. What you need first
+## 4. What you need first
 
 - A Cloudflare account with the `rupeefund.org` zone.
 - pnpm, at the version in `packageManager` in `package.json`. Also direnv.
 - Access to the Razorpay dashboard of FOSS United Foundation, in test mode.
 
-## 2. Secrets in `.env` and direnv
+## 5. Secrets and variables
 
-The project uses one `.env` file at the top of the repository. Both direnv and wrangler read this file. Do **not** also make a `.dev.vars` file. If that file exists, wrangler ignores `.env`.
+There are three kinds of value, and each kind has a different home.
+
+| Kind            | Home                                      | Example                    |
+| --------------- | ----------------------------------------- | -------------------------- |
+| Build variable  | Workers Builds settings, in the dashboard | `PUBLIC_TURNSTILE_SITEKEY` |
+| Worker secret   | `wrangler secret`                         | `TURNSTILE_SECRET`         |
+| Worker variable | `vars` in `wrangler.jsonc`                | `TURNSTILE_HOSTNAMES`      |
+
+A build variable goes into the static files. It is public. A Worker secret never leaves Cloudflare.
+
+For local work, one `.env` file at the top of the repository holds all of them. Both direnv and wrangler read this file. Do **not** also make a `.dev.vars` file. If that file exists, wrangler ignores `.env`.
 
 ```sh
 cp .env.example .env          # write the real values
@@ -86,23 +88,31 @@ pnpm wrangler secret bulk .env --env post-launch
 
 Use `pnpm wrangler`, because the project pins the version. A global CLI can be too old for `secrets.required`.
 
-## 3. The database
+### The test sitekey
+
+Cloudflare supplies an always-pass test sitekey, `1x00000000000000000000AA`. A deployed build that uses it refuses every signup, because the Worker examines the token with the real secret.
+
+The build therefore refuses the test sitekey. To use it on purpose, set `PUBLIC_ALLOW_TEST_SITEKEY=true`. The local preview scripts, the site tests, and both CI build jobs set this variable. **Never set it in the Workers Builds settings.**
+
+## 6. The databases
+
+Each environment has its own database and its own migrations directory. The `migrations_dir` key in `wrangler.jsonc` selects the directory. One `wrangler d1 migrations apply` command reads only the directory of the environment that you name.
 
 ```sh
-pnpm wrangler d1 create trf-rupeefund       # copy database_id into wrangler.jsonc
-pnpm wrangler d1 migrations apply trf-rupeefund --local
 pnpm wrangler d1 migrations apply trf-rupeefund --remote
-pnpm wrangler d1 info trf-rupeefund          # examine the result
+pnpm wrangler d1 migrations apply trf-rupeefund-post-launch --env post-launch --remote
 ```
 
-The `database_id` value selects the local database. If you change the value, apply the migration with `--local` again.
+For local work, `pnpm db:reset` makes both databases again from zero.
 
-**The schema is one migration, `0001_init.sql`.** It stays one file until the first true signup. After that signup, you must add a new file for each change.
+The two directories each hold one file, `0001_init.sql`. The two files have the same name and different content. This is correct, because each database has its own ledger.
+
+Both files contain the `waitlist` table. The two copies must stay the same. Marker comments (`-- >>> shared: waitlist`) delimit the block, and `tests/migrations/replay.test.ts` fails the build if the two copies are different.
 
 **Wrangler resolves a migration by the file name only.** `getUnappliedMigrations` compares the file names with the names in the `d1_migrations` table. It calculates no hash. Two results follow:
 
 - If you change a migration that Wrangler applied before, the database does not change.
-- If you use a file name that the table records, Wrangler skips the file and reports no error. The names `0002_waitlist.sql`, `0003_voting.sql` and `0004_proposal_options.sql` all existed here. Do not use them again. `tests/migrations/replay.test.ts` stops the build if you use one of them.
+- If you use a file name that the table records, Wrangler skips the file and reports no error. The names `0002_waitlist.sql`, `0003_voting.sql`, `0004_proposal_options.sql`, `0002_waitlist_launch.sql` and `0003_voting_post_launch.sql` all existed here. Do not use them again. `tests/migrations/replay.test.ts` stops the build if you use one of them.
 
 Never use `migrations list` as proof that the schema is correct. That command reports "No migrations to apply" when the file names agree, and it does not examine the tables. Examine the schema:
 
@@ -111,21 +121,42 @@ pnpm wrangler d1 execute trf-rupeefund --remote --json --command \
   "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
 ```
 
+The launch database must show only `waitlist`, together with the Cloudflare tables `_cf_KV`, `d1_migrations` and `sqlite_sequence`.
+
 **How to make a database again before the launch.** While the database has no data, you can change `0001_init.sql` and start again. This keeps the history clean. After true signups exist, this procedure destroys data. Then you must add a new migration instead.
 
 ```sh
 pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-pre.sql   # always do this first
 pnpm wrangler d1 execute trf-rupeefund --remote --command "
-  DROP TABLE IF EXISTS ballots; DROP TABLE IF EXISTS vote_tokens; DROP TABLE IF EXISTS proposals;
-  DROP TABLE IF EXISTS waitlist; DROP TABLE IF EXISTS processed_events;
-  DROP TABLE IF EXISTS metrics_cache; DROP TABLE IF EXISTS contributors;
+  DROP TABLE IF EXISTS waitlist;
   DELETE FROM d1_migrations;"
 pnpm wrangler d1 migrations apply trf-rupeefund --remote
 ```
 
 Run `SELECT COUNT(*) FROM waitlist` before this procedure. If the count is not zero, stop.
 
-## 4. Razorpay plans and the webhook
+For the post-launch database, drop the tables in this sequence, because `ballots` and `vote_tokens` refer to `proposals`: `ballots`, `vote_tokens`, `proposals`, `waitlist`, `contributors`, `metrics_cache`, `processed_events`.
+
+## 7. How to verify a deployment
+
+Purge the zone cache first. The live site answers with `cf-cache-status: HIT`, and without a purge the new build can look absent.
+
+```sh
+curl -s https://rupeefund.org/api/health                              # {"ok":true}
+curl -s -o /dev/null -w '%{http_code}\n' https://rupeefund.org/vote   # 404 — gated
+curl -s https://rupeefund.org/subscribe | grep -o 'data-sitekey="[^"]*"'
+curl -sI https://rupeefund.org/ | grep -i -e content-security-policy -e strict-transport
+```
+
+The sitekey must be the real one. If it is `1x00000000000000000000AA`, the build variable is absent from the Workers Builds settings and no visitor can sign up with JavaScript.
+
+Complete the form one time. Then make sure that the database has the row:
+
+```sh
+pnpm wrangler d1 execute trf-rupeefund --remote --command "SELECT email, consent_at FROM waitlist"
+```
+
+## 8. Razorpay plans and the webhook
 
 Make the 5 monthly plans. The command finds the rupee-fund plans that exist and uses them again.
 
@@ -141,21 +172,7 @@ Register the webhook in the Razorpay dashboard:
 
 Set the Razorpay callback address to `https://preview.rupeefund.org/thank-you`. The launch host answers 404 for `/thank-you`. That page shows only a pending state. The true result of the payment comes later from the webhook, and never from the callback.
 
-## 5. How to deploy — the usual sequence
-
-The procedure in "Start here" needs no migration, because the schema is applied. A future deployment can change the schema. Then the sequence is important. The address `/api/waitlist` is live and writes to the `waitlist` table, therefore the table must exist before the new Worker.
-
-```sh
-pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-pre.sql   # make a backup first
-pnpm wrangler d1 migrations apply trf-rupeefund --remote
-pnpm wrangler d1 execute trf-rupeefund --remote --json --command \
-  "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"       # examine the tables
-pnpm deploy
-```
-
-Purge the zone cache after each deployment. Then run the commands in "Start here" again.
-
-## 6. How to change to live keys
+## 9. How to change to live keys
 
 Variables and secrets control all of these values. To go live, or to give the project to a different owner, you change the keys. You change no code.
 
@@ -174,13 +191,13 @@ Variables and secrets control all of these values. To go live, or to give the pr
    PUBLIC_LAUNCH_LIVE=true pnpm deploy:post-launch
    ```
 
-1. Register the webhook in the Razorpay dashboard again, in **live** mode. Use the same address, the same events and the same secret as section 4.
+1. Register the webhook in the Razorpay dashboard again, in **live** mode. Use the same address, the same events and the same secret as section 8.
 
 1. Run `curl https://rupeefund.org/api/health`. The answer is `{ ok: true }`. The answer contains no `mode` field. To examine the mode, look at the start of the key in the Cloudflare secret store.
 
 To give the project to a different Cloudflare account, do these steps also. Make a new database with `pnpm wrangler d1 create trf-rupeefund`. Copy the new `database_id` into `wrangler.jsonc`. Apply the migration. Then add the `rupeefund.org` custom domain to the zone of that account.
 
-## 7. How to remove a person from the list
+## 10. How to remove a person from the list
 
 The launch build has no sender. Therefore a request for removal comes by email to `foundation@fossunited.org`. The signup form shows this address. There is no automatic endpoint for removal. A person does this work.
 
@@ -201,7 +218,7 @@ pnpm wrangler d1 execute trf-rupeefund --remote --json --command \
   "SELECT email, unsubscribed_at FROM waitlist WHERE email = 'someone@example.com'"
 ```
 
-## 8. How to export the list
+## 11. How to export the list
 
 ```sh
 pnpm list:export --remote --dry-run   # prints the CSV, changes nothing
@@ -210,9 +227,13 @@ pnpm list:export --remote > list.csv  # prints the CSV and writes exported_at
 
 The export is incremental. The command sends each row one time only. Because of this, a second import cannot add a person again who asked for removal in the list manager after the first export.
 
-## 9. Voting in the post-launch stage
+## 12. Voting in the post-launch stage
 
-The file `0001_init.sql` makes the voting tables `proposals`, `ballots` and `vote_tokens`. The `d1 migrations apply` command in section 3 makes them. No other action is necessary.
+The file `migrations/post-launch/0001_init.sql` makes the voting tables `proposals`, `ballots` and `vote_tokens`. The launch database does not have them. Apply the migration to the post-launch database:
+
+```sh
+pnpm wrangler d1 migrations apply trf-rupeefund-post-launch --env post-launch --remote
+```
 
 There is no administration page for proposals. You add a proposal with SQL. The `options` column holds a JSON array of `{key,label}` items. The `choice` value of a ballot must agree with one `key`. The `opens_at` and `closes_at` columns hold epoch milliseconds. They control the open state and the closed state.
 
@@ -230,10 +251,11 @@ The system does not keep a counter of the payments. It asks Razorpay for `paid_c
 
 ## Required keys
 
-| key                                      | source                                                                                                                                                                                                                                                                      |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PUBLIC_TURNSTILE_SITEKEY`               | Cloudflare dashboard → Turnstile → Add widget. **Necessary for the launch.** The build reads it and puts it into the static files. `pnpm deploy` refuses to make the build without it.                                                                                      |
-| `TURNSTILE_SECRET`                       | The same widget. **Necessary for the launch.** It is a Worker secret, and `secrets.required` lists it, therefore `wrangler deploy` stops without it. Without it, siteverify answers `missing-input-secret` and the handler answers 403 to each signup that uses JavaScript. |
-| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Razorpay dashboard, test mode                                                                                                                                                                                                                                               |
-| `RAZORPAY_WEBHOOK_SECRET`                | The text that you selected for the webhook                                                                                                                                                                                                                                  |
-| `RZP_PLAN_10/50/100/500/1000`            | The output of `pnpm plans:create`                                                                                                                                                                                                                                           |
+| key                                      | home           | source                                                                                                                                                                                                                                           |
+| ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `PUBLIC_TURNSTILE_SITEKEY`               | Build variable | Cloudflare dashboard → Turnstile → Add widget. **Necessary for the launch.** The build refuses to start without it, and refuses the test sitekey.                                                                                                |
+| `PUBLIC_ALLOW_TEST_SITEKEY`              | Build variable | Set it to `true` for a local preview or a CI build only. Never set it in the Workers Builds settings.                                                                                                                                            |
+| `TURNSTILE_SECRET`                       | Worker secret  | The same widget. **Necessary for the launch.** `secrets.required` lists it, therefore `wrangler deploy` stops without it. Without it, siteverify answers `missing-input-secret` and the handler answers 403 to each signup that uses JavaScript. |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Worker secret  | Razorpay dashboard, test mode                                                                                                                                                                                                                    |
+| `RAZORPAY_WEBHOOK_SECRET`                | Worker secret  | The text that you selected for the webhook                                                                                                                                                                                                       |
+| `RZP_PLAN_10/50/100/500/1000`            | Worker secret  | The output of `pnpm plans:create`                                                                                                                                                                                                                |
