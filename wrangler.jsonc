@@ -24,7 +24,7 @@
       "binding": "DB",
       "database_name": "trf-rupeefund",
       "database_id": "1eea6b53-5e03-4475-aaa2-7c1950b744c3",
-      "migrations_dir": "migrations",
+      "migrations_dir": "migrations/launch",
     },
   ],
   "vars": {
@@ -84,7 +84,7 @@
           "binding": "DB",
           "database_name": "trf-rupeefund-post-launch",
           "database_id": "329406f5-47af-4a04-9084-ff4787e0d8e8",
-          "migrations_dir": "migrations",
+          "migrations_dir": "migrations/post-launch",
         },
       ],
       "secrets": {

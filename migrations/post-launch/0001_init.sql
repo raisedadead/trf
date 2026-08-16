@@ -1,4 +1,8 @@
--- Migration 0001 — the whole Rupee Fund schema.
+-- Migration 0001 — the post-launch schema.
+-- The post-launch Worker serves everything the launch Worker serves, and adds
+-- payments and voting. It therefore carries the shared waitlist table plus the
+-- tables that only it uses.
+--
 -- Razorpay is source of truth; this stores ONLY what Razorpay cannot serve.
 -- NEVER store PAN / address / payment instrument / amount.
 
@@ -27,6 +31,7 @@ CREATE TABLE processed_events (
   received_at INTEGER NOT NULL
 );
 
+-- >>> shared: waitlist — byte-identical in every migrations directory.
 -- Launch mailing list.
 -- consent_at and source are the consent record; neither can be backfilled.
 -- exported_at is the hand-off watermark: the exporter selects rows where it is
@@ -45,6 +50,7 @@ CREATE TABLE waitlist (
 );
 CREATE INDEX idx_waitlist_pending_export ON waitlist (id)
   WHERE exported_at IS NULL AND unsubscribed_at IS NULL;
+-- <<< shared: waitlist
 
 -- Post-launch voting: proposals seeded via SQL (no admin UI); state derived from opens_at/closes_at.
 -- options = JSON array of {key,label}; ballot.choice must match a key (prevents tally-splitting).

@@ -1,6 +1,8 @@
 -- Dev-only proposal + ballot fixtures for manual UI + E2E testing.
 -- Self-dating via strftime so state never goes stale. Local D1 only.
--- Run: pnpm wrangler d1 execute trf-rupeefund --local --file scripts/seed-dev.sql
+-- Voting lives only in the post-launch database; the launch database has no
+-- proposals or ballots table to seed.
+-- Run: pnpm wrangler d1 execute trf-rupeefund-post-launch --env post-launch --local --file scripts/seed-dev.sql
 
 DELETE FROM ballots WHERE proposal_id IN (SELECT id FROM proposals WHERE slug IN ('demo-open', 'demo-closed'));
 DELETE FROM proposals WHERE slug IN ('demo-open', 'demo-closed');
