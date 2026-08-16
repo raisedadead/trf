@@ -1,0 +1,55 @@
+---
+import Icon from "./Icon.astro";
+import { normalizePath } from "../lib/seo.ts";
+import { LAUNCH_LIVE } from "../lib/launch.ts";
+
+const path = normalizePath(Astro.url.pathname);
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/projects", label: "Projects" },
+  ...(LAUNCH_LIVE ? [{ href: "/manage", label: "Manage" }] : []),
+];
+
+const navBase =
+  "font-medium transition-[color,box-shadow] duration-150 ease-out text-sm px-2 py-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50";
+const navActive = `${navBase} text-ink marker-underline`;
+const navIdle = `${navBase} text-ink-2 hover:text-brand-fg`;
+const subscribeBtn =
+  "bg-brand-fg text-white px-5 py-2 rounded-lg hover:bg-brand-900 font-semibold transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white text-sm";
+const subscribeCta = LAUNCH_LIVE
+  ? { href: "/subscribe", label: "Subscribe" }
+  : { href: "/subscribe", label: "Notify me" };
+---
+
+<header class="bg-white border-b-2 border-ink sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex justify-between items-center">
+      <a href="/" class="flex items-center gap-2" aria-label="The Rupee Fund — home">
+        <img
+          src="/logo-foss-united-rupee-fund.png"
+          alt="The Rupee Fund by FOSS United"
+          width="109"
+          height="36"
+          class="h-9 w-auto"
+        />
+      </a>
+      <nav class="hidden md:flex gap-6 items-center" aria-label="Primary">
+        {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class={path === l.href ? navActive : navIdle}>{l.label}</a>)}
+        <a href={subscribeCta.href} class={subscribeBtn}>{subscribeCta.label}</a>
+      </nav>
+      <details class="md:hidden">
+        <summary
+          class="list-none inline-flex items-center justify-center w-11 h-11 -mr-2 rounded-lg text-ink cursor-pointer transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50 [&::-webkit-details-marker]:hidden"
+          aria-label="Menu"
+        >
+          <Icon name="menu" size={22} />
+        </summary>
+        <nav class="mt-3 flex flex-col gap-1 border-t border-ink/10 pt-3" aria-label="Mobile">
+          {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class={path === l.href ? navActive : navIdle}>{l.label}</a>)}
+          <a href={subscribeCta.href} class={`w-full text-center ${subscribeBtn}`}>{subscribeCta.label}</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>

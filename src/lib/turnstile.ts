@@ -1,0 +1,6 @@
+export const TURNSTILE_TEST_SITEKEY = "1x00000000000000000000AA";
+
+export const TURNSTILE_ACTION = "waitlist_signup";
+
+export const TURNSTILE_SITEKEY: string =
+  import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? TURNSTILE_TEST_SITEKEY;

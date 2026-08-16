@@ -1,0 +1,79 @@
+---
+const footLink =
+  "py-1 hover:text-brand-fg transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50";
+
+const SOCIAL = [
+  { href: "https://x.com/fossunited", label: "X", aria: "FOSS United on X" },
+  { href: "https://mas.to/@fossunited", label: "Mastodon", aria: "FOSS United on Mastodon" },
+  { href: "https://in.linkedin.com/company/fossunited", label: "LinkedIn", aria: "FOSS United on LinkedIn" },
+  { href: "https://www.youtube.com/c/fossunited", label: "YouTube", aria: "FOSS United on YouTube" },
+  { href: "https://t.me/fossunited", label: "Telegram", aria: "FOSS United on Telegram" },
+];
+
+const LEGAL = [
+  { href: "https://fossunited.org/privacy-policy", label: "Privacy Policy" },
+  { href: "https://fossunited.org/terms-of-service", label: "Terms of Service" },
+  { href: "https://fossunited.org/refund-transfer-policy", label: "Refund Policy" },
+  { href: "https://fossunited.org/code-of-conduct", label: "Code of Conduct" },
+];
+---
+
+<footer class="bg-ink footer-glow text-gray-400 py-10 border-t-2 border-brand">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <span class="bg-white rounded-lg p-2 inline-flex">
+            <img src="/logo-rupee-fund.png" alt="The Rupee Fund" width="46" height="24" loading="lazy" decoding="async" class="h-6 w-auto" />
+          </span>
+          <span class="text-xs text-gray-400">by FOSS United</span>
+        </div>
+        <p class="text-xs leading-relaxed text-gray-400">
+          Supporting small, indie FOSS maintainers and builders across India.
+        </p>
+      </div>
+      <div>
+        <h2 class="font-semibold text-white mb-3 text-sm">Quick Links</h2>
+        <ul class="space-y-2 text-xs text-gray-400">
+          <li><a href="/projects" class={footLink}>How Funding Works</a></li>
+          <li><a href="https://fossunited.org/about" target="_blank" rel="noopener noreferrer" class={footLink}>About FOSS United</a></li>
+          <li><a href="https://forum.fossunited.org" target="_blank" rel="noopener noreferrer" class={footLink}>Community Forum</a></li>
+          <li><a href="https://github.com/fossunited/fossunited" target="_blank" rel="noopener noreferrer" class={footLink}>Source on GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-semibold text-white mb-3 text-sm">Contact</h2>
+        <p class="text-xs mb-2 text-gray-400">
+          <a href="mailto:foundation@fossunited.org" class={footLink}>foundation@fossunited.org</a>
+        </p>
+        <p class="text-xs mb-2 leading-relaxed text-gray-400">
+          FOSS United Foundation<br />
+          D-324 Neelkanth Business Park,<br />
+          Vidyavihar, Mumbai, India
+        </p>
+        <p class="text-xs mb-3 font-mono text-gray-400">CIN: U74999MH2016NPL288653</p>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400">
+          {
+            SOCIAL.map((s) => (
+              <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.aria} class={footLink}>
+                {s.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-6 text-center text-xs text-gray-400">
+      <div class="mb-3 flex flex-wrap justify-center gap-x-4 gap-y-1">
+        {
+          LEGAL.map((l) => (
+            <a href={l.href} target="_blank" rel="noopener noreferrer" class={footLink}>
+              {l.label}
+            </a>
+          ))
+        }
+      </div>
+      <p>© 2026 The Rupee Fund. A FOSS United Foundation initiative.</p>
+    </div>
+  </div>
+</footer>

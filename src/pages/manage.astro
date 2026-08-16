@@ -1,0 +1,82 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+---
+
+<Base>
+  <div class="min-h-screen screen-enter">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="bg-white rounded-lg border border-ink/10 shadow-soft p-6">
+        <div class="flex items-center justify-center gap-2 mb-6">
+          <h1 class="text-2xl font-bold text-ink text-center tracking-tight">Manage Subscription</h1>
+          <span class="rounded-md bg-card border border-ink/15 px-2 py-0.5 text-xs font-mono font-bold uppercase tracking-wider text-ink-3">
+            Preview
+          </span>
+        </div>
+
+        <div class="bg-card border-l-4 border-ink/20 rounded-r-lg p-4 mb-6">
+          <div class="flex items-start gap-2">
+            <Icon name="alert" class="text-ink-3 flex-shrink-0" size={20} />
+            <div>
+              <h2 class="font-semibold text-ink text-sm mb-1">No active subscription yet</h2>
+              <p class="text-xs text-ink-2">
+                This is a preview of what you'll manage once you join. The Rupee Fund launches at
+                IndiaFOSS 2026 (26–27 September).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 mb-6 opacity-60">
+          <div class="flex justify-between items-center pb-3 border-b border-ink/10 text-sm">
+            <span class="text-ink-2">Monthly Amount</span>
+            <span class="font-mono font-semibold text-ink">—</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-ink/10 text-sm">
+            <span class="text-ink-2">Next Payment</span>
+            <span class="font-mono font-semibold text-ink">—</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-ink/10 text-sm">
+            <span class="text-ink-2">Total Contributed</span>
+            <span class="font-mono font-semibold text-ink">—</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-ink/10 text-sm">
+            <span class="text-ink-2">Voting Status</span>
+            <span class="font-semibold text-ink-3">Eligible after 10+ months</span>
+          </div>
+        </div>
+
+        <a
+          href="/subscribe"
+          class="block w-full text-center bg-brand-fg text-white py-3 rounded-lg font-semibold hover:bg-brand-900 text-sm transition duration-150 ease-out active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        >
+          Start your contribution →
+        </a>
+
+        <div class="mt-6 pt-6 border-t border-ink/10">
+          <h2 class="font-semibold text-ink mb-3 text-sm">Cancelling your contribution</h2>
+          <p class="text-xs text-ink-2 mb-3">
+            You'll be able to cancel your UPI AutoPay mandate anytime. Contributions up to
+            cancellation count toward voting eligibility.
+          </p>
+          <details class="mb-3">
+            <summary class="text-xs text-ink-2 cursor-pointer font-medium transition-colors duration-150 ease-out hover:text-brand-fg rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50">
+              How to cancel via UPI
+            </summary>
+            <div class="mt-2 text-xs text-ink-2 space-y-2 pl-3">
+              <p class="font-semibold text-ink">Method 1: UPI App</p>
+              <ol class="list-decimal pl-4 space-y-1">
+                <li>Open your UPI app</li>
+                <li>Go to AutoPay/Mandate section</li>
+                <li>Find The Rupee Fund</li>
+                <li>Select Cancel</li>
+              </ol>
+              <p class="mt-2 font-semibold text-ink">Method 2: Email Link</p>
+              <p>Use the cancellation link in your subscription email.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>

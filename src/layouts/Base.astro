@@ -1,0 +1,67 @@
+---
+import "../index.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { seoForPath, OG_IMAGE, SITE_URL } from "../lib/seo.ts";
+
+interface Props {
+  withHeader?: boolean;
+  withFooter?: boolean;
+}
+
+const { withHeader = true, withFooter = true } = Astro.props;
+const seo = seoForPath(Astro.url.pathname);
+
+const orgLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "The Rupee Fund",
+  url: SITE_URL,
+  logo: OG_IMAGE,
+  description:
+    "A FOSS United Foundation initiative funding Indian open source through small monthly contributions.",
+  parentOrganization: { "@type": "Organization", name: "FOSS United Foundation" },
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#057a33" />
+    <link rel="icon" type="image/png" href="/logo-rupee-fund.png" />
+    <link rel="apple-touch-icon" href="/logo-rupee-fund.png" />
+    <link rel="canonical" href={seo.canonical} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+    />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.description} />
+    <meta property="og:title" content={seo.ogTitle} />
+    <meta property="og:description" content={seo.ogDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={seo.canonical} />
+    <meta property="og:image" content={OG_IMAGE} />
+    <meta property="og:image:alt" content="The Rupee Fund by FOSS United" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {!seo.indexable && <meta name="robots" content="noindex" />}
+    <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+  </head>
+  <body class="bg-paper text-ink font-sans">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:left-4 focus:top-4 focus:rounded-lg focus:bg-brand-fg focus:px-4 focus:py-2 focus:text-white focus:font-semibold"
+    >
+      Skip to content
+    </a>
+    {withHeader && <Header />}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    {withFooter && <Footer />}
+  </body>
+</html>

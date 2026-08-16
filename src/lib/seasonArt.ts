@@ -71,7 +71,7 @@ export const SEASON_ART: readonly SeasonArt[] = [
       d: "#b45309",
       h: "#fffbeb",
     },
-    accent: "oklch(0.62 0.15 60)",
+    accent: "oklch(0.52 0.15 60)",
     grad: "linear-gradient(to bottom, oklch(0.72 0.14 72 / 0.16) 0%, oklch(0.78 0.10 72 / 0.04) 55%, oklch(0.85 0.06 72 / 0) 100%)",
     sprite: [
       "00000000005550000000000",
@@ -110,7 +110,7 @@ export const SEASON_ART: readonly SeasonArt[] = [
       d: "#94a3b8",
       h: "#f8fafc",
     },
-    accent: "oklch(0.58 0.15 152)",
+    accent: "oklch(0.52 0.15 152)",
     grad: "linear-gradient(to bottom, oklch(0.72 0.15 152 / 0.16) 0%, oklch(0.78 0.10 152 / 0.04) 55%, oklch(0.85 0.06 152 / 0) 100%)",
     sprite: [
       "00000555455500000000",
