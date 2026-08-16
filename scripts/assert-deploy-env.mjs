@@ -11,7 +11,7 @@ const sitekey = process.env.PUBLIC_TURNSTILE_SITEKEY;
 
 if (sitekey === undefined || sitekey.length === 0) {
   problems.push(
-    "PUBLIC_TURNSTILE_SITEKEY is unset. The build would bake in Cloudflare's always-pass TEST sitekey, the Worker would reject every token it produced, and no visitor could sign up.",
+    "PUBLIC_TURNSTILE_SITEKEY is unset. Set it in the build environment — the Astro build fails on /subscribe without it.",
   );
 } else if (sitekey === TEST_SITEKEY) {
   problems.push(

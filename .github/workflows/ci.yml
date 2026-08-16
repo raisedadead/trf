@@ -33,6 +33,8 @@ jobs:
       - run: pnpm format:check
       - run: pnpm check
       - run: pnpm build
+        env:
+          PUBLIC_TURNSTILE_SITEKEY: 1x00000000000000000000AA
 
   post-launch-still-compiles:
     runs-on: ubuntu-latest
@@ -50,6 +52,7 @@ jobs:
         run: pnpm build
         env:
           PUBLIC_LAUNCH_LIVE: "true"
+          PUBLIC_TURNSTILE_SITEKEY: 1x00000000000000000000AA
 
   e2e:
     runs-on: ubuntu-latest
