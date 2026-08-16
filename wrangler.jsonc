@@ -1,13 +1,48 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "trf",
+  "main": "./src/worker/index.ts",
   "compatibility_date": "2026-06-20",
+  "compatibility_flags": ["nodejs_compat"],
   "routes": [{ "pattern": "rupeefund.org", "custom_domain": true }],
   "assets": {
-    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "run_worker_first": [
+      "/api/*",
+      "/vote",
+      "/vote.html",
+      "/manage",
+      "/manage.html",
+      "/thank-you",
+      "/thank-you.html",
+    ],
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "trf-rupeefund",
+      "database_id": "1eea6b53-5e03-4475-aaa2-7c1950b744c3",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "vars": {
+    "TURNSTILE_HOSTNAMES": "rupeefund.org",
+    "TURNSTILE_ACTION": "waitlist_signup",
+  },
+  "secrets": {
+    "required": ["TURNSTILE_SECRET"],
+  },
+  "ratelimits": [
+    {
+      "name": "SIGNUP_LIMITER",
+      "namespace_id": "7301",
+      "simple": { "limit": 30, "period": 60 },
+    },
+  ],
   "observability": {
-    "enabled": false,
+    "enabled": true,
     "head_sampling_rate": 1,
     "logs": {
       "enabled": true,
@@ -19,6 +54,72 @@
       "enabled": false,
       "persist": true,
       "head_sampling_rate": 1,
+    },
+  },
+  "env": {
+    "post-launch": {
+      "name": "trf-post-launch",
+      "routes": [{ "pattern": "preview.rupeefund.org", "custom_domain": true }],
+      "vars": {
+        "POST_LAUNCH_ENABLED": "true",
+        "TURNSTILE_HOSTNAMES": "preview.rupeefund.org",
+        "TURNSTILE_ACTION": "waitlist_signup",
+      },
+      "assets": {
+        "binding": "ASSETS",
+        "directory": "./dist",
+        "not_found_handling": "404-page",
+        "run_worker_first": [
+          "/api/*",
+          "/vote",
+          "/vote.html",
+          "/manage",
+          "/manage.html",
+          "/thank-you",
+          "/thank-you.html",
+        ],
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "trf-rupeefund-post-launch",
+          "database_id": "329406f5-47af-4a04-9084-ff4787e0d8e8",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "secrets": {
+        "required": [
+          "TURNSTILE_SECRET",
+          "RAZORPAY_KEY_ID",
+          "RAZORPAY_KEY_SECRET",
+          "RAZORPAY_WEBHOOK_SECRET",
+          "RZP_PLAN_10",
+          "RZP_PLAN_50",
+          "RZP_PLAN_100",
+          "RZP_PLAN_500",
+          "RZP_PLAN_1000",
+        ],
+      },
+      "ratelimits": [
+        {
+          "name": "SIGNUP_LIMITER",
+          "namespace_id": "7302",
+          "simple": { "limit": 30, "period": 60 },
+        },
+      ],
+      "triggers": {
+        "crons": ["0 * * * *"],
+      },
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 1,
+          "persist": true,
+          "invocation_logs": true,
+        },
+      },
     },
   },
 }
