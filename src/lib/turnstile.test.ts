@@ -3,28 +3,38 @@ import { TURNSTILE_TEST_SITEKEY, getSitekey, resolveSitekey } from "./turnstile.
 
 describe("resolveSitekey", () => {
   it("refuses an unset sitekey instead of falling back to the test key", () => {
-    expect(() => resolveSitekey(undefined)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
+    expect(() => resolveSitekey(undefined, false)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
   });
 
   it("refuses an empty sitekey", () => {
-    expect(() => resolveSitekey("")).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
+    expect(() => resolveSitekey("", false)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
   });
 
   it("names the failing variable so a build log explains itself", () => {
-    expect(() => resolveSitekey(undefined)).toThrow(/unset/);
+    expect(() => resolveSitekey(undefined, false)).toThrow(/unset/);
   });
 
   it("returns a real sitekey unchanged", () => {
-    expect(resolveSitekey("0x4AAAAAAEQqCldZbFvXQvQr")).toBe("0x4AAAAAAEQqCldZbFvXQvQr");
+    expect(resolveSitekey("0x4AAAAAAEQqCldZbFvXQvQr", false)).toBe("0x4AAAAAAEQqCldZbFvXQvQr");
   });
 
-  it("allows the test sitekey, which local preview and CI both set on purpose", () => {
-    expect(resolveSitekey(TURNSTILE_TEST_SITEKEY)).toBe(TURNSTILE_TEST_SITEKEY);
+  it("refuses the test sitekey when nothing opted in, whatever script ran the build", () => {
+    expect(() => resolveSitekey(TURNSTILE_TEST_SITEKEY, false)).toThrow(
+      /PUBLIC_ALLOW_TEST_SITEKEY/,
+    );
+  });
+
+  it("accepts the test sitekey only behind the explicit opt-in", () => {
+    expect(resolveSitekey(TURNSTILE_TEST_SITEKEY, true)).toBe(TURNSTILE_TEST_SITEKEY);
+  });
+
+  it("still refuses an unset sitekey even with the opt-in on", () => {
+    expect(() => resolveSitekey(undefined, true)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
   });
 });
 
 describe("getSitekey", () => {
-  it("stays importable when the variable is absent, and only throws when called", () => {
+  it("is a function, not a module-level constant that throws on import", () => {
     expect(typeof getSitekey).toBe("function");
   });
 });

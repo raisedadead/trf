@@ -6,7 +6,11 @@ export default function setup(): void {
   try {
     execSync("pnpm exec astro build", {
       stdio: "pipe",
-      env: { ...process.env, PUBLIC_TURNSTILE_SITEKEY: TEST_SITEKEY },
+      env: {
+        ...process.env,
+        PUBLIC_TURNSTILE_SITEKEY: TEST_SITEKEY,
+        PUBLIC_ALLOW_TEST_SITEKEY: "true",
+      },
     });
   } catch (error) {
     const shown = error as { stdout?: Buffer; stderr?: Buffer };

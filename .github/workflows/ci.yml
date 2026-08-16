@@ -35,6 +35,7 @@ jobs:
       - run: pnpm build
         env:
           PUBLIC_TURNSTILE_SITEKEY: 1x00000000000000000000AA
+          PUBLIC_ALLOW_TEST_SITEKEY: "true"
 
   post-launch-still-compiles:
     runs-on: ubuntu-latest
@@ -53,6 +54,7 @@ jobs:
         env:
           PUBLIC_LAUNCH_LIVE: "true"
           PUBLIC_TURNSTILE_SITEKEY: 1x00000000000000000000AA
+          PUBLIC_ALLOW_TEST_SITEKEY: "true"
 
   e2e:
     runs-on: ubuntu-latest
