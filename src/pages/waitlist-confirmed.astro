@@ -1,32 +1,30 @@
 ---
 import Base from "../layouts/Base.astro";
-import { REMOVAL_ADDRESS } from "../lib/contact.ts";
+import { REMOVAL_ADDRESS } from "../lib/launch.ts";
 ---
 
 <Base>
-  <div class="min-h-screen screen-enter">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-      <h1 class="text-2xl font-bold text-ink tracking-tight mb-3">You're on the list</h1>
-      <p class="text-sm text-ink-2 mb-6">
-        We'll email you when Season 1 opens at IndiaFOSS 2026. Nothing else, and no payment yet.
-      </p>
-      <p class="text-xs text-ink-3 mb-8">
-        Changed your mind? Email <a href={`mailto:${REMOVAL_ADDRESS}`} class="underline hover:text-brand-fg">{REMOVAL_ADDRESS}</a> and we'll remove you.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <a
-          href="/"
-          class="bg-brand-fg text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-900 text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-        >
-          Back to home
-        </a>
-        <a
-          href="/projects"
-          class="border border-ink/15 text-ink px-6 py-3 rounded-lg font-semibold hover:bg-card text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-        >
-          See what we fund
-        </a>
-      </div>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <h1 class="text-2xl font-bold text-ink tracking-tight mb-3">You're on the list</h1>
+    <p class="text-sm text-ink-2 mb-6">
+      One email when we open, so you can set up UPI AutoPay. Nothing else, and no payment yet.
+    </p>
+    <p class="text-xs text-ink-3 mb-8">
+      Changed your mind? Email <a href={`mailto:${REMOVAL_ADDRESS}`} class="underline hover:text-brand-fg">{REMOVAL_ADDRESS}</a> and we'll remove you.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a
+        href="/"
+        class="btn btn-primary px-6 py-3 text-sm"
+      >
+        Back to home
+      </a>
+      <a
+        href="/projects"
+        class="btn btn-secondary px-6 py-3 text-sm"
+      >
+        See projects
+      </a>
     </div>
   </div>
 </Base>

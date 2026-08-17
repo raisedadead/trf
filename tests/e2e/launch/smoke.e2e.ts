@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 const ROUTES = [
   { path: "/", title: /The Rupee Fund/, h1: /Keep Indian open source alive/ },
-  { path: "/subscribe", title: /Subscribe/, h1: /Founding Contributor/ },
-  { path: "/projects", title: /Projects/, h1: /Where your rupees will go/ },
+  { path: "/subscribe", title: /Get notified/, h1: /Get notified at launch/ },
+  { path: "/projects", title: /How funding works/, h1: /Where your rupees will go/ },
   { path: "/waitlist-confirmed", title: /You're on the list/, h1: /You're on the list/ },
   { path: "/waitlist-problem", title: /didn't go through/, h1: /didn't go through/ },
 ] as const;

@@ -49,7 +49,7 @@ const orgLd = {
     <meta property="og:image:alt" content="The Rupee Fund by FOSS United" />
     <meta name="twitter:card" content="summary_large_image" />
     {!seo.indexable && <meta name="robots" content="noindex" />}
-    <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(orgLd)} />
   </head>
   <body class="bg-paper text-ink font-sans">
     <a
@@ -59,7 +59,7 @@ const orgLd = {
       Skip to content
     </a>
     {withHeader && <Header />}
-    <main id="main" tabindex="-1">
+    <main id="main" tabindex="-1" class="min-h-screen screen-enter">
       <slot />
     </main>
     {withFooter && <Footer />}

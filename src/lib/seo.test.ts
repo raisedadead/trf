@@ -21,11 +21,11 @@ describe("seoForPath", () => {
   });
 
   it("matches a route from a build-format .html pathname", () => {
-    expect(seoForPath("/subscribe.html").title).toBe("Subscribe — The Rupee Fund");
+    expect(seoForPath("/subscribe.html").title).toBe("Get notified at launch — The Rupee Fund");
   });
 
   it("matches a route from a trailing-slash pathname", () => {
-    expect(seoForPath("/projects/").title).toBe("Projects — The Rupee Fund");
+    expect(seoForPath("/projects/").title).toBe("How funding works — The Rupee Fund");
   });
 
   it("marks manage as non-indexable", () => {

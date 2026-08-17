@@ -1,3 +1,5 @@
+import { LAUNCH_LIVE, SUBSCRIBE_CTA } from "./launch.ts";
+
 export const SITE_URL = "https://rupeefund.org";
 export const OG_IMAGE = `${SITE_URL}/logo-foss-united-rupee-fund.png`;
 
@@ -25,23 +27,27 @@ const ROUTE_SEO: readonly RouteSeo[] = [
   },
   {
     path: "/subscribe",
-    title: "Subscribe — The Rupee Fund",
-    description:
-      "Join the mailing list for The Rupee Fund and hear first when monthly contributions from ₹10 open at IndiaFOSS 2026. A FOSS United Foundation initiative.",
-    ogTitle: "Join the Rupee Fund mailing list",
-    ogDescription:
-      "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
+    title: `${SUBSCRIBE_CTA} — The Rupee Fund`,
+    description: LAUNCH_LIVE
+      ? "Set up monthly UPI AutoPay from ₹10 and fund Indian open source. Cancel anytime. A FOSS United Foundation initiative."
+      : "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United Foundation initiative.",
+    ogTitle: LAUNCH_LIVE
+      ? "Become a Founding Contributor"
+      : "Get notified when the Rupee Fund opens",
+    ogDescription: LAUNCH_LIVE
+      ? "Monthly UPI AutoPay from ₹10 for Indian FOSS maintainers. Cancel anytime."
+      : "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
     canonical: `${SITE_URL}/subscribe`,
     indexable: true,
   },
   {
     path: "/projects",
-    title: "Projects — The Rupee Fund",
+    title: "How funding works — The Rupee Fund",
     description:
-      "See the Indian FOSS maintainers and projects supported by The Rupee Fund, a FOSS United Foundation initiative.",
-    ogTitle: "Projects funded by The Rupee Fund",
+      "How The Rupee Fund pools small monthly contributions, who votes, and where the money goes. A FOSS United Foundation initiative.",
+    ogTitle: "How funding works — The Rupee Fund",
     ogDescription:
-      "Discover the Indian open source projects and maintainers backed by Rupee Fund contributors.",
+      "Seasons, voting and disbursement — how contributors decide where the money goes.",
     canonical: `${SITE_URL}/projects`,
     indexable: true,
   },
@@ -76,9 +82,9 @@ const ROUTE_SEO: readonly RouteSeo[] = [
   {
     path: "/waitlist-confirmed",
     title: "You're on the list — The Rupee Fund",
-    description: "You'll hear from us when Season 1 opens at IndiaFOSS 2026.",
+    description: "You'll hear from us the day The Rupee Fund opens.",
     ogTitle: "You're on the list — The Rupee Fund",
-    ogDescription: "You'll hear from us when Season 1 opens at IndiaFOSS 2026.",
+    ogDescription: "You'll hear from us the day The Rupee Fund opens.",
     canonical: `${SITE_URL}/waitlist-confirmed`,
     indexable: false,
   },

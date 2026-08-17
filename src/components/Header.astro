@@ -11,12 +11,6 @@ const links = [
   ...(LAUNCH_LIVE ? [{ href: "/manage", label: "Manage" }] : []),
 ];
 
-const navBase =
-  "font-medium transition-[color,box-shadow] duration-150 ease-out text-sm px-2 py-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50";
-const navActive = `${navBase} text-ink marker-underline`;
-const navIdle = `${navBase} text-ink-2 hover:text-brand-fg`;
-const subscribeBtn =
-  "bg-brand-fg text-white px-5 py-2 rounded-lg hover:bg-brand-900 font-semibold transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white text-sm";
 const subscribeCta = LAUNCH_LIVE
   ? { href: "/subscribe", label: "Subscribe" }
   : { href: "/subscribe", label: "Notify me" };
@@ -25,7 +19,7 @@ const subscribeCta = LAUNCH_LIVE
 <header class="bg-white border-b-2 border-ink sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
     <div class="flex justify-between items-center">
-      <a href="/" class="flex items-center gap-2" aria-label="The Rupee Fund — home">
+      <a href="/" class="flex items-center gap-2 min-h-11" aria-label="The Rupee Fund — home">
         <img
           src="/logo-foss-united-rupee-fund.png"
           alt="The Rupee Fund by FOSS United"
@@ -35,8 +29,8 @@ const subscribeCta = LAUNCH_LIVE
         />
       </a>
       <nav class="hidden md:flex gap-6 items-center" aria-label="Primary">
-        {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class={path === l.href ? navActive : navIdle}>{l.label}</a>)}
-        <a href={subscribeCta.href} class={subscribeBtn}>{subscribeCta.label}</a>
+        {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class="nav-link">{l.label}</a>)}
+        <a href={subscribeCta.href} class="btn btn-primary px-5 text-sm">{subscribeCta.label}</a>
       </nav>
       <details class="md:hidden">
         <summary
@@ -45,9 +39,12 @@ const subscribeCta = LAUNCH_LIVE
         >
           <Icon name="menu" size={22} />
         </summary>
-        <nav class="mt-3 flex flex-col gap-1 border-t border-ink/10 pt-3" aria-label="Mobile">
-          {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class={path === l.href ? navActive : navIdle}>{l.label}</a>)}
-          <a href={subscribeCta.href} class={`w-full text-center ${subscribeBtn}`}>{subscribeCta.label}</a>
+        <nav
+          class="absolute inset-x-0 top-full mt-0.5 z-50 flex flex-col gap-1 border-b-2 border-ink bg-white px-4 sm:px-6 py-3 shadow-card"
+          aria-label="Mobile"
+        >
+          {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class="nav-link">{l.label}</a>)}
+          <a href={subscribeCta.href} class="w-full text-center btn btn-primary px-5 text-sm">{subscribeCta.label}</a>
         </nav>
       </details>
     </div>

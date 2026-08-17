@@ -10,3 +10,6 @@
 
 /*.png
   Cache-Control: public, max-age=604800
+
+/*.svg
+  Cache-Control: public, max-age=604800

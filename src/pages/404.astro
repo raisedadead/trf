@@ -3,27 +3,25 @@ import Base from "../layouts/Base.astro";
 ---
 
 <Base>
-  <div class="min-h-screen screen-enter">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-      <p class="font-mono text-sm font-bold tracking-wider text-brand-fg mb-2">404</p>
-      <h1 class="text-2xl font-bold text-ink tracking-tight mb-3">Page not found</h1>
-      <p class="text-sm text-ink-2 mb-6">
-        That page doesn't exist. Head back home or set up your contribution.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <a
-          href="/"
-          class="bg-brand-fg text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-900 text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-        >
-          Back to home
-        </a>
-        <a
-          href="/subscribe"
-          class="border border-ink/15 text-ink px-6 py-3 rounded-lg font-semibold hover:bg-card text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-        >
-          Set up your contribution
-        </a>
-      </div>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <p class="font-mono text-sm font-bold tracking-wider text-brand-fg mb-2">404</p>
+    <h1 class="text-2xl font-bold text-ink tracking-tight mb-3">Page not found</h1>
+    <p class="text-sm text-ink-2 mb-6">
+      That page doesn't exist. Head back home or set up your contribution.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a
+        href="/"
+        class="btn btn-primary px-6 py-3 text-sm"
+      >
+        Back to home
+      </a>
+      <a
+        href="/subscribe"
+        class="btn btn-secondary px-6 py-3 text-sm"
+      >
+        Set up your contribution
+      </a>
     </div>
   </div>
 </Base>

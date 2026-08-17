@@ -1,7 +1,6 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-
-const read = (file: string) => readFileSync(`dist/${file}`, "utf8");
+import { read } from "./dist.ts";
 
 describe("sitemap", () => {
   it("generates the sitemap index", () => {

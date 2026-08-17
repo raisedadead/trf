@@ -1,7 +1,7 @@
-import { readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { PAGES, read } from "./dist.ts";
 
-const headers = () => readFileSync("dist/_headers", "utf8");
+const headers = () => read("_headers");
 
 function policy(): Record<string, string[]> {
   const line = headers()
@@ -23,12 +23,10 @@ function allows(directive: string, origin: string): boolean {
   return values.includes(origin);
 }
 
-const pages = () => readdirSync("dist").filter((f) => f.endsWith(".html"));
-
 function externalOrigins(attr: "src" | "href"): Set<string> {
   const found = new Set<string>();
-  for (const page of pages()) {
-    const html = readFileSync(`dist/${page}`, "utf8");
+  for (const page of PAGES) {
+    const html = read(page);
     for (const m of html.matchAll(
       new RegExp(`<(script|link)[^>]*${attr}="(https://[^"]+)"`, "g"),
     )) {

@@ -1,53 +1,54 @@
 ---
 import Base from "../layouts/Base.astro";
-
-const primaryBtn =
-  "bg-brand-fg text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-900 text-sm transition duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+import { LAUNCH_EVENT, LAUNCH_EVENT_URL, SUBSCRIBE_CTA } from "../lib/launch.ts";
 ---
 
 <Base>
-  <div class="min-h-screen screen-enter">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-ink mb-2 tracking-tight">Where your rupees will go</h1>
-        <p class="text-sm text-ink-2">
-          The Rupee Fund hasn't disbursed yet — Season 1 opens at IndiaFOSS 2026 (26–27 September,
-          Bengaluru). Here's how funding will work.
-        </p>
-      </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-bold text-ink mb-2 tracking-tight">Where your rupees will go</h1>
+      <p class="text-sm text-ink-2">
+        Nothing has been disbursed yet. Here is exactly how the money will move once Season 1
+        opens.
+      </p>
+    </div>
 
-      <div class="bg-white rounded-lg border border-ink/10 shadow-soft p-5 mb-6">
-        <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-          <div>
-            <h2 class="text-lg font-bold text-ink mb-1">Season 1 — opens at IndiaFOSS 2026</h2>
-            <p class="text-ink-3 text-xs">26–27 September · Bengaluru · be the first rupee</p>
-          </div>
-          <div class="bg-brand-50 px-6 py-3 rounded-lg border border-brand-200">
-            <div class="text-xs text-ink-3 mb-1">Pool starts at</div>
-            <div class="text-2xl font-mono font-bold text-brand-fg">₹0</div>
-          </div>
+    <div class="card p-5 mb-6">
+      <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div>
+          <h2 class="text-lg font-bold text-ink mb-1">
+            Season 1 — opens at{" "}
+            <a href={LAUNCH_EVENT_URL} target="_blank" rel="noopener noreferrer" class="inline-link">
+              {LAUNCH_EVENT}
+            </a>
+          </h2>
+          <p class="text-ink-3 text-xs">Be the first rupee in the pool</p>
+        </div>
+        <div class="bg-brand-50 px-6 py-3 rounded-lg border border-brand-200">
+          <div class="text-xs text-ink-3 mb-1">Pool starts at</div>
+          <div class="text-2xl font-mono font-bold text-brand-fg">₹0</div>
         </div>
       </div>
+    </div>
 
-      <div class="bg-white rounded-lg border border-ink/10 border-dashed p-8 text-center transition-colors duration-150 ease-out hover:border-ink/25">
-        <h2 class="text-lg font-bold text-ink mb-2">No disbursements yet</h2>
-        <p class="text-sm text-ink-2 max-w-xl mx-auto mb-5">
-          Founding contributors seed the first pool. Then contributors with 10+ months of giving
-          vote on which indie Indian FOSS maintainers and builders receive funding each season — and
-          disbursements will be listed right here, transparently.
-        </p>
-        <a href="/subscribe" class={primaryBtn}>Become a Founding Contributor</a>
-      </div>
+    <div class="bg-white rounded-lg border border-ink/10 border-dashed p-8 text-center transition-colors duration-150 ease-out hover:border-ink/25">
+      <h2 class="text-lg font-bold text-ink mb-2">No disbursements yet</h2>
+      <p class="text-sm text-ink-2 max-w-xl mx-auto mb-5">
+        Founding contributors seed the first pool. Then contributors with 10+ months of giving
+        vote on which indie Indian FOSS maintainers and builders receive funding each season — and
+        disbursements will be listed right here, transparently.
+      </p>
+      <a href="/subscribe" class="btn btn-primary px-6 text-sm">{SUBSCRIBE_CTA}</a>
+    </div>
 
-      <div class="mt-8 bg-white rounded-lg p-6 text-center border border-ink/10 border-t-4 border-t-brand">
-        <h2 class="text-lg font-bold text-ink mb-2">Want to suggest a project?</h2>
-        <p class="text-sm text-ink-2 mb-4">
-          Once you're a contributor with 10+ months, you can vote and suggest projects.
-        </p>
-        <a href="https://forum.fossunited.org" target="_blank" rel="noopener noreferrer" class={`inline-block ${primaryBtn}`}>
-          Submit Suggestion
-        </a>
-      </div>
+    <div class="mt-8 bg-white rounded-lg p-6 text-center border border-ink/10 border-t-4 border-t-brand">
+      <h2 class="text-lg font-bold text-ink mb-2">Want to suggest a project?</h2>
+      <p class="text-sm text-ink-2 mb-4">
+        Once you're a contributor with 10+ months, you can vote and suggest projects.
+      </p>
+      <a href="https://forum.fossunited.org" target="_blank" rel="noopener noreferrer" class="btn btn-primary px-6 text-sm">
+        Submit Suggestion
+      </a>
     </div>
   </div>
 </Base>

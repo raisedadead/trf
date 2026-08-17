@@ -20,8 +20,9 @@ function readBundle(entrySrc: string): string {
 }
 
 describe("Subscribe page (/subscribe) — pre-launch (waitlist-only, PUBLIC_LAUNCH_LIVE unset)", () => {
-  it("renders the heading", () => {
-    expect(html).toContain("Become a Founding Contributor");
+  it("asks to be notified rather than to contribute, while payments are closed", () => {
+    expect(html).toContain("Get notified at launch");
+    expect(html).not.toContain("Become a Founding Contributor");
   });
 
   it("renders the waitlist form with name and email", () => {
@@ -36,13 +37,6 @@ describe("Subscribe page (/subscribe) — pre-launch (waitlist-only, PUBLIC_LAUN
     expect(html).not.toContain('id="autopay-address"');
   });
 
-  it("does not render the dropped mode toggle", () => {
-    expect(html).not.toContain('id="mode-autopay"');
-    expect(html).not.toContain('id="mode-waitlist"');
-    expect(html).not.toContain("peer-checked/ap");
-    expect(html).not.toContain('getElementById("mode-autopay")');
-  });
-
   it("wires the waitlist submit path in the island bundle", () => {
     expect(html).toContain('<script type="module"');
     expect(bundle).toContain("/api/waitlist");
@@ -53,6 +47,6 @@ describe("Subscribe page (/subscribe) — pre-launch (waitlist-only, PUBLIC_LAUN
   });
 
   it("sets the subscribe title", () => {
-    expect(html).toContain("<title>Subscribe — The Rupee Fund</title>");
+    expect(html).toContain("<title>Get notified at launch — The Rupee Fund</title>");
   });
 });

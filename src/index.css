@@ -70,10 +70,226 @@
     letter-spacing: -0.02em;
     text-wrap: balance;
   }
+
+  /* Every link that leaves this site carries `target="_blank"` already, and
+     `tests/site/external-links.test.ts` holds that true. Mark the arrow off
+     that attribute, so a new external link is marked the moment it is written
+     and no class has to be remembered.
+
+     The arrow is absolutely positioned into reserved padding rather than set
+     inline. An inline-block pseudo-element is an atomic inline, so the line
+     breaker may drop it onto a line of its own, away from the word it marks.
+     Out of flow it cannot wrap, and it also stays out of the flex box of the
+     `inline-flex` links — `.foot-link` and `.btn` — which would otherwise lay
+     it out as a flex item.
+
+     `.link-plain` opts a link out. A whole row of outbound links reads as a
+     group on its own, so repeating the arrow down the row only adds noise.
+
+     Progressive: a browser without `mask-image` gets no arrow instead of a
+     solid square, and the reserved padding is harmless. The second `content`
+     asks the engine to name the arrow for a screen reader; a browser that
+     cannot parse the alt text syntax keeps the first declaration and stays
+     silent. Chromium drops the name when the anchor is a direct flex item, so
+     an anchor inside a flex row needs a plain `<span>` around it —
+     `tests/site/external-links.test.ts` does not catch that. */
+  @supports (mask-image: linear-gradient(#000, #000)) {
+    a[target="_blank"]:not(.link-plain) {
+      position: relative;
+      padding-right: 1.1em;
+    }
+
+    a[target="_blank"]:not(.link-plain)::after {
+      content: "";
+      content: "" / " (opens in a new tab)";
+      position: absolute;
+      right: 0.1em;
+      top: 50%;
+      width: 0.75em;
+      height: 0.75em;
+      translate: 0 -50%;
+      background-color: currentColor;
+      /* Ink spans 4→20 of this 16-unit viewBox, so `contain` scales the arrow
+         itself to the box rather than the empty margin around it. */
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 4 16 16' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7'/%3E%3Cpath d='M7 7h10v10'/%3E%3C/svg%3E");
+      mask-position: center;
+      mask-size: contain;
+      mask-repeat: no-repeat;
+    }
+  }
 }
 
-@utility marker-underline {
-  box-shadow: inset 0 -2px 0 0 var(--color-brand);
+/* Page furniture. These live in `components` so a utility written in the
+   markup — `card p-5`, `field min-h-11` — always wins over the class. */
+@layer components {
+  .card {
+    @apply bg-white rounded-lg border border-ink/10 shadow-soft p-6;
+  }
+
+  .tile {
+    @apply bg-card rounded-lg border border-ink/10 p-4;
+  }
+
+  .note {
+    @apply bg-card border-l-4 border-brand rounded-r-lg;
+  }
+
+  .field {
+    @apply w-full px-3 py-2 text-sm border border-ink/15 rounded-lg;
+    @apply focus:ring-2 focus:ring-brand-fg focus:border-transparent outline-none;
+  }
+
+  .field-label {
+    @apply block text-xs font-semibold text-ink-2 mb-1;
+  }
+
+  .nav-link {
+    @apply inline-flex items-center min-h-11 font-medium;
+    @apply transition-[color,box-shadow] duration-150 ease-out text-sm px-2 rounded-sm;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50;
+    @apply text-ink-2;
+  }
+
+  .nav-link:hover {
+    @apply text-brand-fg;
+  }
+
+  /* The current page already says so in `aria-current`. Read that, not a class.
+     Declared after `:hover` so the current link keeps its colour under the
+     pointer, which is what the two hand-written class strings used to do. */
+  .nav-link[aria-current="page"] {
+    @apply text-ink shadow-[inset_0_-2px_0_0_var(--color-brand)];
+  }
+
+  /* A tier button and a vote option are the same control. `aria-pressed` says
+     which one is chosen, so no script has to repaint six classes per button. */
+  .choice {
+    @apply px-3 py-2 border rounded-md transition duration-150 ease-out;
+    @apply border-ink/20 hover:border-brand hover:text-brand-fg;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg;
+  }
+
+  .choice[aria-pressed="true"] {
+    @apply border-brand bg-brand-50 text-brand-900;
+  }
+
+  #vote-results-list p:first-child {
+    @apply font-semibold text-ink;
+  }
+
+  #vote-results-list ul {
+    @apply list-disc list-inside;
+  }
+
+  .foot-link {
+    @apply inline-flex items-center min-h-11 px-2 hover:text-brand-fg;
+    @apply transition-colors duration-150 ease-out rounded-sm;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50;
+  }
+
+  /* A horizontal row hides the 44px touch target, but a stacked list shows it
+     as a gap between the lines. Close the list up where the pointer is fine
+     and a small target costs nothing. A finger keeps the full 44px. The
+     tighter row is 32px, so WCAG 2.5.8 still holds either way. */
+  @media (pointer: fine) {
+    .foot-list .foot-link {
+      @apply min-h-8;
+    }
+  }
+
+  /* This class sits in `components` and so outranks the right padding the
+     arrow reserves in `base`. A marked footer link has to hand the gutter
+     back, or the arrow sits on top of the last letter. The guard matches the
+     one on the arrow, so a browser that draws no arrow reserves no gutter. */
+  @supports (mask-image: linear-gradient(#000, #000)) {
+    .foot-link[target="_blank"]:not(.link-plain) {
+      @apply pr-5;
+    }
+  }
+
+  .inline-link {
+    @apply text-brand-fg underline decoration-brand/40 hover:decoration-brand;
+    @apply transition-colors duration-150 ease-out rounded-sm;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50;
+  }
+
+  .stat {
+    @apply bg-card p-3 sm:p-4 rounded-lg border border-ink/10 shadow-soft text-center;
+    @apply transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card;
+  }
+
+  .stat-value {
+    @apply text-xl sm:text-2xl font-mono font-bold text-brand-fg mb-1;
+  }
+
+  .stat-label {
+    @apply text-xs text-ink-3;
+  }
+
+  .pillar-title {
+    @apply text-base font-extrabold text-brand-900 mb-1 tracking-tight;
+  }
+
+  .pillar-body {
+    @apply text-sm text-ink-2 leading-relaxed;
+  }
+
+  .step-badge {
+    @apply relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center;
+    @apply rounded-lg bg-brand-fg;
+  }
+
+  .step-number {
+    @apply font-mono text-sm font-bold text-white;
+  }
+
+  .step-title {
+    @apply mb-1 text-sm font-semibold text-ink;
+  }
+
+  .step-body {
+    @apply text-xs text-ink-3;
+  }
+
+  .faq {
+    @apply bg-card p-4 rounded-lg border border-ink/10 shadow-soft;
+    @apply transition-colors duration-150 ease-out hover:border-ink/20;
+  }
+
+  .faq-summary {
+    @apply min-h-11 gap-3 font-semibold text-sm cursor-pointer text-ink;
+    @apply flex justify-between items-center;
+    @apply transition-colors duration-150 ease-out hover:text-brand-fg rounded-sm;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50;
+  }
+
+  .faq-plus {
+    @apply text-brand-fg text-xl group-open:rotate-45;
+    @apply transition-transform duration-200 ease-out;
+  }
+
+  .faq-answer {
+    @apply mt-3 text-ink-2 text-xs leading-relaxed border-t border-ink/10 pt-3;
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center min-h-11 rounded-lg font-semibold;
+  @apply transition duration-150 ease-out active:scale-[0.98];
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg;
+  @apply focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+}
+
+@utility btn-primary {
+  @apply bg-brand-fg text-white hover:bg-brand-900;
+}
+
+@utility btn-secondary {
+  @apply border border-ink/15 text-ink hover:bg-card;
+}
+
+@utility btn-ghost {
+  @apply bg-white text-ink border border-ink/20 hover:border-brand hover:text-brand-fg;
 }
 
 @utility hero-glow {

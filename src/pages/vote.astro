@@ -2,103 +2,95 @@
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 
-const cardClass = "bg-white rounded-lg border border-ink/10 shadow-soft p-6";
-const inputClass =
-  "w-full px-3 py-2 text-sm border border-ink/15 rounded-lg focus:ring-2 focus:ring-brand-fg focus:border-transparent outline-none";
-const labelClass = "block text-xs font-semibold text-ink-2 mb-1";
-const submitBtn =
-  "w-full bg-brand-fg text-white py-3 rounded-lg font-semibold hover:bg-brand-900 transition duration-150 ease-out active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:opacity-60 disabled:pointer-events-none";
 ---
 
 <Base>
-  <div class="min-h-screen screen-enter">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      <header class="text-center">
-        <div class="inline-block p-3 bg-brand-50 rounded-lg mb-3">
-          <Icon name="heart" class="text-brand-fg" size={28} fill="currentColor" />
-        </div>
-        <h1 class="text-2xl font-bold text-ink tracking-tight">Vote on Rupee Fund proposals</h1>
-      </header>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <header class="text-center">
+      <div class="inline-block p-3 bg-brand-50 rounded-lg mb-3">
+        <Icon name="heart" class="text-brand-fg" size={28} fill="currentColor" />
+      </div>
+      <h1 class="text-2xl font-bold text-ink tracking-tight">Vote on Rupee Fund proposals</h1>
+    </header>
 
-      <section id="vote-cast" hidden class={cardClass}>
-        <div class="text-center mb-6">
-          <h2 id="vote-cast-title" class="text-xl font-bold text-ink mb-2 tracking-tight">
-            Cast your vote
-          </h2>
-          <p id="vote-cast-body" class="text-ink-2 text-sm"></p>
-        </div>
-        <form id="vote-cast-form" class="space-y-4">
-          <input type="hidden" id="vote-token-value" value="" />
-          <input type="hidden" id="vote-choice-value" value="" />
-          <fieldset>
-            <legend class={labelClass}>Choose one *</legend>
-            <div class="flex flex-wrap gap-2" id="vote-choices"></div>
-          </fieldset>
-          <p id="vote-cast-error" class="text-xs text-red-600 text-center" role="alert"></p>
-          <button type="submit" id="vote-cast-submit" class={submitBtn}>Submit vote</button>
-        </form>
-        <div
-          id="vote-cast-success"
-          hidden
-          class="bg-card border-l-4 border-brand rounded-r-lg p-4 text-sm text-ink-2"
-          aria-live="polite"
-        >
-          <p class="font-semibold text-ink mb-1">Vote recorded</p>
-          <p>Thanks for helping decide how The Rupee Fund supports Indian open source.</p>
-        </div>
-      </section>
+    <section id="vote-cast" hidden class="card">
+      <div class="text-center mb-6">
+        <h2 id="vote-cast-title" class="text-xl font-bold text-ink mb-2 tracking-tight">
+          Cast your vote
+        </h2>
+        <p id="vote-cast-body" class="text-ink-2 text-sm"></p>
+      </div>
+      <form id="vote-cast-form" class="space-y-4">
+        <input type="hidden" id="vote-token-value" value="" />
+        <input type="hidden" id="vote-choice-value" value="" />
+        <fieldset>
+          <legend class="field-label">Choose one *</legend>
+          <div class="flex flex-wrap gap-2" id="vote-choices"></div>
+        </fieldset>
+        <p id="vote-cast-error" class="text-xs text-red-600 text-center" role="alert"></p>
+        <button type="submit" id="vote-cast-submit" class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none">Submit vote</button>
+      </form>
+      <div
+        id="vote-cast-success"
+        hidden
+        class="note p-4 text-sm text-ink-2"
+        aria-live="polite"
+      >
+        <p class="font-semibold text-ink mb-1">Vote recorded</p>
+        <p>Thanks for helping decide how The Rupee Fund supports Indian open source.</p>
+      </div>
+    </section>
 
-      <section id="vote-request" class={cardClass}>
-        <div class="text-center mb-6">
-          <h2 class="text-xl font-bold text-ink mb-2 tracking-tight">Request a voting link</h2>
-          <p class="text-ink-2 text-sm">
-            Contributors with an active monthly contribution (10 or more collected) can vote on how
-            the fund supports Indian open source. We'll email you a one-time voting link.
-          </p>
-        </div>
-        <form id="vote-request-form" class="space-y-4">
-          <div>
-            <label for="vote-proposal-select" class={labelClass}>Proposal *</label>
-            <select id="vote-proposal-select" name="proposal_slug" class={inputClass} required
-            ></select>
-          </div>
-          <div>
-            <label for="vote-email" class={labelClass}>Email Address *</label>
-            <input
-              id="vote-email"
-              name="email"
-              type="email"
-              placeholder="your.email@example.com"
-              class={inputClass}
-              required
-            />
-          </div>
-          <p id="vote-request-error" class="text-xs text-red-600 text-center" role="alert"></p>
-          <button type="submit" id="vote-request-submit" class={submitBtn}>Email me a voting link</button>
-        </form>
-        <p id="vote-open-empty" hidden class="text-sm text-ink-2 text-center">
-          No proposals are open for voting right now. Check back during the next season.
+    <section id="vote-request" class="card">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-bold text-ink mb-2 tracking-tight">Request a voting link</h2>
+        <p class="text-ink-2 text-sm">
+          Contributors with an active monthly contribution (10 or more collected) can vote on how
+          the fund supports Indian open source. We'll email you a one-time voting link.
         </p>
-        <div
-          id="vote-request-success"
-          hidden
-          class="bg-card border-l-4 border-brand rounded-r-lg p-4 text-sm text-ink-2"
-          aria-live="polite"
-        >
-          <p class="font-semibold text-ink mb-1">Check your email</p>
-          <p>If your contribution is eligible, we've sent a one-time voting link to your inbox.</p>
+      </div>
+      <form id="vote-request-form" class="space-y-4">
+        <div>
+          <label for="vote-proposal-select" class="field-label">Proposal *</label>
+          <select id="vote-proposal-select" name="proposal_slug" class="field min-h-11" required
+          ></select>
         </div>
-      </section>
+        <div>
+          <label for="vote-email" class="field-label">Email Address *</label>
+          <input
+            id="vote-email"
+            name="email"
+            type="email"
+            placeholder="your.email@example.com"
+            class="field min-h-11"
+            required
+          />
+        </div>
+        <p id="vote-request-error" class="text-xs text-red-600 text-center" role="alert"></p>
+        <button type="submit" id="vote-request-submit" class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none">Email me a voting link</button>
+      </form>
+      <p id="vote-open-empty" hidden class="text-sm text-ink-2 text-center">
+        No proposals are open for voting right now. Check back during the next season.
+      </p>
+      <div
+        id="vote-request-success"
+        hidden
+        class="note p-4 text-sm text-ink-2"
+        aria-live="polite"
+      >
+        <p class="font-semibold text-ink mb-1">Check your email</p>
+        <p>If your contribution is eligible, we've sent a one-time voting link to your inbox.</p>
+      </div>
+    </section>
 
-      <section id="vote-results" class={cardClass}>
-        <h2 class="text-lg font-bold text-ink mb-3 tracking-tight">Past results</h2>
-        <div id="vote-results-list" class="space-y-3 text-sm text-ink-2"></div>
-      </section>
-    </div>
+    <section id="vote-results" class="card">
+      <h2 class="text-lg font-bold text-ink mb-3 tracking-tight">Past results</h2>
+      <div id="vote-results-list" class="space-y-3 text-sm text-ink-2"></div>
+    </section>
   </div>
 </Base>
 
 <script>
-  import { initVote } from "../lib/islands.ts";
+  import { initVote } from "../scripts/vote.ts";
   void initVote(document, { fetchImpl: window.fetch.bind(window) });
 </script>
