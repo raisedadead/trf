@@ -92,7 +92,9 @@ Use `pnpm wrangler`, because the project pins the version. A global CLI can be t
 
 Cloudflare supplies an always-pass test sitekey, `1x00000000000000000000AA`. A deployed build that uses it refuses every signup, because the Worker examines the token with the real secret.
 
-The build therefore refuses the test sitekey. To use it on purpose, set `PUBLIC_ALLOW_TEST_SITEKEY=true`. The local preview scripts, the site tests, and both CI build jobs set this variable. **Never set it in the Workers Builds settings.**
+The build therefore refuses the test sitekey twice. `scripts/assert-deploy-env.mjs` refuses the value before the build. `scripts/assert-dist-sitekey.mjs` reads `dist` after the build and refuses the literal wherever it came from. Both run inside `build:launch` and `build:post-launch`, so Cloudflare runs both.
+
+To use the test sitekey on purpose, set `PUBLIC_ALLOW_TEST_SITEKEY=true` and call `astro build` directly. The local preview scripts and the site tests do this. The CI build jobs do not: they supply a stand-in sitekey and run the same command as Cloudflare, so both guards operate. **Never set the opt-in in the Workers Builds settings.**
 
 ## 6. The databases
 
@@ -226,6 +228,8 @@ pnpm list:export --remote > list.csv  # prints the CSV and writes exported_at
 ```
 
 The export is incremental. The command sends each row one time only. Because of this, a second import cannot add a person again who asked for removal in the list manager after the first export.
+
+The exporter is `scripts/list-export.mts`. Node removes the types when it runs the file. Node does this without a flag from v22.18.0 and from v23.6.0, so an older Node stops the command with `ERR_UNKNOWN_FILE_EXTENSION`. The `engines` field in `package.json` states this floor. CI and Cloudflare Workers Builds do not run this command.
 
 ## 12. Voting in the post-launch stage
 

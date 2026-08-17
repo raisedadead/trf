@@ -1,8 +1,16 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.lib.json" },
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.worker.json" }
-  ]
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "types": ["vite/client", "node"]
+  },
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "tests/**/*",
+    "scripts/**/*",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "astro.config.mjs"
+  ],
+  "exclude": ["dist"]
 }

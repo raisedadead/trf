@@ -5,8 +5,10 @@ const TEST_SITEKEY = "1x00000000000000000000AA";
 
 const CARRIERS = [
   "src/lib/turnstile.ts",
-  "scripts/assert-deploy-env.mjs",
+  "scripts/turnstile-dummy-keys.mjs",
   "tests/site/build.setup.ts",
+  "tests/deploy/assert-deploy-env.test.ts",
+  "tests/deploy/assert-dist-sitekey.test.ts",
 ] as const;
 
 function read(path: string): string {
@@ -31,12 +33,15 @@ describe("every build path that uses the test sitekey opts in explicitly", () =>
     });
   }
 
-  it("covers the CI jobs that build with the test sitekey", () => {
-    const ci = read(".github/workflows/ci.yml");
-    const withSitekey = ci.split("PUBLIC_TURNSTILE_SITEKEY").length - 1;
-    const withOptIn = ci.split("PUBLIC_ALLOW_TEST_SITEKEY").length - 1;
-    expect(withOptIn).toBe(withSitekey);
+  it("never lets CI reach for the test sitekey, so the deploy guard runs as it does in production", () => {
+    expect(read(".github/workflows/ci.yml")).not.toContain(TEST_SITEKEY);
   });
+
+  for (const name of ["build:launch", "build:post-launch"] as const) {
+    it(`pnpm ${name} still reads dist afterwards, which is what protects the real deploy`, () => {
+      expect(scripts[name]).toContain("scripts/assert-dist-sitekey.mjs");
+    });
+  }
 
   it("finds at least one such build path, so the suite cannot pass vacuously", () => {
     const paths = Object.values(scripts).filter((body) => body.includes(TEST_SITEKEY));

@@ -1,21 +1,17 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "jsx-a11y"],
+  "plugins": ["typescript", "jsx-a11y", "vitest"],
   "categories": {
     "correctness": "error",
-    "suspicious": "warn"
+    "suspicious": "error"
   },
   "rules": {
-    "react/react-in-jsx-scope": "off"
+    "eslint/no-promise-executor-return": "error",
+    "eslint/no-self-compare": "error",
+    "eslint/no-template-curly-in-string": "error",
+    "vitest/no-identical-title": "error",
+    "vitest/no-conditional-expect": "off",
+    "vitest/require-mock-type-parameters": "off"
   },
-  "overrides": [
-    {
-      "files": ["src/site/**/*.tsx"],
-      "rules": {
-        "react/jsx-key": "off",
-        "jsx-a11y/label-has-associated-control": "off"
-      }
-    }
-  ],
   "ignorePatterns": ["dist", ".astro", ".wrangler"]
 }

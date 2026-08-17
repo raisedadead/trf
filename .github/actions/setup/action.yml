@@ -1,0 +1,13 @@
+name: Setup
+description: Install pnpm and Node, then install dependencies from the lockfile.
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@fdbc4fdcf7d143a5d0a39e9a02e103b13e309024 # v6.0.4
+    - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+      with:
+        node-version: 24
+        cache: pnpm
+    - run: pnpm install --frozen-lockfile
+      shell: bash

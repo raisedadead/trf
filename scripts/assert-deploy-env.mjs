@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
+import { DUMMY_SITEKEYS } from "./turnstile-dummy-keys.mjs";
 
-const TEST_SITEKEY = "1x00000000000000000000AA";
 const PLACEHOLDER_D1 = "REPLACE_WITH_POST_LAUNCH_D1_ID";
 
 const postLaunch = process.argv.includes("--post-launch");
@@ -13,9 +13,9 @@ if (sitekey === undefined || sitekey.length === 0) {
   problems.push(
     "PUBLIC_TURNSTILE_SITEKEY is unset. Set it in the build environment — the Astro build fails on /subscribe without it.",
   );
-} else if (sitekey === TEST_SITEKEY) {
+} else if (DUMMY_SITEKEYS.includes(sitekey)) {
   problems.push(
-    "PUBLIC_TURNSTILE_SITEKEY is Cloudflare's TEST sitekey. Use the real one from the Turnstile dashboard.",
+    `PUBLIC_TURNSTILE_SITEKEY is Cloudflare's dummy TEST sitekey ${sitekey}. Use the real one from the Turnstile dashboard.`,
   );
 }
 

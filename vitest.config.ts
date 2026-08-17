@@ -7,7 +7,7 @@ export default defineConfig({
         test: {
           name: "web",
           environment: "jsdom",
-          include: ["src/**/*.test.tsx", "src/lib/**/*.test.ts"],
+          include: ["src/**/*.test.tsx", "src/lib/**/*.test.ts", "src/scripts/**/*.test.ts"],
           css: false,
         },
       },
@@ -23,6 +23,13 @@ export default defineConfig({
           name: "migrations",
           environment: "node",
           include: ["tests/migrations/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
+          name: "deploy",
+          environment: "node",
+          include: ["tests/deploy/**/*.test.ts"],
         },
       },
       {

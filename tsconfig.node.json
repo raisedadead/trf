@@ -20,5 +20,5 @@
     "noUncheckedSideEffectImports": true,
     "types": ["node"]
   },
-  "include": ["vitest.config.ts", "tests/migrations", "tests/site"]
+  "include": ["vitest.config.ts", "playwright.config.ts", "tests", "scripts"]
 }

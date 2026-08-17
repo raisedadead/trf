@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-// @ts-expect-error plain-JS operator script, deliberately not part of a tsconfig project
-import { parseD1Json, toCsv, toCsvField } from "../../scripts/list-export.mjs";
+import { parseD1Json, toCsv, toCsvField } from "../../scripts/list-export.mts";
 
 describe("CSV escaping survives the names people actually have", () => {
   it("leaves a plain value alone", () => {

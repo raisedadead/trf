@@ -15,12 +15,12 @@ Razorpay holds all payment data. The system stores only the data that Razorpay c
 
 ## 2. The parts
 
-| Part        | Technology                         | Function                                                            |
-| ----------- | ---------------------------------- | ------------------------------------------------------------------- |
-| Site        | Astro 7                            | Makes static HTML files before deployment                           |
-| Worker      | Hono 4 on Cloudflare Workers       | Answers requests to `/api/*` and controls which pages are available |
-| Database    | Cloudflare D1                      | Keeps the mailing list                                              |
-| Client code | TypeScript in `src/lib/islands.ts` | Adds behaviour to the static HTML                                   |
+| Part        | Technology                   | Function                                                            |
+| ----------- | ---------------------------- | ------------------------------------------------------------------- |
+| Site        | Astro 7                      | Makes static HTML files before deployment                           |
+| Worker      | Hono 4 on Cloudflare Workers | Answers requests to `/api/*` and controls which pages are available |
+| Database    | Cloudflare D1                | Keeps the mailing list                                              |
+| Client code | TypeScript in `src/scripts/` | Adds behaviour to the static HTML                                   |
 
 The Worker sends all other requests to the static files.
 

@@ -3,13 +3,23 @@ import { execFileSync } from "node:child_process";
 const DB_NAME = "trf-rupeefund";
 const BATCH = 500;
 
-export function toCsvField(value) {
+export type Row = Record<string, unknown>;
+
+export interface ExportableRow extends Row {
+  email: string;
+  name: string;
+  source: string;
+  consent_at: number;
+  created_at: number;
+}
+
+export function toCsvField(value: unknown): string {
   const raw = value === null || value === undefined ? "" : String(value);
   const s = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
   return /[",\n\r]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
 }
 
-export function toCsv(rows) {
+export function toCsv(rows: readonly ExportableRow[]): string {
   const lines = ["email,name,attributes"];
   for (const row of rows) {
     const attributes = JSON.stringify({
@@ -22,13 +32,13 @@ export function toCsv(rows) {
   return `${lines.join("\n")}\n`;
 }
 
-export function parseD1Json(stdout) {
+export function parseD1Json(stdout: string): Row[] {
   const parsed = JSON.parse(stdout);
   const first = Array.isArray(parsed) ? parsed[0] : parsed;
   return first?.results ?? [];
 }
 
-function query(sql, remote) {
+function query<T extends Row = Row>(sql: string, remote: boolean): T[] {
   const args = [
     "wrangler",
     "d1",
@@ -39,7 +49,9 @@ function query(sql, remote) {
     "--command",
     sql,
   ];
-  return parseD1Json(execFileSync("pnpm", args, { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 }));
+  return parseD1Json(
+    execFileSync("pnpm", args, { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 }),
+  ) as T[];
 }
 
 function main() {
@@ -47,7 +59,7 @@ function main() {
   const remote = argv.includes("--remote");
   const dryRun = argv.includes("--dry-run");
 
-  const rows = query(
+  const rows = query<ExportableRow>(
     `SELECT id, email, name, source, consent_at, created_at FROM waitlist
      WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${BATCH}`,
     remote,
