@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { ExecutionContext } from "@cloudflare/workers-types";
 import worker, { app } from "./index.ts";
-import type { Env } from "./types.ts";
+import { makeD1 } from "./testkit.ts";
+import { GATE_HEADER, type Env } from "./types.ts";
 
 function makeEnv(over: Partial<Env> = {}): Env {
   return {
-    DB: {} as Env["DB"],
+    DB: makeD1(),
     ASSETS: {
       fetch: async (input: Request | URL) => {
         const { pathname } = input instanceof URL ? input : new URL(input.url);
@@ -71,8 +72,6 @@ const POST_LAUNCH_ROUTES = [
   { method: "GET", path: "/api/vote/results/season-1" },
 ] as const;
 
-const GATE_BODY = JSON.stringify({ error: "not_found" });
-
 function envWithoutRazorpaySecrets(over: Partial<Env> = {}): Env {
   const env = makeEnv(over) as Partial<Env>;
   for (const key of Object.keys(env)) {
@@ -86,6 +85,7 @@ describe("post-launch routes are gated off by default", () => {
     it(`404s ${method} ${path}`, async () => {
       const res = await app.request(path, { method }, makeEnv(), ctx);
       expect(res.status).toBe(404);
+      expect(res.headers.get(GATE_HEADER)).toBe("closed");
       expect(await res.json()).toEqual({ error: "not_found" });
     });
   }
@@ -98,7 +98,7 @@ describe("post-launch routes are gated off by default", () => {
         makeEnv({ POST_LAUNCH_ENABLED: "true" }),
         ctx,
       );
-      expect(await res.text()).not.toBe(GATE_BODY);
+      expect(res.headers.get(GATE_HEADER)).toBeNull();
     });
   }
 });

@@ -125,7 +125,9 @@ describe("handleWebhook", () => {
     };
     const raw = event({ id: "sub_test_1", status: "active" });
 
-    await expect(handleWebhook(await req(raw), deps(repo, makeMailer()))).rejects.toThrow();
+    await expect(handleWebhook(await req(raw), deps(repo, makeMailer()))).rejects.toThrow(
+      "d1 transient",
+    );
     expect(repo.events.has("evt_1")).toBe(false);
 
     failNext = false;

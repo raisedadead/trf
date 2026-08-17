@@ -1,6 +1,7 @@
 import type {
   Ballot,
   Contributor,
+  Env,
   MetricsSnapshot,
   NewContributor,
   Proposal,
@@ -315,4 +316,14 @@ export function makeLogger(): {
 } {
   const entries: Record<string, unknown>[] = [];
   return { entries, log: (e) => entries.push(e) };
+}
+
+export function makeD1(): Env["DB"] {
+  const statement = {
+    bind: () => statement,
+    all: async () => ({ success: true, results: [], meta: {} }),
+    first: async () => null,
+    run: async () => ({ success: true, meta: { changes: 0 } }),
+  };
+  return { prepare: () => statement } as unknown as Env["DB"];
 }

@@ -19,6 +19,8 @@ export interface Env {
 }
 
 export const TIERS = [10, 50, 100, 500, 1000] as const;
+
+export const GATE_HEADER = "x-post-launch-gate";
 export type Tier = (typeof TIERS)[number];
 
 export interface SubscribeInput {

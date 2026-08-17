@@ -16,7 +16,7 @@ import {
   handleResults,
   type VoteDeps,
 } from "./routes/vote.ts";
-import { TIERS, type Env, type Tier } from "./types.ts";
+import { GATE_HEADER, TIERS, type Env, type Tier } from "./types.ts";
 
 export function isPostLaunchEnabled(env: Env): boolean {
   return env.POST_LAUNCH_ENABLED === "true";
@@ -85,7 +85,9 @@ const POST_LAUNCH_PATHS = [
 
 for (const path of POST_LAUNCH_PATHS) {
   app.all(path, async (c, next) => {
-    if (!isPostLaunchEnabled(c.env)) return c.json({ error: "not_found" }, 404);
+    if (!isPostLaunchEnabled(c.env)) {
+      return c.json({ error: "not_found" }, 404, { [GATE_HEADER]: "closed" });
+    }
     await next();
   });
 }

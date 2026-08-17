@@ -42,7 +42,9 @@ describe("the waitlist SQL actually executed against a migrated database", () =>
   });
 
   it("refuses an address that was not normalised before it reached the database", async () => {
-    await expect(repo.addToWaitlist(entry({ email: "Asha@Example.com" }))).rejects.toThrow();
+    await expect(repo.addToWaitlist(entry({ email: "Asha@Example.com" }))).rejects.toThrow(
+      /CHECK constraint failed/,
+    );
   });
 
   it("hands each pending row to the exporter exactly once", async () => {
