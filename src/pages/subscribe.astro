@@ -23,8 +23,8 @@ const DEFAULT_TIER = 100;
         <p class="text-ink-2 text-sm">
           {
             LAUNCH_LIVE
-              ? "Recurring support for Indian open source, from ₹10/month. Set up UPI AutoPay — cancel anytime."
-              : "Recurring support for Indian open source, from ₹10/month. Leave your email and we'll tell you the day it opens."
+              ? "Support FOSS in India, from ₹10/month. Set up UPI AutoPay — cancel anytime."
+              : "Support FOSS in India, from ₹10/month. We will send you an email to set up your UPI AutoPay mandate when Season 1 opens."
           }
         </p>
       </div>
@@ -190,7 +190,7 @@ const DEFAULT_TIER = 100;
             <button
               type="submit"
               id="autopay-submit"
-              class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none"
+              class="btn btn-primary btn-block disabled:opacity-60 disabled:pointer-events-none"
             >
               Set Up UPI AutoPay
             </button>
@@ -227,17 +227,6 @@ const DEFAULT_TIER = 100;
                   required
                 />
               </div>
-              <div class="note p-3">
-                <div class="flex gap-2">
-                  <Icon name="bell" class="text-brand-fg flex-shrink-0 mt-0.5" size={16} />
-                  <div class="text-xs text-ink-2">
-                    <p class="font-semibold mb-1 text-ink">No payment yet</p>
-                    <p>
-                      One email when we open, so you can set up UPI AutoPay before Season 1 starts.
-                    </p>
-                  </div>
-                </div>
-              </div>
               <div class="hidden" aria-hidden="true">
                 <label for="waitlist-company">Company</label>
                 <input
@@ -257,7 +246,7 @@ const DEFAULT_TIER = 100;
                 data-appearance="interaction-only"
               />
               <p id="waitlist-error" class="text-xs text-red-600 text-center" role="alert" />
-              <button id="waitlist-submit" type="submit" class="btn btn-primary w-full py-3">
+              <button id="waitlist-submit" type="submit" class="btn btn-primary btn-block">
                 Get notified
               </button>
               <p class="text-xs text-ink-3 text-center">

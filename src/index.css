@@ -226,14 +226,6 @@
     @apply text-xs text-ink-3;
   }
 
-  .pillar-title {
-    @apply text-base font-extrabold text-brand-900 mb-1 tracking-tight;
-  }
-
-  .pillar-body {
-    @apply text-sm text-ink-2 leading-relaxed;
-  }
-
   .step-badge {
     @apply relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center;
     @apply rounded-lg bg-brand-fg;
@@ -248,7 +240,7 @@
   }
 
   .step-body {
-    @apply text-xs text-ink-3;
+    @apply text-xs text-ink-3 mb-1;
   }
 
   .faq {
@@ -271,11 +263,171 @@
   .faq-answer {
     @apply mt-3 text-ink-2 text-xs leading-relaxed border-t border-ink/10 pt-3;
   }
+
+  /* /projects holds an empty pool. Rather than a blank slab it shows a cropped,
+     faded rank of proposal cards — a look at the voting dashboard the fund runs
+     from Season 1 on. The card mirrors the shape `src/scripts/vote.ts` already
+     reads: a title, a body, an open/closed state and a share of the vote.
+
+     The rank is decorative and `aria-hidden`. The names are placeholders, and
+     the meters carry no figures, so nothing on this page states a tally the
+     fund has not counted. */
+
+  /* Taller on a phone than on a desktop. The card the veil carries wraps to
+     roughly 385px there against 326px here, and the stage has to clear it and
+     still leave a band of the rank on show. */
+  .preview-stage {
+    @apply relative h-140 sm:h-130 overflow-hidden;
+    @apply rounded-lg border border-ink/10 bg-white shadow-soft;
+  }
+
+  /* The rank keeps its three columns at every width. Below `sm` the cards hold
+     their own width and run off the right edge instead of stacking, so a phone
+     sees the same cropped composition as a desktop rather than one card and two
+     that are clipped away entirely. */
+  .preview-rank {
+    @apply pointer-events-none grid grid-cols-3 gap-5 p-6;
+  }
+
+  .preview-card {
+    @apply flex min-w-70 flex-col gap-3 rounded-lg border border-ink/10 bg-card p-5;
+  }
+
+  /* Break the rank out of a straight line, the way a real listing never lands
+     flush. Only from `sm`, where the three sit side by side. */
+  .preview-card:nth-child(2) {
+    @apply sm:translate-y-10;
+  }
+
+  .preview-head {
+    @apply flex items-center justify-between gap-3;
+  }
+
+  .preview-season {
+    @apply font-mono text-xs font-bold tracking-wider text-ink-3;
+  }
+
+  /* Reads the state off an attribute on the card, the way the rest of the site
+     reads element state, never off a class the markup has to remember. The
+     three states are the three `VoteProposal.state` values, and each card in
+     the rank shows a different one, so the rank reads as the whole lifecycle
+     rather than three copies of one screen. */
+  .preview-state {
+    @apply rounded-md bg-brand-50 px-2 py-0.5 font-mono text-xs font-bold text-brand-fg;
+  }
+
+  .preview-card[data-state="pending"] .preview-state {
+    @apply bg-ink/5 text-ink-3;
+  }
+
+  .preview-card[data-state="closed"] .preview-state {
+    @apply bg-ink/10 text-ink-2;
+  }
+
+  .preview-name {
+    @apply text-lg font-bold text-ink;
+  }
+
+  .preview-blurb {
+    @apply text-sm text-ink-3 leading-snug;
+  }
+
+  .preview-panel {
+    @apply mt-1 flex flex-col gap-3 border-t border-ink/10 pt-4;
+  }
+
+  .preview-panel-label {
+    @apply font-mono text-xs font-bold tracking-wider text-ink-3;
+  }
+
+  /* Pending: the ballot, before a vote exists to count. These are the same
+     `.choice` controls `src/scripts/vote.ts` paints for a live vote, unpressed
+     because nothing has been cast. */
+  .preview-ballot {
+    @apply flex flex-wrap gap-2;
+  }
+
+  /* Open and closed: one row per option, the way `VoteProposal.options` carries
+     them. A voter picks one; the bar is the share it holds. */
+  .preview-option {
+    @apply flex items-baseline justify-between gap-2;
+  }
+
+  .preview-option-label {
+    @apply font-mono text-xs text-ink-3;
+  }
+
+  .preview-carried {
+    @apply font-mono text-xs font-bold text-brand-fg;
+  }
+
+  .preview-meter {
+    @apply mt-1.5 block h-2 overflow-hidden rounded-full bg-ink/10;
+  }
+
+  /* The bar draws itself in on load, so a page with nothing in it still reads
+     as alive rather than broken. `backwards` holds it at zero through the
+     delay. The reduced-motion block at the end of this file stops it. */
+  .preview-meter-fill {
+    @apply block h-full rounded-full bg-brand;
+    transform-origin: left;
+    animation: preview-fill 900ms ease-out backwards;
+  }
+
+  /* A closed vote is history, so its bars drop out of brand colour — except the
+     option that carried, which is the decision the pool acted on. */
+  .preview-card[data-state="closed"] .preview-meter-fill {
+    @apply bg-ink/20;
+  }
+
+  .preview-card[data-state="closed"] [data-carried] .preview-meter-fill {
+    @apply bg-brand-fg;
+  }
+
+  /* Offset the rank so the bars never fill together. */
+  .preview-card:nth-child(2) .preview-meter-fill {
+    animation-delay: 160ms;
+  }
+
+  .preview-card:nth-child(3) .preview-meter-fill {
+    animation-delay: 320ms;
+  }
+
+  /* Crops the rank and carries the real call to action. The cards behind it are
+     a hint at what the pool will hold, never a listing to be read.
+
+     The veil covers the whole stage, not just its foot. It has to reach full
+     opacity above the option rows — a veil anchored to the bottom runs its
+     clear end over the cards and its solid end over empty floor, which fades
+     nothing and leaves the rank legible. It fades to the stage's own white, not
+     to the page behind it. */
+  .preview-veil {
+    @apply absolute inset-0 flex items-end justify-center px-4 pb-6;
+    @apply bg-linear-to-b from-white/0 via-white via-65% to-white;
+  }
+
+  .pool-note {
+    @apply flex flex-col gap-2 rounded-lg border border-brand-200 bg-brand-50 px-5 py-4;
+  }
+
+  .pool-note-index {
+    @apply font-mono text-sm font-bold text-brand-fg;
+  }
+
+  .pool-note-body {
+    @apply text-sm text-ink-2 leading-relaxed;
+  }
 }
 
+/* Two variants, two sizes, one block modifier. `btn btn-primary` is already a
+   complete button — size and padding belong here, never at the call site. A
+   page that reaches for its own `px-*` or `text-*` on a button is drifting.
+
+   Variants read as a pair: solid brand for the one action a screen wants, and
+   outline for everything beside it. There is no third tier. */
 @utility btn {
-  @apply inline-flex items-center justify-center min-h-11 rounded-lg font-semibold;
-  @apply transition duration-150 ease-out active:scale-[0.98];
+  @apply inline-flex items-center justify-center gap-2 min-h-11 px-5 text-sm rounded-lg;
+  @apply font-semibold transition duration-150 ease-out active:scale-[0.98];
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg;
   @apply focus-visible:ring-offset-2 focus-visible:ring-offset-white;
 }
@@ -285,11 +437,37 @@
 }
 
 @utility btn-secondary {
-  @apply border border-ink/15 text-ink hover:bg-card;
+  @apply bg-white text-ink border border-ink/20 hover:border-brand hover:text-brand-fg;
 }
 
-@utility btn-ghost {
-  @apply bg-white text-ink border border-ink/20 hover:border-brand hover:text-brand-fg;
+/* For the one hero-weight call to action on a screen. */
+@utility btn-lg {
+  @apply min-h-12 px-6;
+}
+
+/* Form submits and stacked card actions, where the button owns the row. */
+@utility btn-block {
+  @apply w-full;
+}
+
+/* Inside a button the arrow travels with the label. A button centres its
+   content and `btn-block` makes it as wide as the row, so an arrow pinned to
+   the right edge strands itself in whitespace half a button away from the word
+   it marks. Put it back in flow as a flex item of the `inline-flex` button and
+   the `gap-2` above sets the spacing.
+
+   The reason the arrow is out of flow everywhere else — that a line breaker may
+   drop an atomic inline onto a line of its own — does not apply here. A button
+   label is one short line that never wraps.
+
+   Unlayered, so this beats the `base` rule it resets. The guard matches the one
+   on the arrow, so a browser that draws no arrow is untouched. */
+@supports (mask-image: linear-gradient(#000, #000)) {
+  .btn[target="_blank"]:not(.link-plain)::after {
+    position: static;
+    translate: none;
+    flex: none;
+  }
 }
 
 @utility hero-glow {
@@ -317,6 +495,15 @@
 
 @utility screen-enter {
   animation: screen-enter 220ms ease-out;
+}
+
+@keyframes preview-fill {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
 }
 
 /* Animate native <details> disclosure (FAQ). Progressive: browsers without

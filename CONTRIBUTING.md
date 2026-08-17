@@ -138,4 +138,18 @@ src/
   index.css      Tailwind entry + design tokens + shared classes
 ```
 
+### Buttons
+
+Every button on the site comes from `src/index.css`. There are two variants and two size modifiers. Nothing else.
+
+| Class           | Use                                                                   |
+| --------------- | --------------------------------------------------------------------- |
+| `btn`           | Base. Carries the size, the padding, the radius and the focus ring.   |
+| `btn-primary`   | The one action a screen wants. Solid brand.                           |
+| `btn-secondary` | Everything beside it. Outline.                                        |
+| `btn-lg`        | The hero-weight call to action on a screen.                           |
+| `btn-block`     | Form submits and stacked card actions, where the button owns the row. |
+
+`btn btn-primary` is already complete. Do not add `px-*`, `py-*`, `text-*`, `gap-*` or `w-full` to a button in the markup — that is how the set drifted before. If a button needs a size the modifiers do not cover, add the modifier to `index.css` and use it on every page that needs it.
+
 To add a page, write a `.astro` file in `src/pages/`. Then add an entry to `seo.ts`. The build makes static pages only. Put the behaviour of a page in its own `src/scripts/<page>.ts`, and load it from a `<script>` element on that page. The page must operate without JavaScript. Astro markup uses `class`, not `className`. Write a class string once in the markup. If the same string appears three times, or on two pages, make it a class in `src/index.css`. Read element state from an attribute such as `aria-pressed`, and style that attribute in CSS. Do not paint classes from JavaScript. Each script has a test beside it, and the tests in `tests/site/` examine the HTML that the build makes.
