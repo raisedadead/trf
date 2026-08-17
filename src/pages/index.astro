@@ -21,7 +21,12 @@ import {
           <span class="w-2 h-2 bg-brand inline-block"></span>
           A FOSS United initiative · Launching at{" "}
           <span>
-            <a href={LAUNCH_EVENT_URL} target="_blank" rel="noopener noreferrer" class="inline-link">
+            <a
+              href={LAUNCH_EVENT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-link"
+            >
               {LAUNCH_EVENT}
             </a>
           </span>
@@ -35,17 +40,11 @@ import {
             Keep Indian open source alive, one rupee at a time
           </h1>
           <div class="mt-auto flex flex-wrap gap-3">
-            <a
-              href="/subscribe"
-              class="btn btn-primary px-6 py-3 gap-2"
-            >
+            <a href="/subscribe" class="btn btn-primary px-6 py-3 gap-2">
               <Icon name={LAUNCH_LIVE ? "heart" : "bell"} size={18} />
               {SUBSCRIBE_CTA}
             </a>
-            <a
-              href="/projects"
-              class="btn btn-ghost px-6 py-3 gap-2"
-            >
+            <a href="/projects" class="btn btn-ghost px-6 py-3 gap-2">
               <Icon name="heart" size={18} />
               See projects
             </a>
@@ -53,9 +52,7 @@ import {
         </div>
 
         <div>
-          <p
-            class="mb-3 text-xs font-mono font-bold tracking-wider text-ink-3"
-          >
+          <p class="mb-3 text-xs font-mono font-bold tracking-wider text-ink-3">
             <a
               href="https://fossunited.org/grants"
               target="_blank"
@@ -81,8 +78,8 @@ import {
           </div>
           <div class="mt-6">
             <p class="text-base text-ink-2 mb-4 leading-relaxed">
-              Free software isn't free. The Rupee Fund pools small monthly UPI
-              contributions and routes them to indie Indian FOSS maintainers.
+              Free software isn't free. The Rupee Fund pools small monthly UPI contributions and
+              routes them to indie Indian FOSS maintainers.
             </p>
             <p class="text-base text-ink-2 mb-4 leading-relaxed">
               <strong>Not charity — membership in a commons.</strong>
@@ -102,9 +99,7 @@ import {
         </div>
         <div>
           <h2 class="pillar-title">Pooled</h2>
-          <p class="pillar-body">
-            No one of us could write a grant this size alone.
-          </p>
+          <p class="pillar-body">No one of us could write a grant this size alone.</p>
         </div>
         <div>
           <h2 class="pillar-title">Voted</h2>
@@ -113,8 +108,8 @@ import {
       </div>
       <div class="mt-6 border-t border-brand-200 pt-6">
         <p class="max-w-3xl text-base text-ink-2 leading-relaxed">
-          Every rupee in this fund comes from someone like <strong
-            class="text-brand-900">you</strong
+          Every rupee in this fund comes from someone like <strong class="text-brand-900"
+            >you</strong
           >.
         </p>
       </div>
@@ -125,14 +120,11 @@ import {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid gap-10 md:grid-cols-2">
         <div class="flex flex-col">
-          <h2 class="text-2xl font-bold text-ink mb-5 tracking-tight">
-            How It Works
-          </h2>
+          <h2 class="text-2xl font-bold text-ink mb-5 tracking-tight">How It Works</h2>
           <div class="relative flex-1">
             <span
               aria-hidden="true"
-              class="absolute bottom-4 left-4 top-4 w-px -translate-x-1/2 bg-ink/15"
-            ></span>
+              class="absolute bottom-4 left-4 top-4 w-px -translate-x-1/2 bg-ink/15"></span>
             <ol class="relative flex h-full flex-col justify-between gap-6">
               <li class="flex gap-4">
                 <div class="step-badge">
@@ -149,9 +141,7 @@ import {
                 </div>
                 <div class="pt-0.5">
                   <h3 class="step-title">Pool Funds</h3>
-                  <p class="step-body">
-                    Your contributions pool through the season.
-                  </p>
+                  <p class="step-body">Your contributions pool through the season.</p>
                 </div>
               </li>
               <li class="flex gap-4">
@@ -160,9 +150,7 @@ import {
                 </div>
                 <div class="pt-0.5">
                   <h3 class="step-title">Vote</h3>
-                  <p class="step-body">
-                    Contribute 10+ months and help vote on who gets funded.
-                  </p>
+                  <p class="step-body">Contribute 10+ months and help vote on who gets funded.</p>
                 </div>
               </li>
               <li class="flex gap-4">
@@ -172,8 +160,7 @@ import {
                 <div class="pt-0.5">
                   <h3 class="step-title">Disburse</h3>
                   <p class="step-body">
-                    Funds go to indie FOSS maintainers and builders across
-                    India.
+                    Funds go to indie FOSS maintainers and builders across India.
                   </p>
                 </div>
               </li>
@@ -182,9 +169,7 @@ import {
         </div>
 
         <div class="flex flex-col">
-          <h2 class="text-2xl font-bold text-ink mb-5 tracking-tight">
-            Funding Seasons
-          </h2>
+          <h2 class="text-2xl font-bold text-ink mb-5 tracking-tight">Funding Seasons</h2>
           <div class="grid grid-cols-2 gap-3">
             {
               SEASONS.map((s) => (
@@ -201,12 +186,8 @@ import {
                       class="h-11 w-11"
                     />
                   </div>
-                  <h3 class="text-sm font-extrabold tracking-tight text-ink">
-                    {s.name}
-                  </h3>
-                  <p class="text-sm font-medium uppercase tracking-wider text-ink-3">
-                    {s.months}
-                  </p>
+                  <h3 class="text-sm font-extrabold tracking-tight text-ink">{s.name}</h3>
+                  <p class="text-sm font-medium uppercase tracking-wider text-ink-3">{s.months}</p>
                   <span
                     class="mt-auto rounded-md px-2 py-0.5 text-sm font-semibold text-white"
                     style={`background-color:${s.accent}`}
@@ -224,9 +205,7 @@ import {
 
   <section class="py-12 bg-white border-t border-ink/10">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-2xl font-bold text-ink mb-5 tracking-tight">
-        Frequently Asked Questions
-      </h2>
+      <h2 class="text-2xl font-bold text-ink mb-5 tracking-tight">Frequently Asked Questions</h2>
       <div class="space-y-2">
         <details class="faq group">
           <summary class="faq-summary">
@@ -235,10 +214,15 @@ import {
           </summary>
           <p class="faq-answer">
             Not yet — we open at{" "}
-            <a href={LAUNCH_EVENT_URL} target="_blank" rel="noopener noreferrer" class="inline-link">
+            <a
+              href={LAUNCH_EVENT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-link"
+            >
               {LAUNCH_WHEN}
-            </a>. Leave your email and you'll hear the day contributions open.
-            Nothing is collected until then.
+            </a>. Leave your email and you'll hear the day contributions open. Nothing is collected
+            until then.
           </p>
         </details>
 
@@ -248,9 +232,8 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Free software can be inexpensive and sustainable when a large pool
-            of users pays for it. The minimum is ₹10, which even most students
-            can afford.
+            Free software can be inexpensive and sustainable when a large pool of users pays for it.
+            The minimum is ₹10, which even most students can afford.
           </p>
         </details>
 
@@ -260,9 +243,8 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Those are large, foundation- and company-funded grants (₹3cr+ from
-            FOSS United; $1M a year from Zerodha's FLOSS/fund). The Rupee Fund
-            is the community layer beneath them.
+            Those are large, foundation- and company-funded grants (₹3cr+ from FOSS United; $1M a
+            year from Zerodha's FLOSS/fund). The Rupee Fund is the community layer beneath them.
           </p>
         </details>
 
@@ -272,8 +254,8 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Funding based on community voting. Contributors with 10+ months
-            get voting rights for each season.
+            Funding based on community voting. Contributors with 10+ months get voting rights for
+            each season.
           </p>
         </details>
 
@@ -283,8 +265,7 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            No, but you can fund Indian contributors of international
-            projects.
+            No, but you can fund Indian contributors of international projects.
           </p>
         </details>
 
@@ -294,8 +275,7 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            No. We comply with all statutory requirements, so anonymous
-            donations are not supported.
+            No. We comply with all statutory requirements, so anonymous donations are not supported.
           </p>
         </details>
 
@@ -305,11 +285,11 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Total fund minus administrative overheads equals the funding pool.
-            All costs documented transparently.
+            Total fund minus administrative overheads equals the funding pool. All costs documented
+            transparently.
           </p>
         </details>
       </div>
     </div>
-</section>
+  </section>
 </Base>

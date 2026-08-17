@@ -10,21 +10,14 @@ import { REMOVAL_ADDRESS } from "../lib/launch.ts";
       One email when we open, so you can set up UPI AutoPay. Nothing else, and no payment yet.
     </p>
     <p class="text-xs text-ink-3 mb-8">
-      Changed your mind? Email <a href={`mailto:${REMOVAL_ADDRESS}`} class="underline hover:text-brand-fg">{REMOVAL_ADDRESS}</a> and we'll remove you.
+      Changed your mind? Email <a
+        href={`mailto:${REMOVAL_ADDRESS}`}
+        class="underline hover:text-brand-fg">{REMOVAL_ADDRESS}</a
+      > and we'll remove you.
     </p>
     <div class="flex flex-col sm:flex-row gap-3 justify-center">
-      <a
-        href="/"
-        class="btn btn-primary px-6 py-3 text-sm"
-      >
-        Back to home
-      </a>
-      <a
-        href="/projects"
-        class="btn btn-secondary px-6 py-3 text-sm"
-      >
-        See projects
-      </a>
+      <a href="/" class="btn btn-primary px-6 py-3 text-sm"> Back to home </a>
+      <a href="/projects" class="btn btn-secondary px-6 py-3 text-sm"> See projects </a>
     </div>
   </div>
 </Base>

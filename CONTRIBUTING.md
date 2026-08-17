@@ -17,7 +17,7 @@ All of these commands must pass before a merge. CI runs them again:
 
 ```sh
 pnpm check                    # wrangler types + oxlint + tsc + astro check + vitest
-pnpm format                   # oxfmt — run this before you commit
+pnpm format                   # oxfmt, then Prettier for .astro — run this before you commit
 pnpm test:e2e                 # Playwright, against the launch build
 ```
 
@@ -31,11 +31,13 @@ pnpm test:e2e                 # Playwright, against the launch build
 | `astro check`                | The TypeScript inside `.astro` files, which `tsc` does not examine.  |
 | `vitest`                     | Five projects: `web`, `worker`, `site`, `migrations` and `deploy`.   |
 
-Git ignores `worker-configuration.d.ts`, so a fresh checkout does not have it. `tsc -b tsconfig.build.json` reads different types when the file is absent, and it then reports the `@ts-expect-error` in `src/worker/index.ts` as unused. Therefore `check` and `typecheck` write the file first. Do not call it on its own.
+Git ignores `worker-configuration.d.ts`, so a fresh checkout does not have it. `tsc -b tsconfig.build.json` reads different types when the file is absent. Therefore `check` and `typecheck` write the file first. Do not call it on its own.
 
 There are two TypeScript entry points, and they answer different questions.
 
 `tsconfig.json` is the editor project. It covers `.astro`, `src`, `tests` and `scripts` under one set of options, so every file your editor opens belongs to a real project. `astro check` reads it too. Without it, `.astro` files fall into an inferred project, and `astro check` reports no error whatever the code says.
+
+`tsconfig.json` excludes `src/worker`, and `src/worker/tsconfig.json` covers that directory instead. Worker code runs on workerd, not in a browser, so it needs `@cloudflare/workers-types` rather than the DOM library. Under the DOM library the workerd `Response` and the standard `Response` disagree, and `astro check` then reports the asset fallthrough in `src/worker/index.ts` as an error. The worker files stay under the same options `tsc -b` applies, because `src/worker/tsconfig.json` extends `tsconfig.worker.json`.
 
 `tsconfig.build.json` is the solution file for the three strict per-target projects — `src/lib`, `src/worker`, and `tests` with `scripts`. It is the authority, because each project sets its own `lib` and `types`. `pnpm check` runs it.
 
@@ -53,6 +55,23 @@ Two rules are off, and each one is off for the same reason: it reports a pattern
 | `vitest/require-mock-type-parameters` | The DOM test helpers use untyped `vi.fn()` stubs.                                 |
 
 The `rules` block lists only the deltas from the two categories. Run `pnpm exec oxlint --print-config` to read the resolved set. Do not re-state a severity a category already gives.
+
+## Formatting
+
+Two formatters run, and they never touch the same file.
+
+| Formatter  | Files                                                   | Configuration      |
+| ---------- | ------------------------------------------------------- | ------------------ |
+| `oxfmt`    | TypeScript, JavaScript, JSON, CSS, HTML, Markdown, YAML | `.oxfmtrc.json`    |
+| `prettier` | `.astro` only                                           | `.prettierrc.json` |
+
+`oxfmt` does not parse `.astro`, so Prettier covers those files with `prettier-plugin-astro`. `.prettierignore` lists every language `oxfmt` owns, which stops Prettier from reformatting a file `oxfmt` has already formatted.
+
+`oxfmt` reads `.prettierignore` too, and it would then skip every file it owns. The `format` and `format:check` scripts therefore pass `--ignore-path .gitignore` to `oxfmt`. Keep that flag.
+
+Both formatters use a print width of 100. `.editorconfig` states the same width, so an editor that formats on save produces the same output as `pnpm format`. A default Prettier install wraps at 80 and rewrites every `.astro` file in the repository.
+
+`.vscode/settings.json` binds the two formatters for VS Code, Cursor and Windsurf: `oxc-project.oxc-vscode` for every file, and `astro-build.astro-vscode` for `.astro`. On another editor, bind the same two formatters yourself.
 
 ## What CI runs
 

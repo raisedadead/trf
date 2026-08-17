@@ -8,8 +8,7 @@ import { LAUNCH_EVENT, LAUNCH_EVENT_URL, SUBSCRIBE_CTA } from "../lib/launch.ts"
     <div class="text-center mb-6">
       <h1 class="text-3xl font-bold text-ink mb-2 tracking-tight">Where your rupees will go</h1>
       <p class="text-sm text-ink-2">
-        Nothing has been disbursed yet. Here is exactly how the money will move once Season 1
-        opens.
+        Nothing has been disbursed yet. Here is exactly how the money will move once Season 1 opens.
       </p>
     </div>
 
@@ -18,7 +17,12 @@ import { LAUNCH_EVENT, LAUNCH_EVENT_URL, SUBSCRIBE_CTA } from "../lib/launch.ts"
         <div>
           <h2 class="text-lg font-bold text-ink mb-1">
             Season 1 — opens at{" "}
-            <a href={LAUNCH_EVENT_URL} target="_blank" rel="noopener noreferrer" class="inline-link">
+            <a
+              href={LAUNCH_EVENT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-link"
+            >
               {LAUNCH_EVENT}
             </a>
           </h2>
@@ -31,22 +35,31 @@ import { LAUNCH_EVENT, LAUNCH_EVENT_URL, SUBSCRIBE_CTA } from "../lib/launch.ts"
       </div>
     </div>
 
-    <div class="bg-white rounded-lg border border-ink/10 border-dashed p-8 text-center transition-colors duration-150 ease-out hover:border-ink/25">
+    <div
+      class="bg-white rounded-lg border border-ink/10 border-dashed p-8 text-center transition-colors duration-150 ease-out hover:border-ink/25"
+    >
       <h2 class="text-lg font-bold text-ink mb-2">No disbursements yet</h2>
       <p class="text-sm text-ink-2 max-w-xl mx-auto mb-5">
-        Founding contributors seed the first pool. Then contributors with 10+ months of giving
-        vote on which indie Indian FOSS maintainers and builders receive funding each season — and
+        Founding contributors seed the first pool. Then contributors with 10+ months of giving vote
+        on which indie Indian FOSS maintainers and builders receive funding each season — and
         disbursements will be listed right here, transparently.
       </p>
       <a href="/subscribe" class="btn btn-primary px-6 text-sm">{SUBSCRIBE_CTA}</a>
     </div>
 
-    <div class="mt-8 bg-white rounded-lg p-6 text-center border border-ink/10 border-t-4 border-t-brand">
+    <div
+      class="mt-8 bg-white rounded-lg p-6 text-center border border-ink/10 border-t-4 border-t-brand"
+    >
       <h2 class="text-lg font-bold text-ink mb-2">Want to suggest a project?</h2>
       <p class="text-sm text-ink-2 mb-4">
         Once you're a contributor with 10+ months, you can vote and suggest projects.
       </p>
-      <a href="https://forum.fossunited.org" target="_blank" rel="noopener noreferrer" class="btn btn-primary px-6 text-sm">
+      <a
+        href="https://forum.fossunited.org"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn-primary px-6 text-sm"
+      >
         Submit Suggestion
       </a>
     </div>

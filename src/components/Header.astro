@@ -29,7 +29,13 @@ const subscribeCta = LAUNCH_LIVE
         />
       </a>
       <nav class="hidden md:flex gap-6 items-center" aria-label="Primary">
-        {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class="nav-link">{l.label}</a>)}
+        {
+          links.map((l) => (
+            <a href={l.href} aria-current={path === l.href ? "page" : undefined} class="nav-link">
+              {l.label}
+            </a>
+          ))
+        }
         <a href={subscribeCta.href} class="btn btn-primary px-5 text-sm">{subscribeCta.label}</a>
       </nav>
       <details class="md:hidden">
@@ -43,8 +49,16 @@ const subscribeCta = LAUNCH_LIVE
           class="absolute inset-x-0 top-full mt-0.5 z-50 flex flex-col gap-1 border-b-2 border-ink bg-white px-4 sm:px-6 py-3 shadow-card"
           aria-label="Mobile"
         >
-          {links.map((l) => <a href={l.href} aria-current={path === l.href ? "page" : undefined} class="nav-link">{l.label}</a>)}
-          <a href={subscribeCta.href} class="w-full text-center btn btn-primary px-5 text-sm">{subscribeCta.label}</a>
+          {
+            links.map((l) => (
+              <a href={l.href} aria-current={path === l.href ? "page" : undefined} class="nav-link">
+                {l.label}
+              </a>
+            ))
+          }
+          <a href={subscribeCta.href} class="w-full text-center btn btn-primary px-5 text-sm"
+            >{subscribeCta.label}</a
+          >
         </nav>
       </details>
     </div>

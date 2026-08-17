@@ -1,7 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
-
 ---
 
 <Base>
@@ -28,14 +27,14 @@ import Icon from "../components/Icon.astro";
           <div class="flex flex-wrap gap-2" id="vote-choices"></div>
         </fieldset>
         <p id="vote-cast-error" class="text-xs text-red-600 text-center" role="alert"></p>
-        <button type="submit" id="vote-cast-submit" class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none">Submit vote</button>
+        <button
+          type="submit"
+          id="vote-cast-submit"
+          class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none"
+          >Submit vote</button
+        >
       </form>
-      <div
-        id="vote-cast-success"
-        hidden
-        class="note p-4 text-sm text-ink-2"
-        aria-live="polite"
-      >
+      <div id="vote-cast-success" hidden class="note p-4 text-sm text-ink-2" aria-live="polite">
         <p class="font-semibold text-ink mb-1">Vote recorded</p>
         <p>Thanks for helping decide how The Rupee Fund supports Indian open source.</p>
       </div>
@@ -67,17 +66,17 @@ import Icon from "../components/Icon.astro";
           />
         </div>
         <p id="vote-request-error" class="text-xs text-red-600 text-center" role="alert"></p>
-        <button type="submit" id="vote-request-submit" class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none">Email me a voting link</button>
+        <button
+          type="submit"
+          id="vote-request-submit"
+          class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none"
+          >Email me a voting link</button
+        >
       </form>
       <p id="vote-open-empty" hidden class="text-sm text-ink-2 text-center">
         No proposals are open for voting right now. Check back during the next season.
       </p>
-      <div
-        id="vote-request-success"
-        hidden
-        class="note p-4 text-sm text-ink-2"
-        aria-live="polite"
-      >
+      <div id="vote-request-success" hidden class="note p-4 text-sm text-ink-2" aria-live="polite">
         <p class="font-semibold text-ink mb-1">Check your email</p>
         <p>If your contribution is eligible, we've sent a one-time voting link to your inbox.</p>
       </div>

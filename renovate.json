@@ -21,6 +21,11 @@
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"],
       "automerge": true
+    },
+    {
+      "description": "astro check needs the TypeScript programmatic API, which tsc 7 dropped. See https://github.com/withastro/roadmap/discussions/1321",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7.0.0"
     }
   ]
 }

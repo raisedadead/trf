@@ -17,3 +17,6 @@ playwright-report
 test-results
 
 *.tsbuildinfo
+
+# Shared editor settings. A global ignore usually excludes .vscode/.
+!.vscode/

@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.worker.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../node_modules/.tmp/tsconfig.worker.editor.tsbuildinfo"
+  },
+  "include": [".", "../../worker-configuration.d.ts"]
+}

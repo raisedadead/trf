@@ -178,7 +178,6 @@ app.all("*", async (c, next) => {
   return new Response(notFound.body as BodyInit | null, { status: 404, headers });
 });
 
-// @ts-expect-error workerd Fetcher Response vs Hono standard-Headers (getSetCookie) type drift; ASSETS.fetch(c.req.raw) is the documented CF asset fallthrough
 app.all("*", (c) => c.env.ASSETS.fetch(c.req.raw));
 
 export default {

@@ -12,5 +12,5 @@
     "playwright.config.ts",
     "astro.config.mjs"
   ],
-  "exclude": ["dist"]
+  "exclude": ["dist", "src/worker"]
 }

@@ -37,35 +37,73 @@ const DEFAULT_TIER = 100;
                 <label for="autopay-name" class="field-label">
                   Full Name *
                 </label>
-                <input id="autopay-name" name="name" type="text" placeholder="Your name" class="field" required />
+                <input
+                  id="autopay-name"
+                  name="name"
+                  type="text"
+                  placeholder="Your name"
+                  class="field"
+                  required
+                />
               </div>
               <div>
                 <label for="autopay-mobile" class="field-label">
                   Mobile Number *
                 </label>
-                <input id="autopay-mobile" name="mobile" type="tel" placeholder="+91 98765 43210" class="field" required />
+                <input
+                  id="autopay-mobile"
+                  name="mobile"
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  class="field"
+                  required
+                />
               </div>
             </div>
             <div>
               <label for="autopay-email" class="field-label">
                 Email Address *
               </label>
-              <input id="autopay-email" name="email" type="email" placeholder="your.email@example.com" class="field" required />
+              <input
+                id="autopay-email"
+                name="email"
+                type="email"
+                placeholder="your.email@example.com"
+                class="field"
+                required
+              />
             </div>
             <div>
               <label for="autopay-pan" class="field-label">
                 PAN Number *
               </label>
-              <input id="autopay-pan" name="pan" type="text" placeholder="ABCDE1234F" class="field uppercase font-mono" maxlength="10" required />
+              <input
+                id="autopay-pan"
+                name="pan"
+                type="text"
+                placeholder="ABCDE1234F"
+                class="field uppercase font-mono"
+                maxlength="10"
+                required
+              />
             </div>
             <div>
               <label for="autopay-address" class="field-label">
                 Contact Address *
               </label>
-              <textarea id="autopay-address" name="address" placeholder="Street, City, State, PIN" rows="2" class="field resize-none" required />
+              <textarea
+                id="autopay-address"
+                name="address"
+                placeholder="Street, City, State, PIN"
+                rows="2"
+                class="field resize-none"
+                required
+              />
             </div>
             <p class="text-xs text-ink-3">
-              PAN and address let FOSS United Foundation issue 80G tax benefits via its annual filing (Form 10BD). Held by the Foundation and shared with our payment processor — not stored by this site.
+              PAN and address let FOSS United Foundation issue 80G tax benefits via its annual
+              filing (Form 10BD). Held by the Foundation and shared with our payment processor — not
+              stored by this site.
             </p>
 
             <fieldset>
@@ -90,24 +128,49 @@ const DEFAULT_TIER = 100;
                 <Icon name="alert" class="text-brand-fg flex-shrink-0 mt-0.5" size={16} />
                 <div class="text-xs text-ink-2">
                   <p class="font-semibold mb-1 text-ink">Early-bird UPI AutoPay</p>
-                  <p>Set up a UPI AutoPay mandate you can cancel anytime. Your first contribution is collected when Season 1 opens.</p>
+                  <p>
+                    Set up a UPI AutoPay mandate you can cancel anytime. Your first contribution is
+                    collected when Season 1 opens.
+                  </p>
                 </div>
               </div>
             </div>
 
             <div class="flex items-start gap-2 bg-card p-3 rounded-lg border border-ink/10 shadow-soft">
-              <input type="checkbox" id="terms" name="terms" class="mt-1 w-4 h-4 accent-brand border-ink/20 rounded" required />
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                class="mt-1 w-4 h-4 accent-brand border-ink/20 rounded"
+                required
+              />
               <label for="terms" class="text-xs text-ink-2 leading-relaxed">
-                I authorize FOSS United Foundation to collect my recurring contribution via UPI AutoPay, and accept the{" "}
-                <a href="https://fossunited.org/terms-of-service" target="_blank" rel="noopener noreferrer" class="inline-link">
+                I authorize FOSS United Foundation to collect my recurring contribution via UPI
+                AutoPay, and accept the{" "}
+                <a
+                  href="https://fossunited.org/terms-of-service"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-link"
+                >
                   Terms
                 </a>
                 ,{" "}
-                <a href="https://fossunited.org/privacy-policy" target="_blank" rel="noopener noreferrer" class="inline-link">
+                <a
+                  href="https://fossunited.org/privacy-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-link"
+                >
                   Privacy Policy
                 </a>{" "}
                 and{" "}
-                <a href="https://fossunited.org/refund-transfer-policy" target="_blank" rel="noopener noreferrer" class="inline-link">
+                <a
+                  href="https://fossunited.org/refund-transfer-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-link"
+                >
                   Refund Policy
                 </a>
                 .
@@ -115,14 +178,25 @@ const DEFAULT_TIER = 100;
             </div>
 
             <label class="flex items-start gap-2 text-xs text-ink-2">
-              <input type="checkbox" name="newsletter" checked class="mt-0.5 w-4 h-4 accent-brand border-ink/20 rounded" />
+              <input
+                type="checkbox"
+                name="newsletter"
+                checked
+                class="mt-0.5 w-4 h-4 accent-brand border-ink/20 rounded"
+              />
               Email me occasional Rupee Fund updates. Unsubscribe anytime.
             </label>
             <p id="autopay-error" class="text-xs text-red-600 text-center" role="alert" />
-            <button type="submit" id="autopay-submit" class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none">
+            <button
+              type="submit"
+              id="autopay-submit"
+              class="btn btn-primary w-full py-3 disabled:opacity-60 disabled:pointer-events-none"
+            >
               Set Up UPI AutoPay
             </button>
-            <p class="text-xs text-ink-3 text-center">Processed securely by Razorpay · Cancel anytime · India only</p>
+            <p class="text-xs text-ink-3 text-center">
+              Processed securely by Razorpay · Cancel anytime · India only
+            </p>
           </form>
         ) : (
           <Fragment>
@@ -131,29 +205,57 @@ const DEFAULT_TIER = 100;
                 <label for="waitlist-name" class="field-label">
                   Full Name *
                 </label>
-                <input id="waitlist-name" name="name" type="text" placeholder="Your name" class="field" required />
+                <input
+                  id="waitlist-name"
+                  name="name"
+                  type="text"
+                  placeholder="Your name"
+                  class="field"
+                  required
+                />
               </div>
               <div>
                 <label for="waitlist-email" class="field-label">
                   Email Address *
                 </label>
-                <input id="waitlist-email" name="email" type="email" placeholder="your.email@example.com" class="field" required />
+                <input
+                  id="waitlist-email"
+                  name="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  class="field"
+                  required
+                />
               </div>
               <div class="note p-3">
                 <div class="flex gap-2">
                   <Icon name="bell" class="text-brand-fg flex-shrink-0 mt-0.5" size={16} />
                   <div class="text-xs text-ink-2">
                     <p class="font-semibold mb-1 text-ink">No payment yet</p>
-                    <p>One email when we open, so you can set up UPI AutoPay before Season 1 starts.</p>
+                    <p>
+                      One email when we open, so you can set up UPI AutoPay before Season 1 starts.
+                    </p>
                   </div>
                 </div>
               </div>
               <div class="hidden" aria-hidden="true">
                 <label for="waitlist-company">Company</label>
-                <input id="waitlist-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+                <input
+                  id="waitlist-company"
+                  name="company"
+                  type="text"
+                  tabindex="-1"
+                  autocomplete="off"
+                />
               </div>
               <input type="hidden" name="source" value="subscribe" />
-              <div id="waitlist-turnstile" class="cf-turnstile flex justify-center" data-sitekey={TURNSTILE_SITEKEY} data-action={TURNSTILE_ACTION} data-appearance="interaction-only" />
+              <div
+                id="waitlist-turnstile"
+                class="cf-turnstile flex justify-center"
+                data-sitekey={TURNSTILE_SITEKEY}
+                data-action={TURNSTILE_ACTION}
+                data-appearance="interaction-only"
+              />
               <p id="waitlist-error" class="text-xs text-red-600 text-center" role="alert" />
               <button id="waitlist-submit" type="submit" class="btn btn-primary w-full py-3">
                 Get notified
@@ -161,14 +263,27 @@ const DEFAULT_TIER = 100;
               <p class="text-xs text-ink-3 text-center">
                 By joining you agree we may email you about the launch — nothing else, and no
                 payment is taken now. See our{" "}
-                <a href="https://fossunited.org/privacy-policy" target="_blank" rel="noopener noreferrer" class="inline-link">
+                <a
+                  href="https://fossunited.org/privacy-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-link"
+                >
                   Privacy Policy
-                </a>. To be removed at any time, email{" "}
-                <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link">{REMOVAL_ADDRESS}</a>.
+                </a>
+                . To be removed at any time, email{" "}
+                <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link">
+                  {REMOVAL_ADDRESS}
+                </a>
+                .
               </p>
             </form>
 
-            <div id="waitlist-success" class="hidden note p-4 text-sm text-ink-2" aria-live="polite">
+            <div
+              id="waitlist-success"
+              class="hidden note p-4 text-sm text-ink-2"
+              aria-live="polite"
+            >
               <p class="font-semibold text-ink mb-1">You're on the list</p>
               <p>One email when we open. Nothing else.</p>
             </div>
