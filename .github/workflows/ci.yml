@@ -25,7 +25,7 @@ jobs:
       - name: Reject pre-launch vocabulary in shipped files
         run: |
           if git grep -In -i -e 'phase2' -e 'phase 2' -e 'phase-2' -- . ':(exclude).github/workflows/ci.yml' ; then
-            echo "::error::Use 'post-launch', never 'phase 2', in tracked files."
+            echo "::error::Do not use 'phase 2' in tracked files."
             exit 1
           fi
       - run: pnpm format:check
