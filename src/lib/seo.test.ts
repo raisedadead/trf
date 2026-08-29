@@ -11,7 +11,7 @@ describe("normalizePath", () => {
   });
 
   it("strips a trailing slash", () => {
-    expect(normalizePath("/manage/")).toBe("/manage");
+    expect(normalizePath("/waitlist-confirmed/")).toBe("/waitlist-confirmed");
   });
 });
 
@@ -25,11 +25,11 @@ describe("seoForPath", () => {
   });
 
   it("matches a route from a trailing-slash pathname", () => {
-    expect(seoForPath("/manage/").title).toBe("Manage your contribution — The Rupee Fund");
+    expect(seoForPath("/waitlist-confirmed/").title).toBe("You're on the list — The Rupee Fund");
   });
 
-  it("marks manage as non-indexable", () => {
-    expect(seoForPath("/manage.html").indexable).toBe(false);
+  it("marks a waitlist outcome page as non-indexable", () => {
+    expect(seoForPath("/waitlist-confirmed.html").indexable).toBe(false);
   });
 
   it("falls back to home for an unknown path", () => {

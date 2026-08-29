@@ -3,25 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const VARIANTS = ["launch", "post-launch"] as const;
-type Variant = (typeof VARIANTS)[number];
-
-const LAUNCH_TABLES = ["waitlist"];
-
-const POST_LAUNCH_TABLES = [
-  "ballots",
-  "contributors",
-  "metrics_cache",
-  "processed_events",
-  "proposals",
-  "vote_tokens",
-  "waitlist",
-];
-
-const EXPECTED: Record<Variant, string[]> = {
-  launch: LAUNCH_TABLES,
-  "post-launch": POST_LAUNCH_TABLES,
-};
+const EXPECTED_TABLES = ["waitlist"];
 
 const RETIRED = [
   "0002_waitlist.sql",
@@ -31,32 +13,36 @@ const RETIRED = [
   "0003_voting_post_launch.sql",
 ];
 
-const SHARED_OPEN = "-- >>> shared: waitlist";
-const SHARED_CLOSE = "-- <<< shared: waitlist";
+const GONE_TABLES = [
+  "ballots",
+  "contributors",
+  "metrics_cache",
+  "processed_events",
+  "proposals",
+  "vote_tokens",
+];
 
 const LEDGER_DDL =
   "CREATE TABLE IF NOT EXISTS d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
 
-function dirOf(variant: Variant): string {
-  return fileURLToPath(new URL(`../../migrations/${variant}`, import.meta.url));
-}
+const DIR = fileURLToPath(new URL("../../migrations", import.meta.url));
 
-function migrationFiles(variant: Variant): string[] {
-  return readdirSync(dirOf(variant))
+function migrationFiles(): string[] {
+  return readdirSync(DIR)
     .filter((f) => f.endsWith(".sql"))
     .sort();
 }
 
-function replay(variant: Variant, alreadyRecorded: string[] = []): DatabaseSync {
+function replay(alreadyRecorded: string[] = []): DatabaseSync {
   const db = new DatabaseSync(":memory:");
   db.exec(LEDGER_DDL);
   for (const name of alreadyRecorded) {
     db.prepare("INSERT INTO d1_migrations (name) VALUES (?)").run(name);
   }
-  for (const name of migrationFiles(variant)) {
+  for (const name of migrationFiles()) {
     const seen = db.prepare("SELECT COUNT(*) AS n FROM d1_migrations WHERE name = ?").get(name);
     if ((seen as { n: number }).n > 0) continue;
-    db.exec(readFileSync(`${dirOf(variant)}/${name}`, "utf8"));
+    db.exec(readFileSync(`${DIR}/${name}`, "utf8"));
     db.prepare("INSERT INTO d1_migrations (name) VALUES (?)").run(name);
   }
   return db;
@@ -78,84 +64,50 @@ function tablesOf(db: DatabaseSync): string[] {
     .sort();
 }
 
-function sharedBlock(variant: Variant): string {
-  const sql = readFileSync(`${dirOf(variant)}/0001_init.sql`, "utf8");
-  const start = sql.indexOf(SHARED_OPEN);
-  const end = sql.indexOf(SHARED_CLOSE);
-  if (start < 0 || end < 0) throw new Error(`no shared waitlist block in migrations/${variant}`);
-  return sql.slice(start, end + SHARED_CLOSE.length);
-}
+describe("one migrations directory feeds both databases", () => {
+  it("ships exactly one migration file", () => {
+    expect(migrationFiles()).toEqual(["0001_init.sql"]);
+  });
 
-describe("each environment has its own migrations directory", () => {
-  for (const variant of VARIANTS) {
-    it(`${variant} ships exactly one migration file`, () => {
-      expect(migrationFiles(variant)).toEqual(["0001_init.sql"]);
-    });
+  it("holds no per-environment subdirectory, which is what let the two copies drift", () => {
+    const entries = readdirSync(DIR, { withFileTypes: true });
+    expect(entries.filter((e) => e.isDirectory()).map((e) => e.name)).toEqual([]);
+  });
 
-    it(`${variant} builds its whole schema from that one file`, () => {
-      expect(tablesOf(replay(variant))).toEqual(EXPECTED[variant]);
-    });
+  it("builds the whole schema from that one file", () => {
+    expect(tablesOf(replay())).toEqual(EXPECTED_TABLES);
+  });
 
-    it(`${variant} applies nothing to a database that already recorded it`, () => {
-      expect(tablesOf(replay(variant, ["0001_init.sql"]))).toEqual([]);
-    });
-  }
+  it("applies nothing to a database that already recorded it", () => {
+    expect(tablesOf(replay(["0001_init.sql"]))).toEqual([]);
+  });
 
-  it("keeps the payment and voting tables out of the launch database", () => {
-    const launch = tablesOf(replay("launch"));
-    const postLaunchOnly = POST_LAUNCH_TABLES.filter((t) => !LAUNCH_TABLES.includes(t));
-    expect(postLaunchOnly.length).toBeGreaterThan(0);
-    expect(launch).toEqual(LAUNCH_TABLES);
-    for (const table of postLaunchOnly) {
-      expect(launch).not.toContain(table);
+  it("creates no payment or voting table, which this repository no longer ships", () => {
+    const tables = tablesOf(replay());
+    for (const table of GONE_TABLES) {
+      expect(tables).not.toContain(table);
     }
-  });
-
-  it("gives the post-launch database everything the launch database has", () => {
-    const launch = tablesOf(replay("launch"));
-    const post = tablesOf(replay("post-launch"));
-    expect(post).toEqual(expect.arrayContaining(launch));
-  });
-});
-
-describe("the shared waitlist block cannot drift between the directories", () => {
-  it("is byte-identical in every migrations directory", () => {
-    const [first, ...rest] = VARIANTS.map(sharedBlock);
-    for (const block of rest) expect(block).toBe(first);
-  });
-
-  it("actually contains the waitlist table, so the comparison is not empty", () => {
-    expect(sharedBlock("launch")).toContain("CREATE TABLE waitlist");
   });
 });
 
 describe("wrangler resolves migrations by filename, so a name may never be reused", () => {
-  for (const variant of VARIANTS) {
-    it(`${variant} uses no filename that this repository has retired`, () => {
-      expect(migrationFiles(variant).filter((f) => RETIRED.includes(f))).toEqual([]);
-    });
-  }
-
-  it("keeps no migration at the old flat path, which both ledgers already record", () => {
-    const flat = readdirSync(fileURLToPath(new URL("../../migrations", import.meta.url)));
-    expect(flat.filter((f) => f.endsWith(".sql"))).toEqual([]);
+  it("uses no filename that this repository has retired", () => {
+    expect(migrationFiles().filter((f) => RETIRED.includes(f))).toEqual([]);
   });
 
-  for (const variant of VARIANTS) {
-    it(`${variant} still converges if a later migration is ever added`, () => {
-      const files = migrationFiles(variant);
-      const fromZero = replay(variant);
-      if (files.length > 1) {
-        expect(schemaOf(fromZero)).toEqual(schemaOf(replay(variant, files.slice(0, -1))));
-      }
-      expect(tablesOf(fromZero)).toEqual(EXPECTED[variant]);
-    });
-  }
+  it("still converges if a later migration is ever added", () => {
+    const files = migrationFiles();
+    const fromZero = replay();
+    if (files.length > 1) {
+      expect(schemaOf(fromZero)).toEqual(schemaOf(replay(files.slice(0, -1))));
+    }
+    expect(tablesOf(fromZero)).toEqual(EXPECTED_TABLES);
+  });
 });
 
 describe("the waitlist table records consent and export state", () => {
   const columns = () =>
-    replay("launch")
+    replay()
       .prepare("PRAGMA table_info(waitlist)")
       .all()
       .map((r) => (r as { name: string }).name);
@@ -176,7 +128,7 @@ describe("the waitlist table records consent and export state", () => {
   }
 
   it("requires a consent timestamp, because consent cannot be backfilled", () => {
-    const info = replay("launch")
+    const info = replay()
       .prepare("PRAGMA table_info(waitlist)")
       .all()
       .find((r) => (r as { name: string }).name === "consent_at");
@@ -184,7 +136,7 @@ describe("the waitlist table records consent and export state", () => {
   });
 
   it("hands a row to the exporter once and never again after it is stamped", () => {
-    const db = replay("launch");
+    const db = replay();
     const pending = () =>
       db
         .prepare("SELECT id FROM waitlist WHERE exported_at IS NULL AND unsubscribed_at IS NULL")
@@ -200,7 +152,7 @@ describe("the waitlist table records consent and export state", () => {
   });
 
   it("withholds an unsubscribed row from the exporter", () => {
-    const db = replay("launch");
+    const db = replay();
     db.prepare(
       "INSERT INTO waitlist (email, name, consent_at, source, created_at, updated_at, unsubscribed_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
     ).run("gone@example.com", "G", 1000, "subscribe", 1000, 1000, 1500);

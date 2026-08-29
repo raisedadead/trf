@@ -1,13 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
-import { LAUNCH_LIVE, REMOVAL_ADDRESS, SUBSCRIBE_CTA } from "../lib/launch.ts";
+import { REMOVAL_ADDRESS, SUBSCRIBE_CTA } from "../lib/launch.ts";
 import { TURNSTILE_ACTION, getSitekey } from "../lib/turnstile.ts";
 
 const TURNSTILE_SITEKEY = getSitekey();
-
-const TIERS = [10, 50, 100, 500, 1000] as const;
-const DEFAULT_TIER = 100;
 ---
 
 <Base>
@@ -21,277 +18,75 @@ const DEFAULT_TIER = 100;
           {SUBSCRIBE_CTA}
         </h1>
         <p class="text-ink-2 text-sm">
-          {
-            LAUNCH_LIVE
-              ? "Support FOSS in India, from ₹10/month. Set up UPI AutoPay — cancel anytime."
-              : "Support FOSS in India, from ₹10/month. We will send you an email to set up your UPI AutoPay mandate when Season 1 opens."
-          }
+          Support FOSS in India, from ₹10/month. We will send you an email to set up your UPI
+          AutoPay mandate when Season 1 opens.
         </p>
       </div>
 
-      {
-        LAUNCH_LIVE ? (
-          <form id="autopay-form" class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="autopay-name" class="field-label">
-                  Full Name *
-                </label>
-                <input
-                  id="autopay-name"
-                  name="name"
-                  type="text"
-                  placeholder="Your name"
-                  class="field"
-                  required
-                />
-              </div>
-              <div>
-                <label for="autopay-mobile" class="field-label">
-                  Mobile Number *
-                </label>
-                <input
-                  id="autopay-mobile"
-                  name="mobile"
-                  type="tel"
-                  placeholder="+91 98765 43210"
-                  class="field"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label for="autopay-email" class="field-label">
-                Email Address *
-              </label>
-              <input
-                id="autopay-email"
-                name="email"
-                type="email"
-                placeholder="your.email@example.com"
-                class="field"
-                required
-              />
-            </div>
-            <div>
-              <label for="autopay-pan" class="field-label">
-                PAN Number *
-              </label>
-              <input
-                id="autopay-pan"
-                name="pan"
-                type="text"
-                placeholder="ABCDE1234F"
-                class="field uppercase font-mono"
-                maxlength="10"
-                required
-              />
-            </div>
-            <div>
-              <label for="autopay-address" class="field-label">
-                Contact Address *
-              </label>
-              <textarea
-                id="autopay-address"
-                name="address"
-                placeholder="Street, City, State, PIN"
-                rows="2"
-                class="field resize-none"
-                required
-              />
-            </div>
-            <p class="text-xs text-ink-3">
-              PAN and address let FOSS United Foundation issue 80G tax benefits via its annual
-              filing (Form 10BD). Held by the Foundation and shared with our payment processor — not
-              stored by this site.
-            </p>
+      <form id="waitlist-form" class="space-y-4" action="/api/waitlist" method="post">
+        <div>
+          <label for="waitlist-name" class="field-label">Full Name *</label>
+          <input
+            id="waitlist-name"
+            name="name"
+            type="text"
+            placeholder="Your name"
+            class="field"
+            required
+          />
+        </div>
+        <div>
+          <label for="waitlist-email" class="field-label">Email Address *</label>
+          <input
+            id="waitlist-email"
+            name="email"
+            type="email"
+            placeholder="your.email@example.com"
+            class="field"
+            required
+          />
+        </div>
+        <div class="hidden" aria-hidden="true">
+          <label for="waitlist-company">Company</label>
+          <input
+            id="waitlist-company"
+            name="company"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+          />
+        </div>
+        <input type="hidden" name="source" value="subscribe" />
+        <div
+          id="waitlist-turnstile"
+          class="cf-turnstile flex justify-center"
+          data-sitekey={TURNSTILE_SITEKEY}
+          data-action={TURNSTILE_ACTION}
+          data-appearance="interaction-only"
+        >
+        </div>
+        <p id="waitlist-error" class="text-xs text-red-600 text-center" role="alert"></p>
+        <button id="waitlist-submit" type="submit" class="btn btn-primary btn-block">
+          Get notified
+        </button>
+        <p class="text-xs text-ink-3 text-center">
+          By joining you agree we may email you about the launch — nothing else, and no payment is
+          taken now. See our <a
+            href="https://fossunited.org/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-link">Privacy Policy</a
+          >. To be removed at any time, email <a
+            href={`mailto:${REMOVAL_ADDRESS}`}
+            class="inline-link">{REMOVAL_ADDRESS}</a
+          >.
+        </p>
+      </form>
 
-            <fieldset>
-              <legend class="field-label">Monthly Contribution (₹) *</legend>
-              <input type="hidden" name="tier" id="tier-value" value={String(DEFAULT_TIER)} />
-              <div class="flex flex-wrap gap-2" id="tier-group">
-                {TIERS.map((tier) => (
-                  <button
-                    type="button"
-                    data-tier={tier}
-                    aria-pressed={tier === DEFAULT_TIER ? "true" : "false"}
-                    class="choice text-xs font-mono active:scale-[0.98] focus-visible:ring-offset-1"
-                  >
-                    ₹{tier}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-
-            <div class="note p-3">
-              <div class="flex gap-2">
-                <Icon name="alert" class="text-brand-fg flex-shrink-0 mt-0.5" size={16} />
-                <div class="text-xs text-ink-2">
-                  <p class="font-semibold mb-1 text-ink">Early-bird UPI AutoPay</p>
-                  <p>
-                    Set up a UPI AutoPay mandate you can cancel anytime. Your first contribution is
-                    collected when Season 1 opens.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-2 bg-card p-3 rounded-lg border border-ink/10 shadow-soft">
-              <input
-                type="checkbox"
-                id="terms"
-                name="terms"
-                class="mt-1 w-4 h-4 accent-brand border-ink/20 rounded"
-                required
-              />
-              <label for="terms" class="text-xs text-ink-2 leading-relaxed">
-                I authorize FOSS United Foundation to collect my recurring contribution via UPI
-                AutoPay, and accept the{" "}
-                <a
-                  href="https://fossunited.org/terms-of-service"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-link"
-                >
-                  Terms
-                </a>
-                ,{" "}
-                <a
-                  href="https://fossunited.org/privacy-policy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-link"
-                >
-                  Privacy Policy
-                </a>{" "}
-                and{" "}
-                <a
-                  href="https://fossunited.org/refund-transfer-policy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-link"
-                >
-                  Refund Policy
-                </a>
-                .
-              </label>
-            </div>
-
-            <label class="flex items-start gap-2 text-xs text-ink-2">
-              <input
-                type="checkbox"
-                name="newsletter"
-                checked
-                class="mt-0.5 w-4 h-4 accent-brand border-ink/20 rounded"
-              />
-              Email me occasional Rupee Fund updates. Unsubscribe anytime.
-            </label>
-            <p id="autopay-error" class="text-xs text-red-600 text-center" role="alert" />
-            <button
-              type="submit"
-              id="autopay-submit"
-              class="btn btn-primary btn-block disabled:opacity-60 disabled:pointer-events-none"
-            >
-              Set Up UPI AutoPay
-            </button>
-            <p class="text-xs text-ink-3 text-center">
-              Processed securely by Razorpay · Cancel anytime · India only
-            </p>
-          </form>
-        ) : (
-          <Fragment>
-            <form id="waitlist-form" class="space-y-4" action="/api/waitlist" method="post">
-              <div>
-                <label for="waitlist-name" class="field-label">
-                  Full Name *
-                </label>
-                <input
-                  id="waitlist-name"
-                  name="name"
-                  type="text"
-                  placeholder="Your name"
-                  class="field"
-                  required
-                />
-              </div>
-              <div>
-                <label for="waitlist-email" class="field-label">
-                  Email Address *
-                </label>
-                <input
-                  id="waitlist-email"
-                  name="email"
-                  type="email"
-                  placeholder="your.email@example.com"
-                  class="field"
-                  required
-                />
-              </div>
-              <div class="hidden" aria-hidden="true">
-                <label for="waitlist-company">Company</label>
-                <input
-                  id="waitlist-company"
-                  name="company"
-                  type="text"
-                  tabindex="-1"
-                  autocomplete="off"
-                />
-              </div>
-              <input type="hidden" name="source" value="subscribe" />
-              <div
-                id="waitlist-turnstile"
-                class="cf-turnstile flex justify-center"
-                data-sitekey={TURNSTILE_SITEKEY}
-                data-action={TURNSTILE_ACTION}
-                data-appearance="interaction-only"
-              />
-              <p id="waitlist-error" class="text-xs text-red-600 text-center" role="alert" />
-              <button id="waitlist-submit" type="submit" class="btn btn-primary btn-block">
-                Get notified
-              </button>
-              <p class="text-xs text-ink-3 text-center">
-                By joining you agree we may email you about the launch — nothing else, and no
-                payment is taken now. See our{" "}
-                <a
-                  href="https://fossunited.org/privacy-policy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-link"
-                >
-                  Privacy Policy
-                </a>
-                . To be removed at any time, email{" "}
-                <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link">
-                  {REMOVAL_ADDRESS}
-                </a>
-                .
-              </p>
-            </form>
-
-            <div
-              id="waitlist-success"
-              class="hidden note p-4 text-sm text-ink-2"
-              aria-live="polite"
-            >
-              <p class="font-semibold text-ink mb-1">You're on the list</p>
-              <p>One email when we open. Nothing else.</p>
-            </div>
-          </Fragment>
-        )
-      }
-
-      {
-        LAUNCH_LIVE && (
-          <div class="mt-4 text-center">
-            <a
-              href="/manage"
-              class="text-xs text-ink-2 hover:text-brand-fg font-medium transition-colors duration-150 ease-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg/50"
-            >
-              Preview the member dashboard →
-            </a>
-          </div>
-        )
-      }
+      <div id="waitlist-success" class="hidden note p-4 text-sm text-ink-2" aria-live="polite">
+        <p class="font-semibold text-ink mb-1">You're on the list</p>
+        <p>One email when we open. Nothing else.</p>
+      </div>
     </div>
   </div>
 </Base>

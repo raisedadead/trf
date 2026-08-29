@@ -1,5 +1,3 @@
-export const LAUNCH_LIVE: boolean = import.meta.env.PUBLIC_LAUNCH_LIVE === "true";
-
 export const LAUNCH_EVENT = "IndiaFOSS 2026";
 export const LAUNCH_EVENT_URL = "https://fossunited.org/indiafoss/2026";
 export const LAUNCH_DATES = "26–27 September";
@@ -7,9 +5,7 @@ export const LAUNCH_CITY = "Bengaluru";
 
 export const LAUNCH_WHEN = `${LAUNCH_EVENT}, ${LAUNCH_DATES}, ${LAUNCH_CITY}`;
 
-export const SUBSCRIBE_CTA = LAUNCH_LIVE
-  ? "Become a Founding Contributor"
-  : "Get notified at launch";
+export const SUBSCRIBE_CTA = "Get notified at launch";
 
 export const REMOVAL_ADDRESS = "foundation@fossunited.org";
 

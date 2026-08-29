@@ -56,12 +56,8 @@ describe("the shipped Content-Security-Policy is enforced, not advisory", () => 
     expect(policy()["object-src"]).toEqual(["'none'"]);
   });
 
-  it("confines form submissions to our own origin and the payment provider", () => {
-    expect(policy()["form-action"]).toEqual([
-      "'self'",
-      "https://api.razorpay.com",
-      "https://checkout.razorpay.com",
-    ]);
+  it("confines form submissions to our own origin", () => {
+    expect(policy()["form-action"]).toEqual(["'self'"]);
   });
 });
 
@@ -99,14 +95,10 @@ describe("the policy permits everything the built pages actually load", () => {
     expect(policy()["script-src"]).toContain("'unsafe-inline'");
   });
 
-  it("still permits the post-launch payment surface, which ships the same _headers file", () => {
-    expect(allows("script-src", "https://checkout.razorpay.com")).toBe(true);
-    expect(allows("frame-src", "https://api.razorpay.com")).toBe(true);
-    expect(allows("connect-src", "https://lumberjack.razorpay.com")).toBe(true);
-  });
-
-  it("allows the two origins Razorpay checkout injects at runtime, which no scan of dist can find", () => {
-    expect(allows("script-src", "https://cdn.razorpay.com")).toBe(true);
-    expect(allows("connect-src", "https://lumberjack-cx.razorpay.com")).toBe(true);
+  it("names no payment origin, now that no page loads one", () => {
+    const line = headers()
+      .split("\n")
+      .find((l) => l.trim().startsWith("Content-Security-Policy:"));
+    expect(line).not.toContain("razorpay");
   });
 });

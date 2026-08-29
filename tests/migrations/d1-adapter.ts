@@ -3,11 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 import type { D1Database } from "@cloudflare/workers-types";
 
-export type SchemaVariant = "launch" | "post-launch";
-
-function migrationsDir(variant: SchemaVariant): string {
-  return fileURLToPath(new URL(`../../migrations/${variant}`, import.meta.url));
-}
+const MIGRATIONS_DIR = fileURLToPath(new URL("../../migrations", import.meta.url));
 
 type Row = Record<string, unknown>;
 
@@ -27,11 +23,11 @@ function statementFor(db: DatabaseSync, sql: string, args: unknown[]) {
   };
 }
 
-export function migratedD1(variant: SchemaVariant = "launch"): {
+export function migratedD1(): {
   db: D1Database;
   raw: DatabaseSync;
 } {
-  const dir = migrationsDir(variant);
+  const dir = MIGRATIONS_DIR;
   const raw = new DatabaseSync(":memory:");
   for (const name of readdirSync(dir)
     .filter((f) => f.endsWith(".sql"))

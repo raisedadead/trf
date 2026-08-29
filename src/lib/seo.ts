@@ -1,4 +1,4 @@
-import { LAUNCH_LIVE, SUBSCRIBE_CTA } from "./launch.ts";
+import { SUBSCRIBE_CTA } from "./launch.ts";
 
 export const SITE_URL = "https://rupeefund.org";
 export const OG_IMAGE = `${SITE_URL}/logo-foss-united-rupee-fund.png`;
@@ -28,45 +28,13 @@ const ROUTE_SEO: readonly RouteSeo[] = [
   {
     path: "/subscribe",
     title: `${SUBSCRIBE_CTA} — The Rupee Fund`,
-    description: LAUNCH_LIVE
-      ? "Set up monthly UPI AutoPay from ₹10 and fund Indian open source. Cancel anytime. A FOSS United Foundation initiative."
-      : "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United Foundation initiative.",
-    ogTitle: LAUNCH_LIVE
-      ? "Become a Founding Contributor"
-      : "Get notified when the Rupee Fund opens",
-    ogDescription: LAUNCH_LIVE
-      ? "Monthly UPI AutoPay from ₹10 for Indian FOSS maintainers. Cancel anytime."
-      : "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
+    description:
+      "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United Foundation initiative.",
+    ogTitle: "Get notified when the Rupee Fund opens",
+    ogDescription:
+      "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
     canonical: `${SITE_URL}/subscribe`,
     indexable: true,
-  },
-  {
-    path: "/manage",
-    title: "Manage your contribution — The Rupee Fund",
-    description: "Manage or cancel your monthly Rupee Fund contribution.",
-    ogTitle: "Manage your Rupee Fund contribution",
-    ogDescription: "Update or cancel your monthly Rupee Fund contribution.",
-    canonical: `${SITE_URL}/manage`,
-    indexable: false,
-  },
-  {
-    path: "/thank-you",
-    title: "Thank you — The Rupee Fund",
-    description: "Your monthly Rupee Fund contribution is being set up.",
-    ogTitle: "Thank you — The Rupee Fund",
-    ogDescription: "Your monthly Rupee Fund contribution is being set up.",
-    canonical: `${SITE_URL}/thank-you`,
-    indexable: false,
-  },
-  {
-    path: "/vote",
-    title: "Vote — The Rupee Fund",
-    description:
-      "Eligible Rupee Fund contributors vote on how the fund supports Indian open source. A FOSS United Foundation initiative.",
-    ogTitle: "Vote on Rupee Fund proposals",
-    ogDescription: "Eligible contributors decide how The Rupee Fund supports Indian open source.",
-    canonical: `${SITE_URL}/vote`,
-    indexable: false,
   },
   {
     path: "/waitlist-confirmed",

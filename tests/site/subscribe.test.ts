@@ -6,20 +6,33 @@ let html = "";
 let bundle = "";
 beforeAll(() => {
   html = readFileSync("dist/subscribe.html", "utf8");
-  const entrySrc = html.match(/\/_astro\/subscribe[^"']*\.js/)?.[0];
-  bundle = entrySrc ? readBundle(entrySrc) : "";
+  bundle = [...inlineModules(), ...externalModules()].join("\n");
 });
 
-function readBundle(entrySrc: string): string {
-  const entryPath = resolve("dist", `.${entrySrc}`);
-  const entry = readFileSync(entryPath, "utf8");
-  const imports = [...entry.matchAll(/(?:from|import)\s*["'](\.\/[^"']+\.js)["']/g)].map((m) =>
-    readFileSync(resolve(dirname(entryPath), m[1]), "utf8"),
-  );
-  return [entry, ...imports].join("\n");
+// Astro inlines a small enough island and emits a file for a larger one. The
+// waitlist script sits near that threshold, so read both rather than assume.
+function inlineModules(): string[] {
+  return [...html.matchAll(/<script type="module"[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
 }
 
-describe("Subscribe page (/subscribe) — pre-launch (waitlist-only, PUBLIC_LAUNCH_LIVE unset)", () => {
+function externalModules(): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const queue = [...html.matchAll(/\/_astro\/[^"']+\.js/g)].map((m) => resolve("dist", `.${m[0]}`));
+  while (queue.length > 0) {
+    const path = queue.pop()!;
+    if (seen.has(path)) continue;
+    seen.add(path);
+    const source = readFileSync(path, "utf8");
+    out.push(source);
+    for (const m of source.matchAll(/(?:from|import)\s*["'](\.\/[^"']+\.js)["']/g)) {
+      queue.push(resolve(dirname(path), m[1]));
+    }
+  }
+  return out;
+}
+
+describe("Subscribe page (/subscribe)", () => {
   it("asks to be notified rather than to contribute, while payments are closed", () => {
     expect(html).toContain("Get notified at launch");
     expect(html).not.toContain("Become a Founding Contributor");
@@ -31,13 +44,17 @@ describe("Subscribe page (/subscribe) — pre-launch (waitlist-only, PUBLIC_LAUN
     expect(html).toContain('id="waitlist-email"');
   });
 
-  it("does not render the autopay form or PII fields pre-launch", () => {
+  it("renders no payment form and asks for no PAN or address", () => {
     expect(html).not.toContain('id="autopay-form"');
     expect(html).not.toContain('id="autopay-pan"');
     expect(html).not.toContain('id="autopay-address"');
   });
 
-  it("wires the waitlist submit path in the island bundle", () => {
+  it("loads no payment provider script", () => {
+    expect(html).not.toContain("razorpay");
+  });
+
+  it("wires the waitlist submit path into the shipped island", () => {
     expect(html).toContain('<script type="module"');
     expect(bundle).toContain("/api/waitlist");
   });

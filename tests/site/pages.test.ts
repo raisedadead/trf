@@ -46,38 +46,6 @@ describe("Home page (/)", () => {
   });
 });
 
-describe("Manage page (/manage)", () => {
-  const html = read("manage.html");
-
-  it("renders the heading", () => {
-    expect(html).toContain("Manage Subscription");
-  });
-
-  it("renders the preview empty state", () => {
-    expect(html).toContain("No active subscription yet");
-  });
-
-  it("is marked noindex", () => {
-    expect(html).toContain('name="robots" content="noindex"');
-  });
-});
-
-describe("Thank-you page (/thank-you)", () => {
-  const html = read("thank-you.html");
-
-  it("renders the founding-contributor heading", () => {
-    expect(html).toContain("You're a Founding Contributor");
-  });
-
-  it("renders the share action", () => {
-    expect(html).toContain('id="share-btn"');
-  });
-
-  it("is marked noindex", () => {
-    expect(html).toContain('name="robots" content="noindex"');
-  });
-});
-
 describe("404 page", () => {
   const html = read("404.html");
 

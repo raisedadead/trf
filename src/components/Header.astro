@@ -1,18 +1,12 @@
 ---
 import Icon from "./Icon.astro";
 import { normalizePath } from "../lib/seo.ts";
-import { LAUNCH_LIVE } from "../lib/launch.ts";
 
 const path = normalizePath(Astro.url.pathname);
 
-const links = [
-  { href: "/", label: "Home" },
-  ...(LAUNCH_LIVE ? [{ href: "/manage", label: "Manage" }] : []),
-];
+const links = [{ href: "/", label: "Home" }];
 
-const subscribeCta = LAUNCH_LIVE
-  ? { href: "/subscribe", label: "Subscribe" }
-  : { href: "/subscribe", label: "Notify me" };
+const subscribeCta = { href: "/subscribe", label: "Notify me" };
 ---
 
 <header class="bg-white border-b-2 border-ink sticky top-0 z-50">

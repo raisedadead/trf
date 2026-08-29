@@ -2,7 +2,6 @@
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import {
-  LAUNCH_LIVE,
   LAUNCH_EVENT,
   LAUNCH_EVENT_URL,
   LAUNCH_WHEN,
@@ -41,7 +40,7 @@ import {
           </h1>
           <div class="mt-auto flex flex-wrap gap-3">
             <a href="/subscribe" class="btn btn-primary btn-lg">
-              <Icon name={LAUNCH_LIVE ? "heart" : "bell"} size={18} />
+              <Icon name="bell" size={18} />
               {SUBSCRIBE_CTA}
             </a>
           </div>

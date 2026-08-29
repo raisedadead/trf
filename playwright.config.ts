@@ -25,11 +25,6 @@ export default defineConfig({
       testDir: "./tests/e2e/no-js",
       use: { ...devices["Desktop Chrome"], javaScriptEnabled: false },
     },
-    {
-      name: "post-launch",
-      testDir: "./tests/e2e/post-launch",
-      use: { ...devices["Desktop Chrome"] },
-    },
   ],
   webServer: {
     command: "pnpm preview",

@@ -1,117 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { initTiers, submitAutopay, submitWaitlist } from "./subscribe.ts";
+import { submitWaitlist } from "./subscribe.ts";
 
 function okJson(body: unknown, status = 200) {
   return { ok: status >= 200 && status < 300, status, json: async () => body };
 }
-
-describe("submitAutopay", () => {
-  beforeEach(() => {
-    document.body.innerHTML = `
-      <form id="autopay-form">
-        <input name="name" value="Ada" />
-        <input name="email" value="ada@example.com" />
-        <input name="mobile" value="+91 90000 00000" />
-        <input id="tier-value" value="100" />
-        <button id="autopay-submit">Set Up UPI AutoPay</button>
-        <p id="autopay-error"></p>
-      </form>`;
-  });
-
-  const okSubscribe = () =>
-    okJson({ subscription_id: "sub_1", key_id: "rzp_test_k", short_url: "https://rzp.io/x" });
-
-  it("opens the Razorpay checkout modal on a successful subscribe", async () => {
-    const openCheckout = vi.fn().mockResolvedValue(undefined);
-    const fetchImpl = vi.fn().mockResolvedValue(okSubscribe());
-    const form = document.getElementById("autopay-form") as HTMLFormElement;
-
-    await submitAutopay(form, { fetchImpl, navigate: vi.fn(), openCheckout });
-
-    expect(fetchImpl).toHaveBeenCalledWith(
-      "/api/subscribe",
-      expect.objectContaining({ method: "POST" }),
-    );
-    expect(openCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({ subscription_id: "sub_1", key: "rzp_test_k" }),
-    );
-  });
-
-  it("verifies the signature and lands on thank-you when the mandate is authorized", async () => {
-    const navigate = vi.fn();
-    const fetchImpl = vi
-      .fn()
-      .mockResolvedValueOnce(okSubscribe())
-      .mockResolvedValueOnce(okJson({ ok: true }));
-    const openCheckout = vi.fn().mockImplementation((opts) =>
-      Promise.resolve(
-        opts.handler({
-          razorpay_payment_id: "pay_1",
-          razorpay_subscription_id: "sub_1",
-          razorpay_signature: "sig_1",
-        }),
-      ),
-    );
-    const form = document.getElementById("autopay-form") as HTMLFormElement;
-
-    await submitAutopay(form, { fetchImpl, navigate, openCheckout });
-
-    expect(fetchImpl).toHaveBeenCalledWith(
-      "/api/subscribe/verify",
-      expect.objectContaining({ method: "POST" }),
-    );
-    expect(navigate).toHaveBeenCalledWith("/thank-you");
-  });
-
-  it("re-enables the submit button when the modal is dismissed", async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(okSubscribe());
-    const openCheckout = vi.fn().mockImplementation((opts) => {
-      opts.modal.ondismiss();
-      return Promise.resolve();
-    });
-    const form = document.getElementById("autopay-form") as HTMLFormElement;
-    const submit = document.getElementById("autopay-submit") as HTMLButtonElement;
-
-    await submitAutopay(form, { fetchImpl, navigate: vi.fn(), openCheckout });
-
-    expect(submit.disabled).toBe(false);
-  });
-
-  it("falls back to the short_url redirect when the modal cannot open", async () => {
-    const navigate = vi.fn();
-    const fetchImpl = vi.fn().mockResolvedValue(okSubscribe());
-    const openCheckout = vi.fn().mockRejectedValue(new Error("blocked"));
-    const form = document.getElementById("autopay-form") as HTMLFormElement;
-
-    await submitAutopay(form, { fetchImpl, navigate, openCheckout });
-
-    expect(navigate).toHaveBeenCalledWith("https://rzp.io/x");
-  });
-
-  it("shows the already-subscribed message and re-enables on 409", async () => {
-    const openCheckout = vi.fn();
-    const fetchImpl = vi.fn().mockResolvedValue(okJson({}, 409));
-    const form = document.getElementById("autopay-form") as HTMLFormElement;
-    const submit = document.getElementById("autopay-submit") as HTMLButtonElement;
-
-    await submitAutopay(form, { fetchImpl, navigate: vi.fn(), openCheckout });
-
-    expect(openCheckout).not.toHaveBeenCalled();
-    expect(document.getElementById("autopay-error")?.textContent).toContain("already subscribed");
-    expect(submit.disabled).toBe(false);
-  });
-
-  it("shows a network error and re-enables on fetch rejection", async () => {
-    const fetchImpl = vi.fn().mockRejectedValue(new Error("offline"));
-    const form = document.getElementById("autopay-form") as HTMLFormElement;
-    const submit = document.getElementById("autopay-submit") as HTMLButtonElement;
-
-    await submitAutopay(form, { fetchImpl, navigate: vi.fn(), openCheckout: vi.fn() });
-
-    expect(document.getElementById("autopay-error")?.textContent).toContain("Network error");
-    expect(submit.disabled).toBe(false);
-  });
-});
 
 describe("submitWaitlist", () => {
   beforeEach(() => {
@@ -216,25 +108,5 @@ describe("submitWaitlist", () => {
 
     expect(fetchImpl).not.toHaveBeenCalled();
     expect(document.getElementById("waitlist-error")?.textContent).toMatch(/bot check/i);
-  });
-});
-
-describe("initTiers", () => {
-  it("marks the clicked tier active and updates the hidden value", () => {
-    document.body.innerHTML = `
-      <input id="tier-value" value="100" />
-      <div id="tier-group">
-        <button data-tier="100" aria-pressed="true">₹100</button>
-        <button data-tier="500" aria-pressed="false">₹500</button>
-      </div>`;
-    initTiers(document);
-    const btn500 = document.querySelector<HTMLButtonElement>('button[data-tier="500"]')!;
-    btn500.click();
-
-    expect((document.getElementById("tier-value") as HTMLInputElement).value).toBe("500");
-    expect(btn500.getAttribute("aria-pressed")).toBe("true");
-    expect(document.querySelector('button[data-tier="100"]')?.getAttribute("aria-pressed")).toBe(
-      "false",
-    );
   });
 });

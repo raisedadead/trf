@@ -6,7 +6,10 @@ describe("active-nav highlight", () => {
     expect(read("index.html")).toContain('aria-current="page"');
   });
 
-  it("offers no Manage nav item in a launch build, even on the gated page itself", () => {
-    expect(read("manage.html")).not.toContain('href="/manage"');
+  it("offers no nav item for a page this build no longer ships", () => {
+    for (const href of ['href="/manage"', 'href="/vote"', 'href="/thank-you"']) {
+      expect(read("index.html")).not.toContain(href);
+      expect(read("subscribe.html")).not.toContain(href);
+    }
   });
 });

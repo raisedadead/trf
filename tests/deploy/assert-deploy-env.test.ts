@@ -62,15 +62,6 @@ describe("the deploy guard refuses a launch build that cannot take signups", () 
       expect(stderr).toContain(key);
     });
   }
-
-  it("refuses a launch build that also turns the payment pages on", () => {
-    const { code, stderr } = run({
-      PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY,
-      PUBLIC_LAUNCH_LIVE: "true",
-    });
-    expect(code).toBe(1);
-    expect(stderr).toContain("PUBLIC_LAUNCH_LIVE");
-  });
 });
 
 describe("the deploy guard refuses a Turnstile configuration that checks nothing", () => {
@@ -99,48 +90,5 @@ describe("the deploy guard refuses a Turnstile configuration that checks nothing
     const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY }, [], dir);
     expect(code).toBe(1);
     expect(stderr).toContain("TURNSTILE_ACTION is not set");
-  });
-});
-
-describe("the deploy guard holds the post-launch build to its own rules", () => {
-  it("passes with a real sitekey and the payment pages on", () => {
-    const { code } = run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_LAUNCH_LIVE: "true" }, [
-      "--post-launch",
-    ]);
-    expect(code).toBe(0);
-  });
-
-  it("refuses a post-launch build that leaves the payment pages off", () => {
-    const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY }, ["--post-launch"]);
-    expect(code).toBe(1);
-    expect(stderr).toContain("PUBLIC_LAUNCH_LIVE");
-  });
-
-  it("refuses a configuration that declares no post-launch environment", () => {
-    const dir = repoWith((c) => {
-      delete (c.env as Record<string, unknown>)["post-launch"];
-    });
-    const { code, stderr } = run(
-      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_LAUNCH_LIVE: "true" },
-      ["--post-launch"],
-      dir,
-    );
-    expect(code).toBe(1);
-    expect(stderr).toContain("declares no env.post-launch");
-  });
-
-  it("refuses a placeholder database id", () => {
-    const dir = repoWith((c) => {
-      const env = (c.env as Record<string, Record<string, unknown>>)["post-launch"];
-      (env.d1_databases as Record<string, string>[])[0].database_id =
-        "REPLACE_WITH_POST_LAUNCH_D1_ID";
-    });
-    const { code, stderr } = run(
-      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_LAUNCH_LIVE: "true" },
-      ["--post-launch"],
-      dir,
-    );
-    expect(code).toBe(1);
-    expect(stderr).toContain("placeholder database_id");
   });
 });

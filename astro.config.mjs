@@ -12,8 +12,8 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) =>
-        !["manage", "thank-you", "vote", "404", "waitlist-confirmed", "waitlist-problem"].some(
-          (slug) => page.replace(/\/$/, "").endsWith(`/${slug}`),
+        !["404", "waitlist-confirmed", "waitlist-problem"].some((slug) =>
+          page.replace(/\/$/, "").endsWith(`/${slug}`),
         ),
     }),
   ],
