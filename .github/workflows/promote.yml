@@ -53,21 +53,37 @@ jobs:
               ;;
           esac
 
+      # Naming the checks is the point. "at least one check run and none failed"
+      # passes on a commit that deleted the CI workflow, and passes on a single
+      # unrelated run from another app. Add a name here when ci.yml gains a job.
       - name: Refuse a commit whose checks did not pass
         env:
           SHA: ${{ steps.target.outputs.sha }}
         run: |
-          conclusions="$(gh api "repos/${REPO}/commits/${SHA}/check-runs" \
-            --jq '.check_runs[] | select(.name != "promote") | .conclusion')"
-          if [ -z "$conclusions" ]; then
-            echo "::error::${SHA} has no check runs. CI must pass before a promote."
-            exit 1
-          fi
-          if grep -qvE '^(success|skipped|neutral)$' <<<"$conclusions"; then
-            echo "::error::${SHA} has a check run that did not pass:"
-            printf '%s\n' "$conclusions"
-            exit 1
-          fi
+          required="check
+          build (launch)
+          e2e"
+          runs="$(gh api --paginate "repos/${REPO}/commits/${SHA}/check-runs?filter=latest" \
+            --jq '.check_runs[] | [.name, .conclusion] | @tsv')"
+          failed=0
+          while IFS= read -r name; do
+            [ -n "$name" ] || continue
+            conclusion="$(printf '%s\n' "$runs" | awk -F'\t' -v n="$name" '$1 == n {print $2}' | tail -n 1)"
+            case "$conclusion" in
+              success | skipped | neutral) echo "ok   ${name}: ${conclusion}" ;;
+              "")
+                echo "::error::${SHA} has no check run named '${name}'. CI must run before a promote."
+                failed=1
+                ;;
+              *)
+                echo "::error::${SHA} check '${name}' concluded '${conclusion}'."
+                failed=1
+                ;;
+            esac
+          done <<EOF
+          $required
+          EOF
+          [ "$failed" -eq 0 ]
 
       # force:false makes GitHub itself refuse anything but a fast-forward, so a
       # divergent live fails here instead of silently losing history.
