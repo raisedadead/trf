@@ -1,0 +1,89 @@
+name: Promote to live
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit on main to promote. Empty means the tip of main."
+        required: false
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: promote-live
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    permissions:
+      contents: write
+      checks: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Resolve the commit to promote
+        id: target
+        env:
+          REQUESTED: ${{ inputs.sha }}
+        run: |
+          main="$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha')"
+          sha="${REQUESTED:-$main}"
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          echo "main is at ${main}"
+          echo "promoting ${sha}"
+
+      # compare/<base>...<head> reports head relative to base, so main being
+      # ahead of the target — or identical to it — is what puts the target on
+      # main. Anything else fails closed.
+      - name: Refuse a commit that is not on main
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          status="$(gh api "repos/${REPO}/compare/${SHA}...main" --jq '.status')"
+          case "$status" in
+            identical | ahead) echo "${SHA} is on main (${status})" ;;
+            *)
+              echo "::error::${SHA} is not on main (compare reports '${status}'). Only main is promotable."
+              exit 1
+              ;;
+          esac
+
+      - name: Refuse a commit whose checks did not pass
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          conclusions="$(gh api "repos/${REPO}/commits/${SHA}/check-runs" \
+            --jq '.check_runs[] | select(.name != "promote") | .conclusion')"
+          if [ -z "$conclusions" ]; then
+            echo "::error::${SHA} has no check runs. CI must pass before a promote."
+            exit 1
+          fi
+          if grep -qvE '^(success|skipped|neutral)$' <<<"$conclusions"; then
+            echo "::error::${SHA} has a check run that did not pass:"
+            printf '%s\n' "$conclusions"
+            exit 1
+          fi
+
+      # force:false makes GitHub itself refuse anything but a fast-forward, so a
+      # divergent live fails here instead of silently losing history.
+      - name: Fast-forward live
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          current="$(gh api "repos/${REPO}/git/ref/heads/live" --jq '.object.sha' 2>/dev/null || true)"
+          if [ -z "$current" ]; then
+            echo "::error::The live branch does not exist. Create it before the first promote."
+            exit 1
+          fi
+          if [ "$current" = "$SHA" ]; then
+            echo "live is already at ${SHA}. Nothing to promote."
+            exit 0
+          fi
+          gh api --method PATCH "repos/${REPO}/git/refs/heads/live" \
+            -f "sha=${SHA}" -F "force=false"
+          echo "live is now at ${SHA}"

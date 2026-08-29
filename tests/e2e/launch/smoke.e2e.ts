@@ -7,11 +7,11 @@ const ROUTES = [
   { path: "/waitlist-problem", title: /didn't go through/, h1: /didn't go through/ },
 ] as const;
 
-const GATED = ["/manage", "/vote", "/thank-you", "/vote.html"] as const;
+const REMOVED = ["/manage", "/vote", "/thank-you", "/vote.html"] as const;
 
 test.describe("public pages smoke", () => {
-  for (const path of GATED) {
-    test(`${path} is not reachable in a launch build`, async ({ page }) => {
+  for (const path of REMOVED) {
+    test(`${path} is gone, not merely hidden`, async ({ page }) => {
       const response = await page.goto(path);
       expect(response?.status()).toBe(404);
     });
