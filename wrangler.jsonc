@@ -48,4 +48,53 @@
       "head_sampling_rate": 1,
     },
   },
+  "env": {
+    "beta": {
+      "name": "trf-beta",
+      "routes": [{ "pattern": "beta.rupeefund.org", "custom_domain": true }],
+      "vars": {
+        "TURNSTILE_HOSTNAMES": "beta.rupeefund.org",
+        "TURNSTILE_ACTION": "waitlist_signup",
+      },
+      "assets": {
+        "binding": "ASSETS",
+        "directory": "./dist",
+        "not_found_handling": "404-page",
+        "run_worker_first": ["/api/*"],
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "trf-rupeefund-beta",
+          "database_id": "REPLACE_WITH_BETA_D1_ID",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "secrets": {
+        "required": ["TURNSTILE_SECRET"],
+      },
+      "ratelimits": [
+        {
+          "name": "SIGNUP_LIMITER",
+          "namespace_id": "7302",
+          "simple": { "limit": 30, "period": 60 },
+        },
+      ],
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 1,
+          "persist": true,
+          "invocation_logs": true,
+        },
+        "traces": {
+          "enabled": true,
+          "persist": true,
+          "head_sampling_rate": 1,
+        },
+      },
+    },
+  },
 }

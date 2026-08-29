@@ -92,3 +92,91 @@ describe("the deploy guard refuses a Turnstile configuration that checks nothing
     expect(stderr).toContain("TURNSTILE_ACTION is not set");
   });
 });
+
+describe("the deploy guard holds the beta build to the beta configuration", () => {
+  const betaRepo = () =>
+    repoWith((c) => {
+      const beta = (c.env as Record<string, Record<string, unknown>>).beta;
+      (beta.d1_databases as Record<string, unknown>[])[0].database_id = "real-beta-id";
+    });
+
+  it("passes a beta build once the database id is real", () => {
+    const { code } = run(
+      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "beta" },
+      ["--env", "beta"],
+      betaRepo(),
+    );
+    expect(code).toBe(0);
+  });
+
+  it("refuses the placeholder database id, so beta cannot write to the live list", () => {
+    const { code, stderr } = run(
+      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "beta" },
+      ["--env", "beta"],
+    );
+    expect(code).toBe(1);
+    expect(stderr).toContain("placeholder database_id");
+  });
+
+  it("refuses a beta build that forgets PUBLIC_SITE_ENV, which would ship an indexable beta", () => {
+    const { code, stderr } = run(
+      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY },
+      ["--env", "beta"],
+      betaRepo(),
+    );
+    expect(code).toBe(1);
+    expect(stderr).toContain("PUBLIC_SITE_ENV");
+  });
+
+  it("refuses a live build that carries the beta PUBLIC_SITE_ENV", () => {
+    const { code, stderr } = run({
+      PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY,
+      PUBLIC_SITE_ENV: "beta",
+    });
+    expect(code).toBe(1);
+    expect(stderr).toContain("PUBLIC_SITE_ENV");
+  });
+
+  it("refuses an environment the configuration does not declare", () => {
+    const { code, stderr } = run(
+      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "staging" },
+      ["--env", "staging"],
+    );
+    expect(code).toBe(1);
+    expect(stderr).toContain("declares no env.staging");
+  });
+
+  it("holds the beta host to its own Turnstile hostname, not the live one", () => {
+    const raw = readFileSync("wrangler.jsonc", "utf8");
+    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
+    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
+    expect((beta.vars as Record<string, string>).TURNSTILE_HOSTNAMES).toBe("beta.rupeefund.org");
+    expect((config.vars as Record<string, string>).TURNSTILE_HOSTNAMES).toBe("rupeefund.org");
+  });
+
+  it("gives beta its own rate-limit namespace, so it cannot spend the live budget", () => {
+    const raw = readFileSync("wrangler.jsonc", "utf8");
+    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
+    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
+    const betaNs = (beta.ratelimits as Record<string, string>[])[0].namespace_id;
+    const liveNs = (config.ratelimits as Record<string, string>[])[0].namespace_id;
+    expect(betaNs).not.toBe(liveNs);
+  });
+
+  it("points both environments at the one migrations directory", () => {
+    const raw = readFileSync("wrangler.jsonc", "utf8");
+    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
+    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
+    expect((beta.d1_databases as Record<string, string>[])[0].migrations_dir).toBe("migrations");
+    expect((config.d1_databases as Record<string, string>[])[0].migrations_dir).toBe("migrations");
+  });
+
+  it("gives the two environments different databases", () => {
+    const raw = readFileSync("wrangler.jsonc", "utf8");
+    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
+    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
+    expect((beta.d1_databases as Record<string, string>[])[0].database_name).not.toBe(
+      (config.d1_databases as Record<string, string>[])[0].database_name,
+    );
+  });
+});

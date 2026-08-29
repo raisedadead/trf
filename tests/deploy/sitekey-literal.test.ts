@@ -37,7 +37,7 @@ describe("every build path that uses the test sitekey opts in explicitly", () =>
     expect(read(".github/workflows/ci.yml")).not.toContain(TEST_SITEKEY);
   });
 
-  for (const name of ["build:launch"] as const) {
+  for (const name of ["build:launch", "build:beta"] as const) {
     it(`pnpm ${name} still reads dist afterwards, which is what protects the real deploy`, () => {
       expect(scripts[name]).toContain("scripts/assert-dist-sitekey.mjs");
     });
