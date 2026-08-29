@@ -1,8 +1,5 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function isValidEmail(email: string): boolean {
-  return EMAIL_RE.test(email);
-}
 export const WAITLIST_SOURCES = ["subscribe", "landing", "footer"] as const;
 export type WaitlistSource = (typeof WAITLIST_SOURCES)[number];
 const DEFAULT_WAITLIST_SOURCE: WaitlistSource = "subscribe";

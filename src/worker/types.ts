@@ -26,7 +26,4 @@ export interface WaitlistRow extends WaitlistEntry {
 
 export interface Repo {
   addToWaitlist(entry: WaitlistEntry): Promise<void>;
-  listPendingExport(limit: number): Promise<WaitlistRow[]>;
-  markExported(ids: number[], exportedAt: number): Promise<number>;
-  unsubscribeFromWaitlist(email: string, unsubscribedAt: number): Promise<boolean>;
 }

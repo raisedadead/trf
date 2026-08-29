@@ -25,31 +25,6 @@ export function makeRepo(): FakeRepo {
       existing.source = entry.source;
       existing.updated_at = entry.updated_at;
     },
-
-    async listPendingExport(limit) {
-      return self.waitlist
-        .filter((w) => w.exported_at === null && w.unsubscribed_at === null)
-        .sort((a, b) => a.id - b.id)
-        .slice(0, limit);
-    },
-
-    async markExported(ids, exportedAt) {
-      let changed = 0;
-      for (const row of self.waitlist) {
-        if (!ids.includes(row.id) || row.exported_at !== null) continue;
-        row.exported_at = exportedAt;
-        changed += 1;
-      }
-      return changed;
-    },
-
-    async unsubscribeFromWaitlist(email, unsubscribedAt) {
-      const row = self.waitlist.find((w) => w.email === email && w.unsubscribed_at === null);
-      if (row === undefined) return false;
-      row.unsubscribed_at = unsubscribedAt;
-      row.updated_at = unsubscribedAt;
-      return true;
-    },
   };
   return self;
 }

@@ -339,14 +339,14 @@ describe("consent and provenance are recorded on every stored signup", () => {
   it("does not let an unauthenticated post undo a removal somebody asked for", async () => {
     const repo = makeRepo();
     await handleWaitlist(jsonReq(VALID), deps({ repo, now: () => 1 }));
-    await repo.markExported([1], 5);
-    await repo.unsubscribeFromWaitlist("asha@example.com", 10);
+    repo.waitlist[0]!.exported_at = 5;
+    repo.waitlist[0]!.unsubscribed_at = 10;
 
     const res = await handleWaitlist(jsonReq(VALID), deps({ repo, now: () => 20 }));
 
     expect(res.status).toBe(200);
     expect(repo.waitlist[0]?.unsubscribed_at).toBe(10);
-    expect(await repo.listPendingExport(10)).toEqual([]);
+    expect(repo.waitlist[0]?.name).toBe("Asha");
   });
 
   it("rejects a name longer than the column is meant to hold", async () => {

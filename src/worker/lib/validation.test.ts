@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, isValidEmail, validateWaitlist } from "./validation.ts";
+import { MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, validateWaitlist } from "./validation.ts";
 
 const base = { name: "Asha", email: "Asha@Example.com", source: "subscribe" };
 
@@ -50,15 +50,5 @@ describe("validateWaitlist", () => {
   it("reports every failed field at once", () => {
     const result = validateWaitlist({ name: "", email: "nope" });
     expect(result).toEqual({ ok: false, errors: ["name", "email"] });
-  });
-});
-
-describe("isValidEmail", () => {
-  it("accepts an address with one at sign and a dotted domain", () => {
-    expect(isValidEmail("a@b.co")).toBe(true);
-  });
-
-  it("rejects an address with no domain dot", () => {
-    expect(isValidEmail("a@b")).toBe(false);
   });
 });

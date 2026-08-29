@@ -4,6 +4,40 @@ import type { Repo, WaitlistEntry } from "../../src/worker/types.ts";
 import { migratedD1, rowsOf } from "./d1-adapter.ts";
 import type { DatabaseSync } from "node:sqlite";
 
+const EXPORT_BATCH = 500;
+
+const SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT = `SELECT id, email, name, source, consent_at, created_at FROM waitlist
+     WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${EXPORT_BATCH}`;
+
+const COUNT_PENDING_AS_THE_EXPORTER_RUNS_IT =
+  "SELECT COUNT(*) AS n FROM waitlist WHERE exported_at IS NULL AND unsubscribed_at IS NULL";
+
+function stampExportedAsTheExporterRunsIt(raw: DatabaseSync, ids: number[], at: number): number {
+  const res = raw
+    .prepare(
+      `UPDATE waitlist SET exported_at = ${at} WHERE exported_at IS NULL AND id IN (${ids.join(",")})`,
+    )
+    .run();
+  return Number(res.changes);
+}
+
+function markUnsubscribedAsTheOperatorRunsIt(raw: DatabaseSync, email: string, at: number): number {
+  const res = raw
+    .prepare(
+      `UPDATE waitlist SET unsubscribed_at = ${at}, updated_at = ${at}
+       WHERE email = ? AND unsubscribed_at IS NULL`,
+    )
+    .run(email);
+  return Number(res.changes);
+}
+
+function pending(raw: DatabaseSync): { id: number; email: string }[] {
+  return rowsOf(raw, SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT) as unknown as {
+    id: number;
+    email: string;
+  }[];
+}
+
 function entry(over: Partial<WaitlistEntry> = {}): WaitlistEntry {
   return {
     email: "asha@example.com",
@@ -16,7 +50,7 @@ function entry(over: Partial<WaitlistEntry> = {}): WaitlistEntry {
   };
 }
 
-describe("the waitlist SQL actually executed against a migrated database", () => {
+describe("the signup SQL the Worker runs, against a migrated database", () => {
   let repo: Repo;
   let raw: DatabaseSync;
 
@@ -46,55 +80,67 @@ describe("the waitlist SQL actually executed against a migrated database", () =>
       /CHECK constraint failed/,
     );
   });
+});
+
+describe("the export SQL that scripts/list-export.mts itself runs, against a migrated database", () => {
+  let repo: Repo;
+  let raw: DatabaseSync;
+
+  beforeEach(() => {
+    const d1 = migratedD1();
+    repo = createRepo(d1.db);
+    raw = d1.raw;
+  });
 
   it("hands each pending row to the exporter exactly once", async () => {
     await repo.addToWaitlist(entry());
     await repo.addToWaitlist(entry({ email: "b@example.com" }));
 
-    const pending = await repo.listPendingExport(100);
-    expect(pending.map((r) => r.email)).toEqual(["asha@example.com", "b@example.com"]);
+    const rows = pending(raw);
+    expect(rows.map((r) => r.email)).toEqual(["asha@example.com", "b@example.com"]);
 
     expect(
-      await repo.markExported(
-        pending.map((r) => r.id),
+      stampExportedAsTheExporterRunsIt(
+        raw,
+        rows.map((r) => r.id),
         5000,
       ),
     ).toBe(2);
-    expect(await repo.listPendingExport(100)).toEqual([]);
+    expect(pending(raw)).toEqual([]);
   });
 
   it("does not re-stamp a row that a previous run already exported", async () => {
     await repo.addToWaitlist(entry());
-    const [row] = await repo.listPendingExport(100);
-    await repo.markExported([row!.id], 5000);
-    expect(await repo.markExported([row!.id], 9999)).toBe(0);
+    const [row] = pending(raw);
+    stampExportedAsTheExporterRunsIt(raw, [row!.id], 5000);
+    expect(stampExportedAsTheExporterRunsIt(raw, [row!.id], 9999)).toBe(0);
     expect(rowsOf(raw, "SELECT exported_at FROM waitlist")).toEqual([{ exported_at: 5000 }]);
   });
 
   it("withholds an unsubscribed row and reports whether the removal changed anything", async () => {
     await repo.addToWaitlist(entry());
-    expect(await repo.unsubscribeFromWaitlist("asha@example.com", 3000)).toBe(true);
-    expect(await repo.unsubscribeFromWaitlist("asha@example.com", 4000)).toBe(false);
-    expect(await repo.listPendingExport(100)).toEqual([]);
+    expect(markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 3000)).toBe(1);
+    expect(markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 4000)).toBe(0);
+    expect(pending(raw)).toEqual([]);
   });
 
   it("refuses to resurrect someone who unsubscribed, because anyone can post their address", async () => {
     await repo.addToWaitlist(entry());
-    const [row] = await repo.listPendingExport(100);
-    await repo.markExported([row!.id], 5000);
-    await repo.unsubscribeFromWaitlist("asha@example.com", 6000);
+    const [row] = pending(raw);
+    stampExportedAsTheExporterRunsIt(raw, [row!.id], 5000);
+    markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 6000);
 
     await repo.addToWaitlist(entry({ name: "Someone Else", consent_at: 7000, updated_at: 7000 }));
 
     expect(
       rowsOf(raw, "SELECT name, exported_at, unsubscribed_at, consent_at FROM waitlist"),
     ).toEqual([{ name: "Asha", exported_at: 5000, unsubscribed_at: 6000, consent_at: 1000 }]);
-    expect(await repo.listPendingExport(100)).toEqual([]);
+    expect(pending(raw)).toEqual([]);
   });
 
   it("keeps the removal on record, so the operator can still see one was requested", async () => {
     await repo.addToWaitlist(entry());
-    await repo.unsubscribeFromWaitlist("asha@example.com", 6000);
+    markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 6000);
     await repo.addToWaitlist(entry({ consent_at: 7000, updated_at: 7000 }));
     expect(
       rowsOf(raw, "SELECT COUNT(*) AS n FROM waitlist WHERE unsubscribed_at IS NOT NULL"),
@@ -103,35 +149,49 @@ describe("the waitlist SQL actually executed against a migrated database", () =>
 
   it("leaves an already-exported subscriber alone when they simply sign up twice", async () => {
     await repo.addToWaitlist(entry());
-    const [row] = await repo.listPendingExport(100);
-    await repo.markExported([row!.id], 5000);
+    const [row] = pending(raw);
+    stampExportedAsTheExporterRunsIt(raw, [row!.id], 5000);
 
     await repo.addToWaitlist(entry({ consent_at: 7000, updated_at: 7000 }));
 
     expect(rowsOf(raw, "SELECT exported_at FROM waitlist")).toEqual([{ exported_at: 5000 }]);
   });
 
-  it("exports nothing when there is nothing pending", async () => {
-    expect(await repo.markExported([], 1)).toBe(0);
+  it("reports nothing pending once every row is stamped", async () => {
+    await repo.addToWaitlist(entry());
+    stampExportedAsTheExporterRunsIt(
+      raw,
+      pending(raw).map((r) => r.id),
+      5000,
+    );
+    expect(rowsOf(raw, COUNT_PENDING_AS_THE_EXPORTER_RUNS_IT)).toEqual([{ n: 0 }]);
   });
-});
 
-describe("the exporter survives a batch bigger than one SQL statement can bind", () => {
-  it("stamps every id even past D1's bound-parameter cap", async () => {
-    const d1 = migratedD1();
-    const repo = createRepo(d1.db);
-    for (let i = 0; i < 250; i += 1) {
-      await repo.addToWaitlist(entry({ email: `p${i}@example.com` }));
+  it("takes one batch at a time, and reports what is still pending after it", async () => {
+    for (let i = 0; i < EXPORT_BATCH + 20; i += 1) {
+      await repo.addToWaitlist(entry({ email: `p${String(i).padStart(4, "0")}@example.com` }));
     }
-    const pending = await repo.listPendingExport(500);
-    expect(pending).toHaveLength(250);
 
+    const first = pending(raw);
+    expect(first).toHaveLength(EXPORT_BATCH);
     expect(
-      await repo.markExported(
-        pending.map((r) => r.id),
+      stampExportedAsTheExporterRunsIt(
+        raw,
+        first.map((r) => r.id),
         9000,
       ),
-    ).toBe(250);
-    expect(await repo.listPendingExport(500)).toEqual([]);
+    ).toBe(EXPORT_BATCH);
+    expect(rowsOf(raw, COUNT_PENDING_AS_THE_EXPORTER_RUNS_IT)).toEqual([{ n: 20 }]);
+
+    const second = pending(raw);
+    expect(second).toHaveLength(20);
+    expect(
+      stampExportedAsTheExporterRunsIt(
+        raw,
+        second.map((r) => r.id),
+        9001,
+      ),
+    ).toBe(20);
+    expect(rowsOf(raw, COUNT_PENDING_AS_THE_EXPORTER_RUNS_IT)).toEqual([{ n: 0 }]);
   });
 });
