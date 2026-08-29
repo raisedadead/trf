@@ -12,10 +12,15 @@ describe("sitemap", () => {
     expect(xml).toContain("https://rupeefund.org/subscribe");
   });
 
-  it("excludes noindex routes", () => {
+  it("excludes every route the sitemap filter names", () => {
     const xml = read("sitemap-0.xml");
-    expect(xml).not.toContain("rupeefund.org/manage");
-    expect(xml).not.toContain("rupeefund.org/thank-you");
+    for (const slug of ["404", "waitlist-confirmed", "waitlist-problem"]) {
+      expect(xml).not.toContain(`rupeefund.org/${slug}`);
+    }
+  });
+
+  it("lists the two indexable pages and nothing else", () => {
+    expect(read("sitemap-0.xml").match(/<loc>/g)).toHaveLength(2);
   });
 });
 

@@ -76,9 +76,10 @@ const LAUNCH_PAGE_REQUESTS = ["/", "/subscribe", "/subscribe.html", "/404.html"]
 
 describe("the mailing-list pages still serve", () => {
   for (const path of LAUNCH_PAGE_REQUESTS) {
-    it(`serves ${path}`, async () => {
+    it(`serves ${path} from the assets binding`, async () => {
       const res = await app.request(path, {}, makeEnv(), ctx);
       expect(res.status).toBe(200);
+      expect(await res.text()).toContain(`asset:${path}`);
     });
   }
 });
