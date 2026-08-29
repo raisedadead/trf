@@ -75,35 +75,41 @@ Both formatters use a print width of 100. `.editorconfig` states the same width,
 
 ## What CI runs
 
-| Job     | What it protects                                                               |
-| ------- | ------------------------------------------------------------------------------ |
-| `check` | The gate, plus a guard that refuses the retired pre-launch vocabulary.         |
-| `build` | The same commands Cloudflare Workers Builds runs, for both stages.             |
-| `e2e`   | Playwright against the launch build. A failed run keeps its report for 7 days. |
+| Job     | What it protects                                                             |
+| ------- | ---------------------------------------------------------------------------- |
+| `check` | The gate, plus a guard that refuses the retired pre-launch vocabulary.       |
+| `build` | The same commands Cloudflare Workers Builds runs, for both environments.     |
+| `e2e`   | Playwright against the live build. A failed run keeps its report for 7 days. |
 
-The `build` job matters most. Workers Builds deploys with `pnpm run build:launch`, not `pnpm build`, so CI runs that exact command.
+The `build` job matters most. Workers Builds builds with `pnpm run build:launch` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs both of those exact commands.
 
-`build:launch` and `build:post-launch` each run two guards around `astro build`:
+Each build command runs three guards around `astro build`:
 
-| Guard                             | When it runs     | What it refuses                                                          |
-| --------------------------------- | ---------------- | ------------------------------------------------------------------------ |
-| `scripts/assert-deploy-env.mjs`   | before the build | An unsafe environment or an unsafe `wrangler.jsonc`.                     |
-| `scripts/assert-dist-sitekey.mjs` | after the build  | A `dist` that baked in the always-pass test sitekey, or an empty `dist`. |
+| Guard                             | When it runs     | What it refuses                                                                                           |
+| --------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------- |
+| `scripts/assert-deploy-env.mjs`   | before the build | An unsafe environment, an unsafe `wrangler.jsonc`, or a `PUBLIC_SITE_ENV` that does not match the target. |
+| `scripts/assert-dist-sitekey.mjs` | after the build  | A `dist` that baked in the always-pass test sitekey, or an empty `dist`.                                  |
+| `scripts/apply-site-env.mjs`      | after the build  | A live `dist` that refuses crawlers. On a beta build it writes the refusal instead.                       |
 
-Both guards therefore protect the real deploy, not only CI. Keep them in the build command. Do not move either one into the workflow.
+The guards therefore protect the real deployment, not only CI. Keep them in the build command. Do not move any of them into the workflow.
 
 ## How to deliver a change
 
-Do not commit to `main`. A merge into `main` deploys `rupeefund.org` immediately, through Cloudflare Workers Builds.
+Open your pull request against `main`. A merge into `main` deploys `beta.rupeefund.org`, which no search engine indexes and which no member of the public is sent to. Nothing you merge reaches `rupeefund.org` on its own.
 
 1. Make a branch.
 1. Commit your work. Run `pnpm check` and `pnpm format` first.
-1. Open a pull request. GitHub CI runs the gate, and Workers Builds makes a build for the branch.
-1. Get a review. Then merge. The merge deploys.
+1. Open a pull request against `main`. GitHub CI runs the gate.
+1. Get a review. Then merge. Beta deploys.
+1. Prove the change on `beta.rupeefund.org`.
 
-**If your change needs a new migration, apply it to the remote database before you merge.** There is no gap between the merge and the deployment. Refer to `docs/deploy.md` section 2.
+Only the maintainer promotes to the live site, by running the **Promote to live** workflow. That workflow refuses a commit that is not on `main` and a commit whose checks did not pass, and the `production` environment holds it until a reviewer approves. Refer to `docs/deploy.md` section 2.
 
-Preview URLs are not available yet. `wrangler.jsonc` does not set `preview_urls`, and the default value is `false`. A preview URL would use the **production** database, because a versioned preview keeps the bindings of the Worker. The `preview_database_id` key does not help, because wrangler uses it only for `wrangler dev`. The post-launch Worker is the correct place for previews.
+`live` moves forward only. It is always a prefix of the history of `main`, so a promote takes a commit and everything before it. There is no cherry-pick, and no way to hold one commit back while a later one goes out.
+
+**Every migration must be additive.** The two environments have two databases and one `migrations/` directory. During a deployment two Worker versions read the one live database, so a change that is not additive breaks the older one while it still answers the public. Add a column with a default value or with NULL permitted. Never change a migration that ran before, and never reuse a file name. Refer to `docs/deploy.md` section 3.
+
+Preview URLs are not available. `wrangler.jsonc` does not set `preview_urls`, and the default value is `false`. A preview URL would keep the bindings of its Worker, so a preview of the live Worker would write to the **live** mailing list. `beta.rupeefund.org` is the place to look at a change.
 
 ## Conventions
 
@@ -117,26 +123,31 @@ Preview URLs are not available yet. `wrangler.jsonc` does not set `preview_urls`
 
 ```
 src/worker/
-  index.ts       entry + router + scheduled()
-  routes/        one handler module per endpoint group
-  lib/           infra: razorpay, db, newsletter, http, validation, signature
-  types.ts       shared types (Env, domain models)
+  index.ts       entry + router
+  routes/        one handler module per endpoint group (waitlist)
+  lib/           infra: db, http, turnstile, validation
+  types.ts       shared types (Env, WaitlistEntry, Repo)
   testkit.ts     shared test fakes + helpers
 ```
 
-To add an endpoint, write a handler in `routes/`. Connect it in `index.ts`. Put a test next to the handler. To add a helper, write it in `lib/`. All Razorpay requests go through `lib/razorpay.ts`, which uses `fetch`. Do not use the Razorpay SDK.
+To add an endpoint, write a handler in `routes/`. Connect it in `index.ts`. Put a test next to the handler. To add a helper, write it in `lib/`.
+
+The Worker answers `/api/health` and `/api/waitlist` only. `assets.run_worker_first` in `wrangler.jsonc` names `/api/*` alone, so a request for a page never reaches the Worker. If you add a route outside `/api/`, add its path to that list, or Cloudflare serves the static file and your route never runs.
 
 ## Site layout
 
 ```
 src/
-  pages/         Astro routes → static HTML (index, subscribe, projects, manage, thank-you, 404)
+  pages/         Astro routes → static HTML (index, subscribe, waitlist-confirmed,
+                 waitlist-problem, 404)
   layouts/       Base.astro (shell + <head>/SEO + header + footer + JSON-LD)
-  components/    Header, Footer, Icon (.astro)
-  scripts/       one vanilla-DOM script per page (subscribe, vote, share)
+  components/    Header, Footer, Icon, SocialIcon (.astro)
+  scripts/       one vanilla-DOM script per page (subscribe)
   lib/           launch.ts (launch copy + seasons), seo.ts (per-route meta), turnstile.ts
   index.css      Tailwind entry + design tokens + shared classes
 ```
+
+Two pages are public: `/` and `/subscribe`. The other three are outcomes of the signup form and the not-found handler, and `seo.ts` marks each one non-indexable.
 
 ### Buttons
 

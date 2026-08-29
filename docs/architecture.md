@@ -11,49 +11,44 @@ The system does two things:
 - It shows information pages to the public.
 - It collects email addresses for a mailing list.
 
-Razorpay holds all payment data. The system stores only the data that Razorpay cannot supply. The system does not store a PAN, an address, a payment instrument, or an amount.
+The system takes no payment and holds no vote. That code is removed. A later wave writes it again from zero. Therefore the system stores no PAN, no address, no payment instrument and no amount.
 
 ## 2. The parts
 
-| Part        | Technology                   | Function                                                            |
-| ----------- | ---------------------------- | ------------------------------------------------------------------- |
-| Site        | Astro 7                      | Makes static HTML files before deployment                           |
-| Worker      | Hono 4 on Cloudflare Workers | Answers requests to `/api/*` and controls which pages are available |
-| Database    | Cloudflare D1                | Keeps the mailing list                                              |
-| Client code | TypeScript in `src/scripts/` | Adds behaviour to the static HTML                                   |
+| Part        | Technology                   | Function                                  |
+| ----------- | ---------------------------- | ----------------------------------------- |
+| Site        | Astro 7                      | Makes static HTML files before deployment |
+| Worker      | Hono 4 on Cloudflare Workers | Answers requests to `/api/*`              |
+| Database    | Cloudflare D1                | Keeps the mailing list                    |
+| Client code | TypeScript in `src/scripts/` | Adds behaviour to the static HTML         |
 
-The Worker sends all other requests to the static files.
+The Worker answers two addresses, `/api/health` and `/api/waitlist`. It sends every other request to the static files. `assets.run_worker_first` in `wrangler.jsonc` names only `/api/*`, so a request for a page never reaches the Worker.
 
-## 3. The two stages
+## 3. The two environments
 
-The product goes to the public in two stages. One set of code makes both stages. A variable selects the stage. The stages do not use different branches.
+One branch feeds each environment. The code is the same. A build variable selects the environment.
 
-| Item                  | Launch stage    | Post-launch stage           |
-| --------------------- | --------------- | --------------------------- |
-| Address               | `rupeefund.org` | `preview.rupeefund.org`     |
-| Worker                | `trf`           | `trf-post-launch`           |
-| Database              | `trf-rupeefund` | `trf-rupeefund-post-launch` |
-| `POST_LAUNCH_ENABLED` | not set         | `true`                      |
-| `PUBLIC_LAUNCH_LIVE`  | not set         | `true`                      |
-| Razorpay keys         | none            | necessary                   |
+| Item                 | Live               | Beta                 |
+| -------------------- | ------------------ | -------------------- |
+| Branch               | `live`             | `main`               |
+| Address              | `rupeefund.org`    | `beta.rupeefund.org` |
+| Worker               | `trf`              | `trf-beta`           |
+| Database             | `trf-rupeefund`    | `trf-rupeefund-beta` |
+| `PUBLIC_SITE_ENV`    | `live`, or not set | `beta`               |
+| Rate-limit namespace | `7301`             | `7302`               |
+| Crawlers             | permitted          | refused              |
 
-The launch stage shows the information pages and the form for the mailing list. The post-launch stage also shows the payment pages and the voting pages.
+`beta.rupeefund.org` is a real public site. It is never indexed. This is deliberate: two hosts that serve the same pages would split the ranking of the live host.
 
-`POST_LAUNCH_ENABLED` controls the Worker. If you do not set this variable, the Worker sends status 404 for these addresses:
+`PUBLIC_SITE_ENV` controls the build, not the Worker. After `astro build`, `scripts/apply-site-env.mjs` reads it. For a beta build the script writes `Disallow: /` into `dist/robots.txt` and adds `X-Robots-Tag: noindex, nofollow` to the sitewide block of `dist/_headers`. For a live build the script refuses a `dist` that carries either one.
 
-- `/api/subscribe`, `/api/subscribe/verify`, `/api/webhook/razorpay`
-- `/api/vote/*`, `/api/metrics`, `/api/dataset`, `/api/unsubscribe`
-- `/vote`, `/manage`, `/thank-you`
+The build does this, and not the Worker, because a Worker route for `/robots.txt` needs `/robots.txt` in `assets.run_worker_first`. That entry makes every request for the file an invocation of the Worker. A build-time rewrite costs nothing at runtime.
 
-The three page addresses are in `assets.run_worker_first` in `wrangler.jsonc`. This list makes the Worker examine these addresses. If you remove an address from the list, Cloudflare sends the file directly and the Worker cannot block it.
-
-`PUBLIC_LAUNCH_LIVE` controls the content of one page. On `/subscribe`, it selects the form for the mailing list or the form for payment. Set both variables together, or set neither variable.
-
-The HTML files for the blocked pages stay in the `dist` directory. The Worker prevents access to them. The files are not absent.
+`scripts/assert-deploy-env.mjs` refuses a build where `PUBLIC_SITE_ENV` and the target environment do not agree. Without that guard a live deploy could ship the beta `robots.txt` to `rupeefund.org`.
 
 ## 4. How a person joins the mailing list
 
-The address `POST /api/waitlist` is the only address that the public can write to. This address is always available. The Worker does not block it in the launch stage.
+The address `POST /api/waitlist` is the only address that the public can write to.
 
 The Worker does these steps in this sequence:
 
@@ -81,18 +76,13 @@ The second path uses status 303. Because of this, the browser does not send the 
 
 ## 5. The databases
 
-Each stage has its own database and its own migrations directory. The `migrations_dir` key in `wrangler.jsonc` selects the directory for each stage.
+The two environments have two databases and **one** migrations directory. Each database keeps its own `d1_migrations` ledger, so each one tracks what it applied.
 
-| Directory                | Database                    | Tables                |
-| ------------------------ | --------------------------- | --------------------- |
-| `migrations/launch`      | `trf-rupeefund`             | `waitlist`            |
-| `migrations/post-launch` | `trf-rupeefund-post-launch` | `waitlist` and 6 more |
+| Directory    | Databases                             | Tables     |
+| ------------ | ------------------------------------- | ---------- |
+| `migrations` | `trf-rupeefund`, `trf-rupeefund-beta` | `waitlist` |
 
-The launch Worker never reads or writes a payment table or a voting table, therefore the launch database does not have them.
-
-Each directory holds one file, `0001_init.sql`. The two files have the same name and different content. This is correct, because each database has its own ledger.
-
-Both files contain the `waitlist` table. The two copies must stay the same. Marker comments (`-- >>> shared: waitlist`) delimit the block, and `tests/migrations/replay.test.ts` fails the build if the two copies are different.
+One directory is deliberate. Two directories held two files with the same name and different content, and marker comments kept the shared block in agreement. The two copies could drift. One file cannot.
 
 Wrangler compares only the file names of the migrations with the names in the `d1_migrations` table. Wrangler does not calculate a hash of the content. Two results follow:
 
@@ -103,7 +93,7 @@ Do not use these file names again: `0002_waitlist.sql`, `0003_voting.sql`, `0004
 
 Do not use `wrangler d1 migrations list` to prove that the schema is correct. That command reports success when the file names agree. It does not examine the tables. Query `sqlite_master` instead.
 
-The databases contain no data now. Therefore you can change `0001_init.sql` and apply it again. **After the first true signup, you must add a new migration file for each change.**
+**`trf-rupeefund` holds true signups.** You cannot change `0001_init.sql` and apply it again. Each change needs a new migration file, and each migration must be additive. Two Worker versions read the one live database during a deployment, so a change that is not additive breaks the older one while it still answers the public.
 
 The `waitlist` table:
 
@@ -143,20 +133,20 @@ The second run of the command writes only the header line. Because of this, a se
 
 The policy permits `'unsafe-inline'` for scripts. This is necessary because Bot Fight Mode is active on the zone. Cloudflare adds an inline script to each HTML answer.
 
-A blocked page gives status 404 and the same headers as all other pages.
+The policy names the font hosts `fonts.googleapis.com` and `fonts.gstatic.com`, and the Turnstile host `challenges.cloudflare.com`. It names no payment host. `form-action` permits `'self'` only.
 
-The site loads fonts from `fonts.googleapis.com` and `fonts.gstatic.com`. The policy permits these two addresses. The policy also permits the addresses for Turnstile and Razorpay, because one `_headers` file goes to both stages.
+The test `tests/site/csp.test.ts` reads the policy and the HTML files. The test fails if a page loads an address that the policy does not permit, and it fails if the policy names a payment host again.
 
-The test `tests/site/csp.test.ts` reads the policy and the HTML files. The test fails if a page loads an address that the policy does not permit.
+A beta build adds `X-Robots-Tag: noindex, nofollow` to the same sitewide block. `tests/deploy/apply-site-env.test.ts` proves that the other headers survive that edit.
 
 ## 8. How to deploy
 
 Refer to `docs/deploy.md` for the full procedure and the commands.
 
-Cloudflare Workers Builds watches the repository. A merge into `main` starts a build, and the build deploys the Worker. Nobody runs a deploy command.
+Cloudflare Workers Builds watches two branches. A push to `main` deploys `beta.rupeefund.org`. A push to `live` deploys `rupeefund.org`. Nobody runs a deploy command.
 
-The build command is `pnpm run build:launch`. It examines the configuration first. It stops the build if `PUBLIC_TURNSTILE_SITEKEY` has no value, if it holds the test sitekey from Cloudflare, or if `TURNSTILE_HOSTNAMES` or `TURNSTILE_ACTION` is empty. Wrangler stops the deployment if `TURNSTILE_SECRET` has no value. Without a correct sitekey and secret, the Worker refuses each signup that uses JavaScript.
+Only the workflow `.github/workflows/promote.yml` writes to `live`. It takes a commit that is on `main`, refuses a commit whose checks did not pass, and moves `live` forward. The GitHub environment `production` holds the run until a reviewer approves it. The update uses the GitHub API with `force: false`, so GitHub itself refuses anything that is not a fast-forward.
 
-**Apply a migration to the remote database before you merge the code that uses it.** A merge deploys immediately, therefore there is no gap between the merge and the deployment. Make each migration additive, so that the Worker which operates before the migration continues to operate after it.
+**Apply a migration to the beta database, prove it there, then apply it to the live database, then promote.** The promote is the only step that puts new code in front of the public, so you control the sequence.
 
-After the deployment, clear the cache of the zone. Then examine the site.
+After a promote, clear the cache of the zone. Then examine the site.
