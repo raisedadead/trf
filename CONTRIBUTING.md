@@ -78,10 +78,12 @@ Both formatters use a print width of 100. `.editorconfig` states the same width,
 | Job     | What it protects                                                             |
 | ------- | ---------------------------------------------------------------------------- |
 | `check` | The gate, plus a guard that refuses the retired pre-launch vocabulary.       |
-| `build` | The same commands Cloudflare Workers Builds runs, for both environments.     |
+| `build` | The same command Cloudflare Workers Builds runs on `live`.                   |
 | `e2e`   | Playwright against the live build. A failed run keeps its report for 7 days. |
 
-The `build` job matters most. Workers Builds builds with `pnpm run build:launch` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs both of those exact commands.
+The `build` job matters most. Workers Builds builds with `pnpm run build:launch` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs those exact commands rather than an approximation.
+
+The matrix carries `launch` alone today. `build:beta` refuses the placeholder `database_id` in `env.beta`, so a `beta` leg would be red on every commit, and `promote.yml` refuses a commit with a failed check. Add `beta` to `stage:` in the same change that gives `env.beta` a real database id.
 
 Each build command runs three guards around `astro build`:
 

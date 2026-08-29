@@ -20,6 +20,8 @@ Two branches feed two sites. Cloudflare Workers Builds watches both.
 
 Collaborators open a pull request against `main`. CI runs the gate. A merge deploys beta, and nothing reaches the public.
 
+The CI build matrix carries `launch` alone until `env.beta` has a real `database_id`. Add `beta` to it in the same change that creates the database, or the leg fails on every commit and no promote can pass.
+
 ## 2. How to promote to the live site
 
 Run the workflow **Promote to live** from the Actions tab. Give it a commit, or leave the field empty to take the tip of `main`.
