@@ -40,12 +40,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stage: [launch, beta]
+        stage: [launch]
     steps:
       - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+      # Add `beta` here once env.beta carries a real database_id. Until then the
+      # deploy guard refuses the placeholder, the leg is red on every commit, and
+      # promote.yml refuses to move live.
       - name: Run the same build command Cloudflare Workers Builds runs
         run: pnpm run build:${{ matrix.stage }}
         env:

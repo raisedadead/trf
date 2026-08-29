@@ -17,7 +17,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "build:launch": "node scripts/assert-deploy-env.mjs && astro build && node scripts/assert-dist-sitekey.mjs && node scripts/apply-site-env.mjs",
-    "build:beta": "PUBLIC_SITE_ENV=beta node scripts/assert-deploy-env.mjs --env beta && PUBLIC_SITE_ENV=beta astro build && node scripts/assert-dist-sitekey.mjs && PUBLIC_SITE_ENV=beta node scripts/apply-site-env.mjs",
+    "build:beta": "PUBLIC_SITE_ENV=beta node scripts/assert-deploy-env.mjs --env beta && astro build && node scripts/assert-dist-sitekey.mjs && PUBLIC_SITE_ENV=beta node scripts/apply-site-env.mjs",
     "preview": "PUBLIC_ALLOW_TEST_SITEKEY=true PUBLIC_TURNSTILE_SITEKEY=1x00000000000000000000AA astro build && wrangler dev --var TURNSTILE_HOSTNAMES:example.com --var TURNSTILE_ACTION: --var TURNSTILE_SECRET:1x0000000000000000000000000000000AA",
     "db:reset": "rm -rf .wrangler/state/v3/d1 && wrangler d1 migrations apply trf-rupeefund --local",
     "cf-typegen": "wrangler types",
