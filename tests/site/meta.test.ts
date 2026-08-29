@@ -10,7 +10,6 @@ describe("sitemap", () => {
   it("includes indexable routes", () => {
     const xml = read("sitemap-0.xml");
     expect(xml).toContain("https://rupeefund.org/subscribe");
-    expect(xml).toContain("https://rupeefund.org/projects");
   });
 
   it("excludes noindex routes", () => {

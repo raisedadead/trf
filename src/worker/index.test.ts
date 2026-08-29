@@ -119,7 +119,6 @@ const LAUNCH_PAGE_REQUESTS = [
   "/",
   "/subscribe",
   "/subscribe.html",
-  "/projects",
   "/404.html",
 ] as const;
 

@@ -6,10 +6,6 @@ describe("active-nav highlight", () => {
     expect(read("index.html")).toContain('aria-current="page"');
   });
 
-  it("marks the current route on /projects", () => {
-    expect(read("projects.html")).toContain('aria-current="page"');
-  });
-
   it("offers no Manage nav item in a launch build, even on the gated page itself", () => {
     expect(read("manage.html")).not.toContain('href="/manage"');
   });

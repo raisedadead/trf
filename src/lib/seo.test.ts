@@ -3,7 +3,7 @@ import { normalizePath, seoForPath } from "./seo.ts";
 
 describe("normalizePath", () => {
   it("strips the .html build-format extension", () => {
-    expect(normalizePath("/projects.html")).toBe("/projects");
+    expect(normalizePath("/subscribe.html")).toBe("/subscribe");
   });
 
   it("keeps the root path", () => {
@@ -25,7 +25,7 @@ describe("seoForPath", () => {
   });
 
   it("matches a route from a trailing-slash pathname", () => {
-    expect(seoForPath("/projects/").title).toBe("How funding works — The Rupee Fund");
+    expect(seoForPath("/manage/").title).toBe("Manage your contribution — The Rupee Fund");
   });
 
   it("marks manage as non-indexable", () => {

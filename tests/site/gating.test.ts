@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { read } from "./dist.ts";
 
-const LAUNCH_PAGES = ["index.html", "projects.html", "subscribe.html", "404.html"] as const;
+const LAUNCH_PAGES = ["index.html", "subscribe.html", "404.html"] as const;
 const GATED_HREFS = ["/vote", "/manage", "/thank-you"] as const;
 
 describe("launch pages never link to a gated post-launch page", () => {

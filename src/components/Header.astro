@@ -7,7 +7,6 @@ const path = normalizePath(Astro.url.pathname);
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/projects", label: "Projects" },
   ...(LAUNCH_LIVE ? [{ href: "/manage", label: "Manage" }] : []),
 ];
 

@@ -46,44 +46,6 @@ describe("Home page (/)", () => {
   });
 });
 
-describe("Projects page (/projects)", () => {
-  const html = read("projects.html");
-
-  it("renders the heading", () => {
-    expect(html).toContain("Projects worth backing");
-  });
-
-  it("renders the no-disbursements state", () => {
-    expect(html).toContain("Be the first project in the pool");
-  });
-
-  it("keeps the mailing-list call to action on the page", () => {
-    expect(html).toContain('href="/subscribe"');
-  });
-
-  it("names no decorative preview project outside an aria-hidden subtree", () => {
-    const hidden = html.indexOf('aria-hidden="true"');
-    expect(hidden).toBeGreaterThan(-1);
-    for (const name of ["Prakalpa Prathama", "Prakalpa Dvitiya", "Prakalpa Tritiya"]) {
-      expect(html.indexOf(name)).toBeGreaterThan(hidden);
-    }
-  });
-
-  it("shows all three proposal states in the preview, not three copies of one", () => {
-    expect(["pending", "open", "closed"].every((s) => html.includes(`data-state="${s}"`))).toBe(
-      true,
-    );
-  });
-
-  it("has exactly one h1", () => {
-    expect(h1Count(html)).toBe(1);
-  });
-
-  it("is indexable (no robots noindex)", () => {
-    expect(html).not.toContain('name="robots"');
-  });
-});
-
 describe("Manage page (/manage)", () => {
   const html = read("manage.html");
 

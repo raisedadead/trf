@@ -41,17 +41,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     indexable: true,
   },
   {
-    path: "/projects",
-    title: "How funding works — The Rupee Fund",
-    description:
-      "How The Rupee Fund pools small monthly contributions, who votes, and where the money goes. A FOSS United Foundation initiative.",
-    ogTitle: "How funding works — The Rupee Fund",
-    ogDescription:
-      "Seasons, voting and disbursement — how contributors decide where the money goes.",
-    canonical: `${SITE_URL}/projects`,
-    indexable: true,
-  },
-  {
     path: "/manage",
     title: "Manage your contribution — The Rupee Fund",
     description: "Manage or cancel your monthly Rupee Fund contribution.",
