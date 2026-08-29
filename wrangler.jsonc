@@ -66,7 +66,7 @@
         {
           "binding": "DB",
           "database_name": "trf-rupeefund-beta",
-          "database_id": "REPLACE_WITH_BETA_D1_ID",
+          "database_id": "78bd0018-1908-47ce-94f4-9161d7f9a5fc",
           "migrations_dir": "migrations",
         },
       ],

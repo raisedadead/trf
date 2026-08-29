@@ -110,9 +110,14 @@ describe("the deploy guard holds the beta build to the beta configuration", () =
   });
 
   it("refuses the placeholder database id, so beta cannot write to the live list", () => {
+    const dir = repoWith((c) => {
+      const beta = (c.env as Record<string, Record<string, unknown>>).beta;
+      (beta.d1_databases as Record<string, unknown>[])[0].database_id = "REPLACE_WITH_BETA_D1_ID";
+    });
     const { code, stderr } = run(
       { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "beta" },
       ["--env", "beta"],
+      dir,
     );
     expect(code).toBe(1);
     expect(stderr).toContain("placeholder database_id");
