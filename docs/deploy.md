@@ -20,8 +20,6 @@ Two branches feed two sites. Cloudflare Workers Builds watches both.
 
 Collaborators open a pull request against `main`. CI runs the gate. A merge deploys beta, and nothing reaches the public.
 
-The CI build matrix carries `launch` alone until `env.beta` has a real `database_id`. Add `beta` to it in the same change that creates the database, or the leg fails on every commit and no promote can pass.
-
 ## 2. How to promote to the live site
 
 Run the workflow **Promote to live** from the Actions tab. Give it a commit, or leave the field empty to take the tip of `main`.
@@ -34,6 +32,8 @@ The workflow refuses the promote when any of these is true:
 - The move is not a fast-forward. GitHub refuses this itself, because the workflow sends `force: false`.
 
 The GitHub environment `production` holds the run until a reviewer approves it. That approval is the gate.
+
+The environment carries `can_admins_bypass: true`, which is the GitHub default. A repository administrator can therefore waive the approval. That is acceptable while the reviewer and the administrator are the same person. To make the gate bind everybody, set the field to `false`.
 
 `live` is always a prefix of the history of `main`. You promote a commit and everything before it, or nothing. There is no cherry-pick. Keep the gap small, and promote often.
 

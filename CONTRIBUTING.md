@@ -49,10 +49,10 @@ Do not make a rule less strict to make the gate pass. If a rule is wrong for thi
 
 Two rules are off, and each one is off for the same reason: it reports a pattern that this repository uses on purpose.
 
-| Rule                                  | Why it is off                                                                     |
-| ------------------------------------- | --------------------------------------------------------------------------------- |
-| `vitest/no-conditional-expect`        | The validation tests narrow a discriminated union before they examine the result. |
-| `vitest/require-mock-type-parameters` | The DOM test helpers use untyped `vi.fn()` stubs.                                 |
+| Rule                                  | Why it is off                                                                           |
+| ------------------------------------- | --------------------------------------------------------------------------------------- |
+| `vitest/no-conditional-expect`        | `tests/migrations/replay.test.ts` compares schemas only when a second migration exists. |
+| `vitest/require-mock-type-parameters` | The DOM test helpers use untyped `vi.fn()` stubs.                                       |
 
 The `rules` block lists only the deltas from the two categories. Run `pnpm exec oxlint --print-config` to read the resolved set. Do not re-state a severity a category already gives.
 
@@ -83,7 +83,7 @@ Both formatters use a print width of 100. `.editorconfig` states the same width,
 
 The `build` job matters most. Workers Builds builds with `pnpm run build:launch` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs those exact commands rather than an approximation.
 
-The matrix carries `launch` alone today. `build:beta` refuses the placeholder `database_id` in `env.beta`, so a `beta` leg would be red on every commit, and `promote.yml` refuses a commit with a failed check. Add `beta` to `stage:` in the same change that gives `env.beta` a real database id.
+The matrix carries both stages. Keep it that way: `promote.yml` names `build (launch)` and `build (beta)` among the checks it requires, so a stage that stops running blocks every promote. If you add a stage, add its job name there too.
 
 Each build command runs three guards around `astro build`:
 
