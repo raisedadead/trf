@@ -61,7 +61,7 @@ jobs:
           SHA: ${{ steps.target.outputs.sha }}
         run: |
           required="check
-          build (launch)
+          build (live)
           build (beta)
           e2e"
           runs="$(gh api --paginate "repos/${REPO}/commits/${SHA}/check-runs?filter=latest" \

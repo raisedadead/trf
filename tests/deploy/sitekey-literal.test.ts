@@ -37,11 +37,15 @@ describe("every build path that uses the test sitekey opts in explicitly", () =>
     expect(read(".github/workflows/ci.yml")).not.toContain(TEST_SITEKEY);
   });
 
-  for (const name of ["build:launch", "build:beta"] as const) {
-    it(`pnpm ${name} still reads dist afterwards, which is what protects the real deploy`, () => {
-      expect(scripts[name]).toContain("scripts/assert-dist-sitekey.mjs");
+  for (const name of ["build:live", "build:beta"] as const) {
+    it(`pnpm ${name} routes through the one build chain`, () => {
+      expect(scripts[name]).toContain("node scripts/build.mjs");
     });
   }
+
+  it("that chain still reads dist afterwards, which is what protects the real deploy", () => {
+    expect(read("scripts/build.mjs")).toContain("scripts/assert-dist-sitekey.mjs");
+  });
 
   it("finds at least one such build path, so the suite cannot pass vacuously", () => {
     const paths = Object.values(scripts).filter((body) => body.includes(TEST_SITEKEY));

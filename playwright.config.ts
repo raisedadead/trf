@@ -16,12 +16,12 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "launch",
-      testDir: "./tests/e2e/launch",
+      name: "live",
+      testDir: "./tests/e2e/live",
       use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: "launch-no-js",
+      name: "live-no-js",
       testDir: "./tests/e2e/no-js",
       use: { ...devices["Desktop Chrome"], javaScriptEnabled: false },
     },

@@ -13,10 +13,10 @@ Two branches feed two sites. Cloudflare Workers Builds watches both.
 | `main` | `beta.rupeefund.org` | `trf-beta` | Every push                 |
 | `live` | `rupeefund.org`      | `trf`      | The promote workflow, only |
 
-| Setting        | Value on `main`                  | Value on `live`         |
-| -------------- | -------------------------------- | ----------------------- |
-| Build command  | `pnpm run build:beta`            | `pnpm run build:launch` |
-| Deploy command | `npx wrangler deploy --env beta` | `npx wrangler deploy`   |
+| Setting        | Value on `main`                  | Value on `live`       |
+| -------------- | -------------------------------- | --------------------- |
+| Build command  | `pnpm run build:beta`            | `pnpm run build:live` |
+| Deploy command | `npx wrangler deploy --env beta` | `npx wrangler deploy` |
 
 Collaborators open a pull request against `main`. CI runs the gate. A merge deploys beta, and nothing reaches the public.
 
@@ -96,11 +96,13 @@ printf 'dotenv\n' > .envrc && direnv allow
 
 Cloudflare supplies an always-pass test sitekey, `1x00000000000000000000AA`. A deployed build that uses it refuses every signup, because the Worker examines the token with the real secret.
 
-The build therefore refuses the test sitekey twice. `scripts/assert-deploy-env.mjs` refuses the value before the build. `scripts/assert-dist-sitekey.mjs` reads `dist` after the build and refuses the literal wherever it came from. Both run inside `build:launch` and `build:beta`, so Cloudflare runs both.
+The build therefore refuses the test sitekey twice. `scripts/assert-deploy-env.mjs` refuses the value before the build. `scripts/assert-dist-sitekey.mjs` reads `dist` after the build and refuses the literal wherever it came from. Both run inside `scripts/build.mjs`, which every build goes through, so Cloudflare runs both.
 
 To use the test sitekey on purpose, set `PUBLIC_ALLOW_TEST_SITEKEY=true` and call `astro build` directly. The local preview scripts and the site tests do this. The CI build jobs do not: they supply a stand-in sitekey and run the same command as Cloudflare, so both guards operate. **Never set the opt-in in the Workers Builds settings.**
 
 ### The robots guard
+
+`scripts/build.mjs` runs the whole chain: the config guard, `astro build`, the sitekey guard, then `scripts/apply-site-env.mjs`. The name of the build script sets `PUBLIC_SITE_ENV`, so an inherited value cannot change the result.
 
 `scripts/apply-site-env.mjs` runs after `astro build`. For a beta build it writes `Disallow: /` into `dist/robots.txt` and adds `X-Robots-Tag: noindex, nofollow` to the sitewide block of `dist/_headers`. For a live build it refuses a `dist` that carries either one.
 

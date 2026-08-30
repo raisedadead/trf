@@ -81,11 +81,11 @@ Both formatters use a print width of 100. `.editorconfig` states the same width,
 | `build` | The same command Cloudflare Workers Builds runs on `live`.                   |
 | `e2e`   | Playwright against the live build. A failed run keeps its report for 7 days. |
 
-The `build` job matters most. Workers Builds builds with `pnpm run build:launch` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs those exact commands rather than an approximation.
+The `build` job matters most. Workers Builds builds with `pnpm run build:live` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs those exact commands rather than an approximation.
 
 The matrix carries both stages. Keep it that way: `promote.yml` names `build (launch)` and `build (beta)` among the checks it requires, so a stage that stops running blocks every promote. If you add a stage, add its job name there too.
 
-Each build command runs three guards around `astro build`:
+Both build commands are one word apart — `PUBLIC_SITE_ENV=<env> node scripts/build.mjs` — and that module runs the same three guards around `astro build` for either environment:
 
 | Guard                             | When it runs     | What it refuses                                                                                           |
 | --------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------- |
@@ -93,7 +93,9 @@ Each build command runs three guards around `astro build`:
 | `scripts/assert-dist-sitekey.mjs` | after the build  | A `dist` that baked in the always-pass test sitekey, or an empty `dist`.                                  |
 | `scripts/apply-site-env.mjs`      | after the build  | A live `dist` that refuses crawlers. On a beta build it writes the refusal instead.                       |
 
-The guards therefore protect the real deployment, not only CI. Keep them in the build command. Do not move any of them into the workflow.
+The guards therefore protect the real deployment, not only CI. Keep them in `scripts/build.mjs`. Do not move any of them into the workflow.
+
+The script sets `PUBLIC_SITE_ENV` itself, ahead of the command, so an inherited value cannot change what a build produces. `pnpm run build:live` makes a live build even where the environment says `beta`.
 
 ## How to deliver a change
 
