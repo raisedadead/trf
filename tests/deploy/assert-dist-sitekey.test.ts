@@ -1,8 +1,8 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 const GUARD = resolve("scripts/assert-dist-sitekey.mjs");
 const TEST_SITEKEY = "1x00000000000000000000AA";
@@ -19,8 +19,15 @@ interface Result {
   stderr: string;
 }
 
+const temporary: string[] = [];
+
+afterAll(() => {
+  for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
+});
+
 function runOn(files: Record<string, string>): Result {
   const dir = mkdtempSync(join(tmpdir(), "trf-dist-"));
+  temporary.push(dir);
   mkdirSync(join(dir, "dist"), { recursive: true });
   for (const [file, body] of Object.entries(files)) {
     const target = join(dir, "dist", file);

@@ -81,39 +81,34 @@ Both formatters use a print width of 100. `.editorconfig` states the same width,
 | `build` | The same command Cloudflare Workers Builds runs on `live`.                   |
 | `e2e`   | Playwright against the live build. A failed run keeps its report for 7 days. |
 
-The `build` job matters most. Workers Builds builds with `pnpm run build:live` on `live` and `pnpm run build:beta` on `main`, not with `pnpm build`, so CI runs those exact commands rather than an approximation.
+The `build` job matters most. Workers Builds runs `pnpm run build`, so CI runs that exact command rather than an approximation. `promote.yml` names `build` among the checks it requires, so a job that stops running blocks every promote. If you add a job, add its name there too.
 
-The matrix carries both stages. Keep it that way: `promote.yml` names `build (launch)` and `build (beta)` among the checks it requires, so a stage that stops running blocks every promote. If you add a stage, add its job name there too.
+`pnpm run build` is `node scripts/build.mjs`, and that module runs two guards around `astro build`:
 
-Both build commands are one word apart — `PUBLIC_SITE_ENV=<env> node scripts/build.mjs` — and that module runs the same three guards around `astro build` for either environment:
+| Guard                             | When it runs     | What it refuses                                                                                                                     |
+| --------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/assert-deploy-env.mjs`   | before the build | An unset or always-pass sitekey, an `env` block, an open `workers_dev` or `preview_urls`, or a Turnstile check that checks nothing. |
+| `scripts/assert-dist-sitekey.mjs` | after the build  | A `dist` that baked in the always-pass test sitekey, or an empty `dist`.                                                            |
 
-| Guard                             | When it runs     | What it refuses                                                                                           |
-| --------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------- |
-| `scripts/assert-deploy-env.mjs`   | before the build | An unsafe environment, an unsafe `wrangler.jsonc`, or a `PUBLIC_SITE_ENV` that does not match the target. |
-| `scripts/assert-dist-sitekey.mjs` | after the build  | A `dist` that baked in the always-pass test sitekey, or an empty `dist`.                                  |
-| `scripts/apply-site-env.mjs`      | after the build  | A live `dist` that refuses crawlers. On a beta build it writes the refusal instead.                       |
-
-The guards therefore protect the real deployment, not only CI. Keep them in `scripts/build.mjs`. Do not move any of them into the workflow.
-
-The script sets `PUBLIC_SITE_ENV` itself, ahead of the command, so an inherited value cannot change what a build produces. `pnpm run build:live` makes a live build even where the environment says `beta`.
+The guards therefore protect the real deployment, not only CI. Keep them in `scripts/build.mjs`. Do not move either of them into the workflow.
 
 ## How to deliver a change
 
-Open your pull request against `main`. A merge into `main` deploys `beta.rupeefund.org`, which no search engine indexes and which no member of the public is sent to. Nothing you merge reaches `rupeefund.org` on its own.
+Open your pull request against `main`. A merge into `main` deploys nothing. Nothing you merge reaches `rupeefund.org` on its own.
 
 1. Make a branch.
 1. Commit your work. Run `pnpm check` and `pnpm format` first.
+1. Prove the change on your own machine with `pnpm preview`.
 1. Open a pull request against `main`. GitHub CI runs the gate.
-1. Get a review. Then merge. Beta deploys.
-1. Prove the change on `beta.rupeefund.org`.
+1. Get a review. Then merge.
 
-Only the maintainer promotes to the live site, by running the **Promote to live** workflow. That workflow refuses a commit that is not on `main` and a commit whose checks did not pass, and the `production` environment holds it until a reviewer approves. Refer to `docs/deploy.md` section 2.
+Only the maintainer promotes to the live site, by running the **Promote to live** workflow. That workflow refuses a commit that is not on `main` and a commit whose checks did not pass, and the `production` environment holds it until a reviewer approves. Refer to `docs/deploy.md` section 3.
 
 `live` moves forward only. It is always a prefix of the history of `main`, so a promote takes a commit and everything before it. There is no cherry-pick, and no way to hold one commit back while a later one goes out.
 
-**Every migration must be additive.** The two environments have two databases and one `migrations/` directory. During a deployment two Worker versions read the one live database, so a change that is not additive breaks the older one while it still answers the public. Add a column with a default value or with NULL permitted. Never change a migration that ran before, and never reuse a file name. Refer to `docs/deploy.md` section 3.
+**Every migration must be additive.** During a deployment two Worker versions read the one database, so a change that is not additive breaks the older one while it still answers the public. Add a column with a default value or with NULL permitted. Never change a migration that ran before, and never reuse a file name. Refer to `docs/deploy.md` section 4.
 
-Preview URLs are not available. `wrangler.jsonc` does not set `preview_urls`, and the default value is `false`. A preview URL would keep the bindings of its Worker, so a preview of the live Worker would write to the **live** mailing list. `beta.rupeefund.org` is the place to look at a change.
+Preview URLs are not available, and the repository builds no beta site. `wrangler.jsonc` sets `preview_urls` and `workers_dev` to `false`, and `scripts/assert-deploy-env.mjs` exits 1 on either one left open. A Worker version keeps the bindings of its Worker, so any second address for `trf` would write to the **true** mailing list. Cloudflare states the limitation at <https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/>. Your own machine is the place to look at a change.
 
 ## Conventions
 

@@ -37,11 +37,9 @@ describe("every build path that uses the test sitekey opts in explicitly", () =>
     expect(read(".github/workflows/ci.yml")).not.toContain(TEST_SITEKEY);
   });
 
-  for (const name of ["build:live", "build:beta"] as const) {
-    it(`pnpm ${name} routes through the one build chain`, () => {
-      expect(scripts[name]).toContain("node scripts/build.mjs");
-    });
-  }
+  it("makes CI supply no sitekey at all, because the repository already carries it", () => {
+    expect(read(".github/workflows/ci.yml")).not.toContain("PUBLIC_TURNSTILE_SITEKEY");
+  });
 
   it("that chain still reads dist afterwards, which is what protects the real deploy", () => {
     expect(read("scripts/build.mjs")).toContain("scripts/assert-dist-sitekey.mjs");

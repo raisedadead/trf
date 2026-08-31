@@ -24,27 +24,23 @@ The system takes no payment and holds no vote. That code is removed. A later wav
 
 The Worker answers two addresses, `/api/health` and `/api/waitlist`. It sends every other request to the static files. `assets.run_worker_first` in `wrangler.jsonc` names only `/api/*`, so a request for a page never reaches the Worker.
 
-## 3. The two environments
+## 3. The one environment
 
-One branch feeds each environment. The code is the same. A build variable selects the environment.
+The system deploys one Worker to one address. There is no second environment, and there is no preview.
 
-| Item                 | Live               | Beta                 |
-| -------------------- | ------------------ | -------------------- |
-| Branch               | `live`             | `main`               |
-| Address              | `rupeefund.org`    | `beta.rupeefund.org` |
-| Worker               | `trf`              | `trf-beta`           |
-| Database             | `trf-rupeefund`    | `trf-rupeefund-beta` |
-| `PUBLIC_SITE_ENV`    | `live`, or not set | `beta`               |
-| Rate-limit namespace | `7301`             | `7302`               |
-| Crawlers             | permitted          | refused              |
+| Item                 | Value           |
+| -------------------- | --------------- |
+| Branch               | `live`          |
+| Address              | `rupeefund.org` |
+| Worker               | `trf`           |
+| Database             | `trf-rupeefund` |
+| Rate-limit namespace | `7301`          |
 
-`beta.rupeefund.org` is a real public site. It is never indexed. This is deliberate: two hosts that serve the same pages would split the ranking of the live host.
+`wrangler.jsonc` sets `workers_dev` and `preview_urls` to `false`. Both are stated, not inherited. The values reach Cloudflare on the next deploy of `trf`, not when you write them. A Worker version keeps the bindings of its Worker, so any second address for `trf` writes to the true mailing list. Cloudflare confirms the limitation: "Unlike Pages, Workers does not natively support defining different bindings in production vs. non-production builds." Refer to <https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/>.
 
-`PUBLIC_SITE_ENV` controls the build, not the Worker. After `astro build`, `scripts/apply-site-env.mjs` reads it. For a beta build the script writes `Disallow: /` into `dist/robots.txt` and adds `X-Robots-Tag: noindex, nofollow` to the sitewide block of `dist/_headers`. For a live build the script refuses a `dist` that carries either one.
+`scripts/assert-deploy-env.mjs` refuses a `wrangler.jsonc` that declares an `env` block, and refuses one that leaves either field open. A second target can only drift from the first.
 
-The build does this, and not the Worker, because a Worker route for `/robots.txt` needs `/robots.txt` in `assets.run_worker_first`. That entry makes every request for the file an invocation of the Worker. A build-time rewrite costs nothing at runtime.
-
-`scripts/assert-deploy-env.mjs` refuses a build where `PUBLIC_SITE_ENV` and the target environment do not agree. Without that guard a live deploy could ship the beta `robots.txt` to `rupeefund.org`.
+You prove a change on your own machine. `wrangler dev` binds the local D1 that `pnpm db:reset` builds, and the Playwright suite runs against it. No test reaches `trf-rupeefund`.
 
 ## 4. How a person joins the mailing list
 
@@ -78,9 +74,9 @@ The second path uses status 303. Because of this, the browser does not send the 
 
 The two environments have two databases and **one** migrations directory. Each database keeps its own `d1_migrations` ledger, so each one tracks what it applied.
 
-| Directory    | Databases                             | Tables     |
-| ------------ | ------------------------------------- | ---------- |
-| `migrations` | `trf-rupeefund`, `trf-rupeefund-beta` | `waitlist` |
+| Directory    | Databases       | Tables     |
+| ------------ | --------------- | ---------- |
+| `migrations` | `trf-rupeefund` | `waitlist` |
 
 One directory is deliberate. Two directories held two files with the same name and different content, and marker comments kept the shared block in agreement. The two copies could drift. One file cannot.
 
@@ -137,16 +133,14 @@ The policy names the font hosts `fonts.googleapis.com` and `fonts.gstatic.com`, 
 
 The test `tests/site/csp.test.ts` reads the policy and the HTML files. The test fails if a page loads an address that the policy does not permit, and it fails if the policy names a payment host again.
 
-A beta build adds `X-Robots-Tag: noindex, nofollow` to the same sitewide block. `tests/deploy/apply-site-env.test.ts` proves that the other headers survive that edit.
-
 ## 8. How to deploy
 
 Refer to `docs/deploy.md` for the full procedure and the commands.
 
-Cloudflare Workers Builds watches two branches. A push to `main` deploys `beta.rupeefund.org`. A push to `live` deploys `rupeefund.org`. Nobody runs a deploy command.
+Cloudflare Workers Builds watches one branch. A push to `live` deploys `rupeefund.org`, and `main` deploys nothing. The repository declares no deploy script.
 
 Only the workflow `.github/workflows/promote.yml` writes to `live`. It takes a commit that is on `main`, refuses a commit whose checks did not pass, and moves `live` forward. The GitHub environment `production` holds the run until a reviewer approves it. The update uses the GitHub API with `force: false`, so GitHub itself refuses anything that is not a fast-forward.
 
-**Apply a migration to the beta database, prove it there, then apply it to the live database, then promote.** The promote is the only step that puts new code in front of the public, so you control the sequence.
+**Rehearse a migration on a local copy of the database, then apply it to `trf-rupeefund`, then promote.** `wrangler d1 export` gives you the copy. The promote is the only step that puts new code in front of the public, so you control the sequence.
 
 After a promote, clear the cache of the zone. Then examine the site.

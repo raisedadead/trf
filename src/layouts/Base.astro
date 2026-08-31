@@ -51,7 +51,7 @@ const orgLd = {
     {!seo.indexable && <meta name="robots" content="noindex" />}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(orgLd)} />
   </head>
-  <body class="bg-paper text-ink font-sans">
+  <body class="bg-paper text-ink font-sans min-h-screen flex flex-col">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:left-4 focus:top-4 focus:rounded-lg focus:bg-brand-fg focus:px-4 focus:py-2 focus:text-white focus:font-semibold"
@@ -59,7 +59,7 @@ const orgLd = {
       Skip to content
     </a>
     {withHeader && <Header />}
-    <main id="main" tabindex="-1" class="min-h-screen screen-enter">
+    <main id="main" tabindex="-1" class="flex-1 screen-enter">
       <slot />
     </main>
     {withFooter && <Footer />}

@@ -9,6 +9,8 @@ export const SUBSCRIBE_CTA = "Get notified at launch";
 
 export const REMOVAL_ADDRESS = "foundation@fossunited.org";
 
+export const REFUND_ADDRESS = "audit@fossunited.org";
+
 export interface Season {
   spriteSlug: string;
   name: string;

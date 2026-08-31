@@ -1,36 +1,60 @@
 import { readFileSync } from "node:fs";
 import { DUMMY_SITEKEYS } from "./turnstile-dummy-keys.mjs";
 
-const PLACEHOLDER_D1 = "REPLACE_WITH_BETA_D1_ID";
-
-const envFlag = process.argv.indexOf("--env");
-const envName = envFlag === -1 ? null : process.argv[envFlag + 1];
 const config = JSON.parse(readFileSync("wrangler.jsonc", "utf8").replace(/,(\s*[}\]])/g, "$1"));
 
+const SITEKEY_LENGTH = 24;
+const SITEKEY_SHAPE = /^0x4[A-Za-z0-9_-]{21}$/;
+
 const problems = [];
-const sitekey = process.env.PUBLIC_TURNSTILE_SITEKEY;
+const lib = readFileSync(new URL("../src/lib/turnstile.ts", import.meta.url), "utf8");
+const declared = /export const TURNSTILE_SITEKEY = "([^"]*)"/.exec(lib)?.[1];
 
-if (sitekey === undefined || sitekey.length === 0) {
+if (declared === undefined || declared.length === 0) {
   problems.push(
-    "PUBLIC_TURNSTILE_SITEKEY is unset. Set it in the build environment — the Astro build fails on /subscribe without it.",
+    "src/lib/turnstile.ts declares no TURNSTILE_SITEKEY. The sitekey is public and lives in the repository, so a build must find it there.",
   );
-} else if (DUMMY_SITEKEYS.includes(sitekey)) {
+} else if (DUMMY_SITEKEYS.includes(declared)) {
   problems.push(
-    `PUBLIC_TURNSTILE_SITEKEY is Cloudflare's dummy TEST sitekey ${sitekey}. Use the real one from the Turnstile dashboard.`,
+    `src/lib/turnstile.ts declares Cloudflare's dummy TEST sitekey ${declared}. Use the real one from the Turnstile dashboard.`,
+  );
+} else if (!SITEKEY_SHAPE.test(declared)) {
+  // A Turnstile secret shares the sitekey prefix and is longer. Pinning the
+  // length stops a rotation pasting the secret into a public, committed file.
+  problems.push(
+    `src/lib/turnstile.ts declares ${declared.length} characters. A Turnstile sitekey is ${SITEKEY_LENGTH}. A longer value is the secret, and committing that publishes it.`,
   );
 }
 
-const target = envName === null ? config : config.env?.[envName];
-if (envName !== null && target === undefined) {
-  problems.push(`wrangler.jsonc declares no env.${envName}.`);
+const override = process.env.PUBLIC_TURNSTILE_SITEKEY;
+if (
+  override !== undefined &&
+  DUMMY_SITEKEYS.includes(override) &&
+  process.env.PUBLIC_ALLOW_TEST_SITEKEY !== "true"
+) {
+  problems.push(
+    `PUBLIC_TURNSTILE_SITEKEY overrides the repository with the dummy TEST sitekey ${override}. Set PUBLIC_ALLOW_TEST_SITEKEY=true for a local preview, or drop the override.`,
+  );
 }
 
-const vars = target?.vars ?? {};
+if (config.env !== undefined) {
+  problems.push(
+    "wrangler.jsonc declares an env block. This project ships one environment, so a second target can only drift from it.",
+  );
+}
+
+if (config.workers_dev !== false || config.preview_urls !== false) {
+  problems.push(
+    'wrangler.jsonc must set "workers_dev": false and "preview_urls": false. Either one left open publishes the site on a workers.dev host that shares the production database.',
+  );
+}
+
+const vars = config.vars ?? {};
 const hostnames = String(vars.TURNSTILE_HOSTNAMES ?? "");
 
 if (hostnames.length === 0) {
   problems.push(
-    "TURNSTILE_HOSTNAMES is not set in wrangler.jsonc for this target. An empty value turns the hostname check off, so a token solved on any other site would be accepted.",
+    "TURNSTILE_HOSTNAMES is not set in wrangler.jsonc. An empty value turns the hostname check off, so a token solved on any other site would be accepted.",
   );
 } else if (/localhost|127\.0\.0\.1|example\.com/.test(hostnames)) {
   problems.push(`TURNSTILE_HOSTNAMES contains a development host: ${hostnames}`);
@@ -38,22 +62,7 @@ if (hostnames.length === 0) {
 
 if (String(vars.TURNSTILE_ACTION ?? "").length === 0) {
   problems.push(
-    "TURNSTILE_ACTION is not set in wrangler.jsonc for this target. An empty value turns the action check off.",
-  );
-}
-
-if (target?.d1_databases?.[0]?.database_id === PLACEHOLDER_D1) {
-  problems.push(
-    `env.${envName} still has the placeholder database_id. Create the database first:\n      pnpm wrangler d1 create trf-rupeefund-beta\n    then paste the returned id into wrangler.jsonc.`,
-  );
-}
-
-const siteEnv = process.env.PUBLIC_SITE_ENV ?? "live";
-const expected = envName ?? "live";
-
-if (siteEnv !== expected) {
-  problems.push(
-    `PUBLIC_SITE_ENV is "${siteEnv}" for a ${expected} build. The two must agree, or the build ships the wrong robots.txt to the wrong host.`,
+    "TURNSTILE_ACTION is not set in wrangler.jsonc. An empty value turns the action check off.",
   );
 }
 

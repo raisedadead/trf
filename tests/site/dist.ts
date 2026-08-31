@@ -1,5 +1,13 @@
 import { readFileSync, readdirSync } from "node:fs";
 
-export const read = (file: string): string => readFileSync(`dist/${file}`, "utf8");
+export const OUT = "dist-preview";
 
-export const PAGES: readonly string[] = readdirSync("dist").filter((f) => f.endsWith(".html"));
+export const read = (file: string): string => readFileSync(`${OUT}/${file}`, "utf8");
+
+export const PAGES: readonly string[] = readdirSync(OUT).filter((f) => f.endsWith(".html"));
+
+export const styles = (): string =>
+  readdirSync(`${OUT}/_astro`)
+    .filter((f) => f.endsWith(".css"))
+    .map((f) => read(`_astro/${f}`))
+    .join("\n");

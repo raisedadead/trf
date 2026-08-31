@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+import { REFUND_ADDRESS, REMOVAL_ADDRESS } from "../lib/launch.ts";
+---
+
+<Base>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-2xl font-bold text-ink tracking-tight mb-3">Refunds</h1>
+    <p class="text-sm text-ink-2 mb-8">
+      The Rupee Fund is a programme of the FOSS United Foundation. The fund adopts the <a
+        href="https://fossunited.org/refund-transfer-policy"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-link">FOSS United refund and transfer policy</a
+      >.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">How to claim a refund</h2>
+    <p class="text-sm text-ink-2 mb-6">
+      Send an email to <a href={`mailto:${REFUND_ADDRESS}`} class="inline-link">{REFUND_ADDRESS}</a> within
+      15 days of your contribution. Read the policy for more details on FOSS United's website.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">Questions</h2>
+    <p class="text-sm text-ink-2 mb-8">
+      Send an email to <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link"
+        >{REMOVAL_ADDRESS}</a
+      >.
+    </p>
+
+    <a href="/" class="btn btn-primary">Back to home</a>
+  </div>
+</Base>

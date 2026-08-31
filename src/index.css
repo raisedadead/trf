@@ -76,44 +76,41 @@
      that attribute, so a new external link is marked the moment it is written
      and no class has to be remembered.
 
-     The arrow is absolutely positioned into reserved padding rather than set
-     inline. An inline-block pseudo-element is an atomic inline, so the line
-     breaker may drop it onto a line of its own, away from the word it marks.
-     Out of flow it cannot wrap, and it also stays out of the flex box of the
-     `inline-flex` links — `.foot-link` and `.btn` — which would otherwise lay
-     it out as a flex item.
+     The pseudo-element holds one no-break space and paints the arrow into its
+     own right padding. Two earlier shapes each failed one way:
+
+     - An absolutely positioned box in reserved padding. For an inline element
+       the containing block is the union of every line box, so a link that
+       wrapped put the arrow at the right margin, half way down, away from the
+       word it marks.
+     - An inline-block box. That is an atomic inline, and the line breaker may
+       drop it onto a line of its own.
+
+     A no-break space offers no break opportunity, so the box cannot leave the
+     last word. Padding cannot wrap, so the arrow cannot leave the box. In
+     `.foot-link` and `.btn` the pseudo-element becomes a flex item instead of
+     an inline, which those rows want: the label and the arrow lay out as two
+     items of one line.
 
      `.link-plain` opts a link out. A whole row of outbound links reads as a
      group on its own, so repeating the arrow down the row only adds noise.
 
-     Progressive: a browser without `mask-image` gets no arrow instead of a
-     solid square, and the reserved padding is harmless. The second `content`
-     asks the engine to name the arrow for a screen reader; a browser that
-     cannot parse the alt text syntax keeps the first declaration and stays
-     silent. Chromium drops the name when the anchor is a direct flex item, so
-     an anchor inside a flex row needs a plain `<span>` around it —
-     `tests/site/external-links.test.ts` does not catch that. */
+     Progressive: a browser without `mask-image` gets no arrow and no padding
+     instead of a solid rectangle. The second `content` asks the engine to name
+     the arrow for a screen reader. A browser that cannot parse the alt text
+     syntax keeps the first declaration, which is only a space, so nothing
+     reads out. */
   @supports (mask-image: linear-gradient(#000, #000)) {
-    a[target="_blank"]:not(.link-plain) {
-      position: relative;
-      padding-right: 1.1em;
-    }
-
     a[target="_blank"]:not(.link-plain)::after {
-      content: "";
-      content: "" / " (opens in a new tab)";
-      position: absolute;
-      right: 0.1em;
-      top: 50%;
-      width: 0.75em;
-      height: 0.75em;
-      translate: 0 -50%;
+      content: "\00A0";
+      content: "\00A0" / " (opens in a new tab)";
+      padding-right: 0.85em;
       background-color: currentColor;
-      /* Ink spans 4→20 of this 16-unit viewBox, so `contain` scales the arrow
-         itself to the box rather than the empty margin around it. */
+      /* Ink spans 4→20 of this 16-unit viewBox, so the size below scales the
+         arrow itself rather than the empty margin around it. */
       mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 4 16 16' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7'/%3E%3Cpath d='M7 7h10v10'/%3E%3C/svg%3E");
-      mask-position: center;
-      mask-size: contain;
+      mask-position: right center;
+      mask-size: 0.7em 0.7em;
       mask-repeat: no-repeat;
     }
   }
@@ -194,16 +191,6 @@
   @media (pointer: fine) {
     .foot-list .foot-link {
       @apply min-h-8;
-    }
-  }
-
-  /* This class sits in `components` and so outranks the right padding the
-     arrow reserves in `base`. A marked footer link has to hand the gutter
-     back, or the arrow sits on top of the last letter. The guard matches the
-     one on the arrow, so a browser that draws no arrow reserves no gutter. */
-  @supports (mask-image: linear-gradient(#000, #000)) {
-    .foot-link[target="_blank"]:not(.link-plain) {
-      @apply pr-5;
     }
   }
 
@@ -294,26 +281,6 @@
 /* Form submits and stacked card actions, where the button owns the row. */
 @utility btn-block {
   @apply w-full;
-}
-
-/* Inside a button the arrow travels with the label. A button centres its
-   content and `btn-block` makes it as wide as the row, so an arrow pinned to
-   the right edge strands itself in whitespace half a button away from the word
-   it marks. Put it back in flow as a flex item of the `inline-flex` button and
-   the `gap-2` above sets the spacing.
-
-   The reason the arrow is out of flow everywhere else — that a line breaker may
-   drop an atomic inline onto a line of its own — does not apply here. A button
-   label is one short line that never wraps.
-
-   Unlayered, so this beats the `base` rule it resets. The guard matches the one
-   on the arrow, so a browser that draws no arrow is untouched. */
-@supports (mask-image: linear-gradient(#000, #000)) {
-  .btn[target="_blank"]:not(.link-plain)::after {
-    position: static;
-    translate: none;
-    flex: none;
-  }
 }
 
 @utility hero-glow {

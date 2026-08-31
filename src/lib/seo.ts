@@ -37,6 +37,26 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     indexable: true,
   },
   {
+    path: "/privacy",
+    title: "Privacy — The Rupee Fund",
+    description:
+      "What The Rupee Fund collects, what it does with your IP address, and how to leave the list.",
+    ogTitle: "Privacy — The Rupee Fund",
+    ogDescription: "What we collect, and how to leave the list.",
+    canonical: `${SITE_URL}/privacy`,
+    indexable: true,
+  },
+  {
+    path: "/refunds",
+    title: "Refunds — The Rupee Fund",
+    description:
+      "How to claim a refund from The Rupee Fund, the address that takes the claim, and the time limit.",
+    ogTitle: "Refunds — The Rupee Fund",
+    ogDescription: "How to claim a refund, and the time limit that applies.",
+    canonical: `${SITE_URL}/refunds`,
+    indexable: true,
+  },
+  {
     path: "/waitlist-confirmed",
     title: "You're on the list — The Rupee Fund",
     description: "You'll hear from us the day The Rupee Fund opens.",

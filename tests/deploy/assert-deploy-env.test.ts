@@ -1,11 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 const GUARD = resolve("scripts/assert-deploy-env.mjs");
-const REAL_SITEKEY = "0x4AAAAAAEQqCldZbFvXQvQr";
 const TEST_SITEKEY = "1x00000000000000000000AA";
 const DUMMY_SITEKEYS = [
   TEST_SITEKEY,
@@ -20,8 +19,46 @@ interface Result {
   stderr: string;
 }
 
-function run(env: Record<string, string>, args: string[] = [], cwd = process.cwd()): Result {
-  const out = spawnSync(process.execPath, [GUARD, ...args], {
+function config(): Record<string, unknown> {
+  const raw = readFileSync("wrangler.jsonc", "utf8");
+  return JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
+}
+
+interface Fixture {
+  config?: (config: Record<string, unknown>) => void;
+  lib?: (source: string) => string;
+}
+
+const temporary: string[] = [];
+
+afterAll(() => {
+  for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
+});
+
+function repoWith(mutate: Fixture): string {
+  const dir = mkdtempSync(join(tmpdir(), "trf-guard-"));
+  temporary.push(dir);
+  mkdirSync(join(dir, "scripts"), { recursive: true });
+  mkdirSync(join(dir, "src", "lib"), { recursive: true });
+
+  copyFileSync(GUARD, join(dir, "scripts", "assert-deploy-env.mjs"));
+  copyFileSync(
+    resolve("scripts/turnstile-dummy-keys.mjs"),
+    join(dir, "scripts", "turnstile-dummy-keys.mjs"),
+  );
+
+  const next = config();
+  mutate.config?.(next);
+  writeFileSync(join(dir, "wrangler.jsonc"), JSON.stringify(next));
+
+  const lib = readFileSync("src/lib/turnstile.ts", "utf8");
+  writeFileSync(join(dir, "src", "lib", "turnstile.ts"), mutate.lib?.(lib) ?? lib);
+  return dir;
+}
+
+function run(env: Record<string, string>, cwd = process.cwd()): Result {
+  const guard = cwd === process.cwd() ? GUARD : join(cwd, "scripts", "assert-deploy-env.mjs");
+  const out = spawnSync(process.execPath, [guard], {
     cwd,
     env: { PATH: process.env.PATH ?? "", ...env },
     encoding: "utf8",
@@ -29,159 +66,153 @@ function run(env: Record<string, string>, args: string[] = [], cwd = process.cwd
   return { code: out.status ?? -1, stderr: out.stderr };
 }
 
-function repoWith(mutate: (config: Record<string, unknown>) => void): string {
-  const raw = readFileSync("wrangler.jsonc", "utf8");
-  const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
-  mutate(config);
-  const dir = mkdtempSync(join(tmpdir(), "trf-guard-"));
-  writeFileSync(join(dir, "wrangler.jsonc"), JSON.stringify(config));
-  return dir;
+function withSitekey(value: string) {
+  return (source: string) =>
+    source.replace(
+      /export const TURNSTILE_SITEKEY = "[^"]*"/,
+      `export const TURNSTILE_SITEKEY = "${value}"`,
+    );
 }
 
-describe("the deploy guard refuses a launch build that cannot take signups", () => {
-  it("passes on the real configuration with a real sitekey", () => {
-    expect(run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY }).code).toBe(0);
+describe("the sitekey comes from the repository, so no dashboard field can be missing", () => {
+  it("passes with nothing set in the environment at all", () => {
+    expect(run({}).code).toBe(0);
   });
 
-  it("refuses an unset sitekey", () => {
-    const { code, stderr } = run({});
+  it("refuses a repository that declares no sitekey at all", () => {
+    const dir = repoWith({
+      lib: (src) => src.replace(/export const TURNSTILE_SITEKEY = "[^"]*";\n/, ""),
+    });
+    const { code, stderr } = run({}, dir);
     expect(code).toBe(1);
-    expect(stderr).toContain("PUBLIC_TURNSTILE_SITEKEY is unset");
-  });
-
-  it("refuses an empty sitekey", () => {
-    const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: "" });
-    expect(code).toBe(1);
-    expect(stderr).toContain("PUBLIC_TURNSTILE_SITEKEY is unset");
+    expect(stderr).toContain("declares no TURNSTILE_SITEKEY");
   });
 
   for (const key of DUMMY_SITEKEYS) {
-    it(`refuses Cloudflare's dummy sitekey ${key}`, () => {
+    it(`refuses a repository that declares dummy sitekey ${key}`, () => {
+      const dir = repoWith({ lib: withSitekey(key) });
+      const { code, stderr } = run({}, dir);
+      expect(code).toBe(1);
+      expect(stderr).toContain(key);
+    });
+  }
+
+  it("refuses a Turnstile secret pasted where the sitekey goes", () => {
+    const dir = repoWith({ lib: withSitekey("0x4AAAAAAEQqCldZbFvXQvQrAAAAAAAAAAA") });
+    const { code, stderr } = run({}, dir);
+    expect(code).toBe(1);
+    expect(stderr).toContain("the secret");
+  });
+
+  it("accepts another real sitekey, so a rotation is not blocked", () => {
+    const dir = repoWith({ lib: withSitekey("0x4AAAAAAEhMNZY_VP1lW8kS") });
+    expect(run({}, dir).code).toBe(0);
+  });
+
+  for (const key of DUMMY_SITEKEYS) {
+    it(`refuses an environment override that is dummy sitekey ${key}`, () => {
       const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: key });
       expect(code).toBe(1);
       expect(stderr).toContain(key);
+    });
+
+    it(`allows the same override behind the explicit opt-in ${key}`, () => {
+      const { code } = run({
+        PUBLIC_TURNSTILE_SITEKEY: key,
+        PUBLIC_ALLOW_TEST_SITEKEY: "true",
+      });
+      expect(code).toBe(0);
     });
   }
 });
 
 describe("the deploy guard refuses a Turnstile configuration that checks nothing", () => {
   it("refuses an empty hostname list, which turns the hostname check off", () => {
-    const dir = repoWith((c) => {
-      (c.vars as Record<string, string>).TURNSTILE_HOSTNAMES = "";
+    const dir = repoWith({
+      config: (c) => {
+        (c.vars as Record<string, string>).TURNSTILE_HOSTNAMES = "";
+      },
     });
-    const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY }, [], dir);
+    const { code, stderr } = run({}, dir);
     expect(code).toBe(1);
     expect(stderr).toContain("TURNSTILE_HOSTNAMES is not set");
   });
 
   it("refuses a development host in the hostname list", () => {
-    const dir = repoWith((c) => {
-      (c.vars as Record<string, string>).TURNSTILE_HOSTNAMES = "localhost";
+    const dir = repoWith({
+      config: (c) => {
+        (c.vars as Record<string, string>).TURNSTILE_HOSTNAMES = "localhost";
+      },
     });
-    const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY }, [], dir);
+    const { code, stderr } = run({}, dir);
     expect(code).toBe(1);
     expect(stderr).toContain("development host");
   });
 
   it("refuses an empty action, which turns the action check off", () => {
-    const dir = repoWith((c) => {
-      (c.vars as Record<string, string>).TURNSTILE_ACTION = "";
+    const dir = repoWith({
+      config: (c) => {
+        (c.vars as Record<string, string>).TURNSTILE_ACTION = "";
+      },
     });
-    const { code, stderr } = run({ PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY }, [], dir);
+    const { code, stderr } = run({}, dir);
     expect(code).toBe(1);
     expect(stderr).toContain("TURNSTILE_ACTION is not set");
   });
 });
 
-describe("the deploy guard holds the beta build to the beta configuration", () => {
-  const betaRepo = () =>
-    repoWith((c) => {
-      const beta = (c.env as Record<string, Record<string, unknown>>).beta;
-      (beta.d1_databases as Record<string, unknown>[])[0].database_id = "real-beta-id";
+describe("the project ships exactly one environment", () => {
+  it("declares no env block", () => {
+    expect(config().env).toBeUndefined();
+  });
+
+  it("refuses a configuration that adds one back", () => {
+    const dir = repoWith({
+      config: (c) => {
+        c.env = { beta: { name: "trf-beta" } };
+      },
+    });
+    const { code, stderr } = run({}, dir);
+    expect(code).toBe(1);
+    expect(stderr).toContain("declares an env block");
+  });
+
+  it("names one database and one migrations directory", () => {
+    const dbs = config().d1_databases as Record<string, string>[];
+    expect(dbs).toHaveLength(1);
+    expect(dbs[0].database_name).toBe("trf-rupeefund");
+    expect(dbs[0].migrations_dir).toBe("migrations");
+  });
+});
+
+describe("the deploy guard keeps the site off every host but the custom domain", () => {
+  it("declares workers_dev and preview_urls false", () => {
+    const c = config();
+    expect(c.workers_dev).toBe(false);
+    expect(c.preview_urls).toBe(false);
+  });
+
+  for (const field of ["workers_dev", "preview_urls"] as const) {
+    it(`refuses a configuration that leaves ${field} open`, () => {
+      const dir = repoWith({
+        config: (c) => {
+          c[field] = true;
+        },
+      });
+      const { code, stderr } = run({}, dir);
+      expect(code).toBe(1);
+      expect(stderr).toContain(field);
     });
 
-  it("passes a beta build once the database id is real", () => {
-    const { code } = run(
-      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "beta" },
-      ["--env", "beta"],
-      betaRepo(),
-    );
-    expect(code).toBe(0);
-  });
-
-  it("refuses the placeholder database id, so beta cannot write to the live list", () => {
-    const dir = repoWith((c) => {
-      const beta = (c.env as Record<string, Record<string, unknown>>).beta;
-      (beta.d1_databases as Record<string, unknown>[])[0].database_id = "REPLACE_WITH_BETA_D1_ID";
+    it(`refuses a configuration that omits ${field} rather than stating it`, () => {
+      const dir = repoWith({
+        config: (c) => {
+          delete c[field];
+        },
+      });
+      const { code, stderr } = run({}, dir);
+      expect(code).toBe(1);
+      expect(stderr).toContain(field);
     });
-    const { code, stderr } = run(
-      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "beta" },
-      ["--env", "beta"],
-      dir,
-    );
-    expect(code).toBe(1);
-    expect(stderr).toContain("placeholder database_id");
-  });
-
-  it("refuses a beta build that forgets PUBLIC_SITE_ENV, which would ship an indexable beta", () => {
-    const { code, stderr } = run(
-      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY },
-      ["--env", "beta"],
-      betaRepo(),
-    );
-    expect(code).toBe(1);
-    expect(stderr).toContain("PUBLIC_SITE_ENV");
-  });
-
-  it("refuses a live build that carries the beta PUBLIC_SITE_ENV", () => {
-    const { code, stderr } = run({
-      PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY,
-      PUBLIC_SITE_ENV: "beta",
-    });
-    expect(code).toBe(1);
-    expect(stderr).toContain("PUBLIC_SITE_ENV");
-  });
-
-  it("refuses an environment the configuration does not declare", () => {
-    const { code, stderr } = run(
-      { PUBLIC_TURNSTILE_SITEKEY: REAL_SITEKEY, PUBLIC_SITE_ENV: "staging" },
-      ["--env", "staging"],
-    );
-    expect(code).toBe(1);
-    expect(stderr).toContain("declares no env.staging");
-  });
-
-  it("holds the beta host to its own Turnstile hostname, not the live one", () => {
-    const raw = readFileSync("wrangler.jsonc", "utf8");
-    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
-    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
-    expect((beta.vars as Record<string, string>).TURNSTILE_HOSTNAMES).toBe("beta.rupeefund.org");
-    expect((config.vars as Record<string, string>).TURNSTILE_HOSTNAMES).toBe("rupeefund.org");
-  });
-
-  it("gives beta its own rate-limit namespace, so it cannot spend the live budget", () => {
-    const raw = readFileSync("wrangler.jsonc", "utf8");
-    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
-    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
-    const betaNs = (beta.ratelimits as Record<string, string>[])[0].namespace_id;
-    const liveNs = (config.ratelimits as Record<string, string>[])[0].namespace_id;
-    expect(betaNs).not.toBe(liveNs);
-  });
-
-  it("points both environments at the one migrations directory", () => {
-    const raw = readFileSync("wrangler.jsonc", "utf8");
-    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
-    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
-    expect((beta.d1_databases as Record<string, string>[])[0].migrations_dir).toBe("migrations");
-    expect((config.d1_databases as Record<string, string>[])[0].migrations_dir).toBe("migrations");
-  });
-
-  it("gives the two environments different databases", () => {
-    const raw = readFileSync("wrangler.jsonc", "utf8");
-    const config = JSON.parse(raw.replace(/,(\s*[}\]])/g, "$1")) as Record<string, unknown>;
-    const beta = (config.env as Record<string, Record<string, unknown>>).beta;
-    expect((beta.d1_databases as Record<string, string>[])[0].database_name).not.toBe(
-      (config.d1_databases as Record<string, string>[])[0].database_name,
-    );
-  });
+  }
 });

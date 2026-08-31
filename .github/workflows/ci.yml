@@ -32,27 +32,17 @@ jobs:
       - run: pnpm check
 
   build:
-    name: build (${{ matrix.stage }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        stage: [live, beta]
     steps:
       - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - name: Run the same build command Cloudflare Workers Builds runs
-        run: pnpm run build:${{ matrix.stage }}
-        env:
-          # Not a secret: the sitekey is public and is baked into every page. This
-          # stand-in makes the deploy guard run exactly as it does in production —
-          # it refuses Cloudflare's always-pass test key, so CI cannot use that.
-          PUBLIC_TURNSTILE_SITEKEY: 0xCI00000000000000000000
+        run: pnpm run build
 
   e2e:
     runs-on: ubuntu-latest

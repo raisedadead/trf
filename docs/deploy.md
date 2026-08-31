@@ -6,21 +6,49 @@ The system runs on the Workers Free plan. A paid plan is not necessary. Refer to
 
 ## 1. The branch model
 
-Two branches feed two sites. Cloudflare Workers Builds watches both.
+One branch feeds one site. Cloudflare Workers Builds watches it.
 
-| Branch | Site                 | Worker     | Trigger                    |
-| ------ | -------------------- | ---------- | -------------------------- |
-| `main` | `beta.rupeefund.org` | `trf-beta` | Every push                 |
-| `live` | `rupeefund.org`      | `trf`      | The promote workflow, only |
+| Branch | Site            | Worker | Trigger                    |
+| ------ | --------------- | ------ | -------------------------- |
+| `main` | none            | none   | Never                      |
+| `live` | `rupeefund.org` | `trf`  | The promote workflow, only |
 
-| Setting        | Value on `main`                  | Value on `live`       |
-| -------------- | -------------------------------- | --------------------- |
-| Build command  | `pnpm run build:beta`            | `pnpm run build:live` |
-| Deploy command | `npx wrangler deploy --env beta` | `npx wrangler deploy` |
+| Setting                      | Value on `live`       |
+| ---------------------------- | --------------------- |
+| Build command                | `pnpm run build`      |
+| Deploy command               | `npx wrangler deploy` |
+| Non-production branch builds | off                   |
 
-Collaborators open a pull request against `main`. CI runs the gate. A merge deploys beta, and nothing reaches the public.
+Collaborators open a pull request against `main`. CI runs the gate. A merge into `main` deploys nothing.
 
-## 2. How to promote to the live site
+**Workers Builds is the supported way code reaches the live site.** The repository declares no deploy script, so the promote workflow is the release gate. A hand-run `wrangler deploy` is unsupported: it uploads whatever `dist` holds and runs neither sitekey guard. `pnpm wrangler rollback` stays available for an incident, because a rollback ships no new code.
+
+Leave non-production branch builds off. Turning them on uploads a Worker version for every branch, and every version keeps the production bindings.
+
+The repository builds no beta site and no preview URL. `wrangler.jsonc` sets `workers_dev` and `preview_urls` to `false`, and `scripts/assert-deploy-env.mjs` exits 1 on a configuration that leaves either one open, or that declares an `env` block. A Worker version keeps the bindings of its Worker, so a second address for `trf` would write to the true mailing list. Cloudflare states the limitation: "Unlike Pages, Workers does not natively support defining different bindings in production vs. non-production builds." Refer to <https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/>.
+
+Those two settings reach Cloudflare only on the next deploy of `trf`. Until a promote runs, the account keeps the preview state it holds now.
+
+## 2. How to prove a change
+
+You prove every change on your own machine. Nothing else is available, and nothing else touches `trf-rupeefund`.
+
+```sh
+pnpm db:reset     # build the local D1 from the migrations
+pnpm preview      # build to dist-preview, then serve it with a local wrangler dev
+pnpm check        # the whole gate: types, lint, astro check, vitest
+pnpm test:e2e     # Playwright against the local build
+```
+
+`pnpm preview` uses Cloudflare's always-pass Turnstile test pair, so the signup form completes without a real widget. It writes to `dist-preview`, never to `dist`, because a `dist` carrying the test sitekey would reject every signup if anybody uploaded it. The site tests build there too. Only `pnpm run build` writes `dist`, and it runs both guards. `pnpm dev` shows the pages only, with no Worker and no database.
+
+Read the rows the local database holds:
+
+```sh
+pnpm wrangler d1 execute trf-rupeefund --local --command "SELECT email, consent_at FROM waitlist"
+```
+
+## 3. How to promote to the live site
 
 Run the workflow **Promote to live** from the Actions tab. Give it a commit, or leave the field empty to take the tip of `main`.
 
@@ -41,17 +69,17 @@ To go back, run `pnpm wrangler rollback`. Then purge the cache of the zone. Do n
 
 **Do not delete a Worker.** Deploy new code on top of it. If you delete the Worker, Cloudflare disconnects the custom domain, and you lose all the earlier deployments. Those deployments are your only targets for a rollback.
 
-## 3. How to apply a migration
+## 4. How to apply a migration
 
 The deployment applies no migration. You apply each one by hand, and the sequence matters.
 
-1. Apply the migration to the beta database.
-1. Merge the code into `main`. Beta deploys. Prove the change there.
+1. Export the live database. Apply the migration to that copy. Prove the change against it.
+1. Merge the code into `main`.
 1. Apply the migration to the live database.
 1. Run the promote workflow.
 
 ```sh
-pnpm wrangler d1 migrations apply trf-rupeefund-beta --env beta --remote
+pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-backup.sql
 pnpm wrangler d1 migrations apply trf-rupeefund --remote
 ```
 
@@ -59,31 +87,30 @@ pnpm wrangler d1 migrations apply trf-rupeefund --remote
 
 A change that is not additive needs two promotes: one that adds the new shape, and a later one that removes the old shape after all the code stops using it.
 
-## 4. What you need first
+## 5. What you need first
 
 - A Cloudflare account with the `rupeefund.org` zone.
 - pnpm, at the version in `packageManager` in `package.json`. Also direnv.
 
-## 5. Secrets and variables
+## 6. Secrets and variables
 
 There are three kinds of value, and each kind has a different home.
 
-| Kind            | Home                                      | Example                    |
-| --------------- | ----------------------------------------- | -------------------------- |
-| Build variable  | Workers Builds settings, in the dashboard | `PUBLIC_TURNSTILE_SITEKEY` |
-| Worker secret   | `wrangler secret`                         | `TURNSTILE_SECRET`         |
-| Worker variable | `vars` in `wrangler.jsonc`                | `TURNSTILE_HOSTNAMES`      |
+| Kind               | Home                       | Example               |
+| ------------------ | -------------------------- | --------------------- |
+| Public build value | The repository             | `TURNSTILE_SITEKEY`   |
+| Worker secret      | `wrangler secret`          | `TURNSTILE_SECRET`    |
+| Worker variable    | `vars` in `wrangler.jsonc` | `TURNSTILE_HOSTNAMES` |
 
-A build variable goes into the static files. It is public. A Worker secret never leaves Cloudflare.
+**The Workers Builds settings hold no variable.** The Turnstile sitekey is public and is baked into every page, so it lives in `src/lib/turnstile.ts` where a diff shows it. No build depends on a dashboard field that a person can forget to set. `TURNSTILE_SECRET` is the one value Cloudflare holds, and a Worker secret never leaves Cloudflare.
 
-Each environment has its own Turnstile widget, therefore its own sitekey and its own secret. Set the sitekey in the Workers Builds settings of that project. Set the secret against that Worker:
+To rotate the sitekey, change the constant in `src/lib/turnstile.ts`, then promote. `scripts/assert-deploy-env.mjs` exits 1 when that constant is absent or is a Cloudflare dummy.
+
+One Turnstile widget serves the site. Its domain list holds `rupeefund.org` and nothing else. Its sitekey is the constant in `src/lib/turnstile.ts`. Set its secret against the Worker:
 
 ```sh
 pnpm wrangler secret put TURNSTILE_SECRET
-pnpm wrangler secret put TURNSTILE_SECRET --env beta
 ```
-
-Set `PUBLIC_SITE_ENV` to `beta` in the beta Workers Builds settings. Leave it unset for live. `build:beta` supplies it too, so a build from your machine agrees with a build from Cloudflare.
 
 For local work, one `.env` file at the top of the repository holds all of them. Both direnv and wrangler read this file. Do **not** also make a `.dev.vars` file. If that file exists, wrangler ignores `.env`.
 
@@ -96,25 +123,18 @@ printf 'dotenv\n' > .envrc && direnv allow
 
 Cloudflare supplies an always-pass test sitekey, `1x00000000000000000000AA`. A deployed build that uses it refuses every signup, because the Worker examines the token with the real secret.
 
-The build therefore refuses the test sitekey twice. `scripts/assert-deploy-env.mjs` refuses the value before the build. `scripts/assert-dist-sitekey.mjs` reads `dist` after the build and refuses the literal wherever it came from. Both run inside `scripts/build.mjs`, which every build goes through, so Cloudflare runs both.
+**Local work uses the test sitekey.** `.env.example` ships it, with `PUBLIC_ALLOW_TEST_SITEKEY=true` beside it. Keep it that way. A real sitekey on `localhost` renders the production widget, which raises the risk score of your own address until Turnstile shows you the interactive checkbox on every load. It also obliges the production widget to allow `localhost` as a domain, and that lets anybody mint a token against your sitekey from their own machine.
 
-To use the test sitekey on purpose, set `PUBLIC_ALLOW_TEST_SITEKEY=true` and call `astro build` directly. The local preview scripts and the site tests do this. The CI build jobs do not: they supply a stand-in sitekey and run the same command as Cloudflare, so both guards operate. **Never set the opt-in in the Workers Builds settings.**
+The build refuses the test sitekey twice. `scripts/assert-deploy-env.mjs` refuses the value before the build. `scripts/assert-dist-sitekey.mjs` reads `dist` after the build and refuses the literal wherever it came from. Both run inside `scripts/build.mjs`, which every build goes through, so Cloudflare runs both.
 
-### The robots guard
+To use the test sitekey on purpose, set `PUBLIC_ALLOW_TEST_SITEKEY=true` and call `astro build` directly. The local preview script and the site tests do this. The CI build job supplies no sitekey at all, so it builds exactly what Cloudflare builds and both guards operate. **Never set the opt-in in the Workers Builds settings.**
 
-`scripts/build.mjs` runs the whole chain: the config guard, `astro build`, the sitekey guard, then `scripts/apply-site-env.mjs`. The name of the build script sets `PUBLIC_SITE_ENV`, so an inherited value cannot change the result.
+## 7. The database
 
-`scripts/apply-site-env.mjs` runs after `astro build`. For a beta build it writes `Disallow: /` into `dist/robots.txt` and adds `X-Robots-Tag: noindex, nofollow` to the sitewide block of `dist/_headers`. For a live build it refuses a `dist` that carries either one.
-
-`scripts/assert-deploy-env.mjs` refuses a build where `PUBLIC_SITE_ENV` and the target do not agree. Without it, a live build could hide `rupeefund.org` from every search engine.
-
-## 6. The databases
-
-The two environments share one migrations directory, `migrations/`. Each database has its own ledger, so `wrangler d1 migrations apply` gives each one only the files it has not applied.
+`migrations/` holds every migration. The database has its own ledger, so `wrangler d1 migrations apply` gives it only the files it has not applied.
 
 ```sh
 pnpm wrangler d1 migrations apply trf-rupeefund --remote
-pnpm wrangler d1 migrations apply trf-rupeefund-beta --env beta --remote
 ```
 
 For local work, `pnpm db:reset` makes the local database again from zero.
@@ -131,7 +151,7 @@ pnpm wrangler d1 execute trf-rupeefund --remote --json --command \
   "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
 ```
 
-Each database must show only `waitlist`, together with the Cloudflare tables `_cf_KV`, `d1_migrations` and `sqlite_sequence`.
+The database must show only `waitlist`, together with the Cloudflare tables `_cf_KV`, `d1_migrations` and `sqlite_sequence`.
 
 **`trf-rupeefund` holds true signups.** You cannot make it again. Export first, then add a new migration for each change:
 
@@ -139,31 +159,26 @@ Each database must show only `waitlist`, together with the Cloudflare tables `_c
 pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-backup.sql
 ```
 
-The beta database holds test data only. You may make it again at any time.
-
-## 7. How to verify a deployment
+## 8. How to verify a deployment
 
 Purge the zone cache first. The live site answers with `cf-cache-status: HIT`, and without a purge the new build can look absent.
 
 ```sh
 curl -s https://rupeefund.org/api/health                       # {"ok":true}
 curl -s https://rupeefund.org/robots.txt                       # Allow: /
-curl -s https://beta.rupeefund.org/robots.txt                  # Disallow: /
-curl -sI https://beta.rupeefund.org/ | grep -i x-robots-tag    # noindex, nofollow
 curl -s https://rupeefund.org/subscribe | grep -o 'data-sitekey="[^"]*"'
 curl -sI https://rupeefund.org/ | grep -i -e content-security-policy -e strict-transport
 ```
 
-The sitekey must be the real one. If it is `1x00000000000000000000AA`, the build variable is absent from the Workers Builds settings and no visitor can sign up with JavaScript.
+The sitekey must be the real one. If it is `1x00000000000000000000AA`, somebody deployed a `dist` that a preview build wrote, and no visitor can sign up with JavaScript. `pnpm run build` cannot produce that, because `scripts/assert-dist-sitekey.mjs` reads `dist` and exits 1 on the literal.
 
-Complete the form one time on each host. Then make sure that the correct database has the row, and that the other one does not:
+Complete the form one time. Then make sure that the database has the row:
 
 ```sh
 pnpm wrangler d1 execute trf-rupeefund --remote --command "SELECT email, consent_at FROM waitlist"
-pnpm wrangler d1 execute trf-rupeefund-beta --env beta --remote --command "SELECT email FROM waitlist"
 ```
 
-## 8. How to remove a person from the list
+## 9. How to remove a person from the list
 
 The build has no sender. Therefore a request for removal comes by email to `foundation@fossunited.org`. The signup form shows this address. There is no automatic endpoint for removal. A person does this work.
 
@@ -184,7 +199,7 @@ pnpm wrangler d1 execute trf-rupeefund --remote --json --command \
   "SELECT email, unsubscribed_at FROM waitlist WHERE email = 'someone@example.com'"
 ```
 
-## 9. How to export the list
+## 10. How to export the list
 
 ```sh
 pnpm list:export --remote --dry-run   # prints the CSV, changes nothing
@@ -195,20 +210,20 @@ The export is incremental. The command sends each row one time only. Because of 
 
 The exporter is `scripts/list-export.mts`. Node removes the types when it runs the file. Node does this without a flag from v22.18.0 and from v23.6.0, so an older Node stops the command with `ERR_UNKNOWN_FILE_EXTENSION`. The `engines` field in `package.json` states this floor. CI and Cloudflare Workers Builds do not run this command.
 
-## 10. How to give the project to a different account
+## 11. How to give the project to a different account
 
 Variables and secrets control every value. You change no code.
 
-1. Make the two databases with `pnpm wrangler d1 create`. Copy each `database_id` into `wrangler.jsonc`.
-1. Apply `migrations/0001_init.sql` to both.
-1. Make a Turnstile widget for each host. Set each sitekey in the Workers Builds settings, and each secret with `wrangler secret put`.
-1. Add the `rupeefund.org` and `beta.rupeefund.org` custom domains to the zone of that account.
+1. Make the database with `pnpm wrangler d1 create`. Copy the `database_id` into `wrangler.jsonc`.
+1. Apply `migrations/0001_init.sql` to it.
+1. Make one Turnstile widget for `rupeefund.org`. Put its sitekey in `src/lib/turnstile.ts`, and set its secret with `wrangler secret put`.
+1. Add the `rupeefund.org` custom domain to the zone of that account.
 
 ## Required keys
 
-| key                         | home           | source                                                                                                                                                                                                      |
-| --------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PUBLIC_TURNSTILE_SITEKEY`  | Build variable | Cloudflare dashboard → Turnstile → Add widget. One widget per host. The build refuses to start without it, and refuses the test sitekey.                                                                    |
-| `PUBLIC_SITE_ENV`           | Build variable | `beta` in the beta Workers Builds settings. Unset for live. The build refuses a value that does not agree with the target.                                                                                  |
-| `PUBLIC_ALLOW_TEST_SITEKEY` | Build variable | Set it to `true` for a local preview or a CI build only. Never set it in the Workers Builds settings.                                                                                                       |
-| `TURNSTILE_SECRET`          | Worker secret  | The same widget. `secrets.required` lists it, therefore the deploy stops without it. Without it, siteverify answers `missing-input-secret` and the handler answers 403 to each signup that uses JavaScript. |
+| key                         | home                   | source                                                                                                                                                                                                      |
+| --------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TURNSTILE_SITEKEY`         | `src/lib/turnstile.ts` | Cloudflare dashboard → Turnstile. One widget. Public, and committed. The build exits 1 when it is absent or is a dummy.                                                                                     |
+| `PUBLIC_TURNSTILE_SITEKEY`  | `.env`, local only     | An override for local work. Absent in CI and in the Workers Builds settings. The build exits 1 on a dummy value without the opt-in below.                                                                   |
+| `PUBLIC_ALLOW_TEST_SITEKEY` | `.env`, local only     | Set it to `true` for local work only. Never set it in the Workers Builds settings.                                                                                                                          |
+| `TURNSTILE_SECRET`          | Worker secret          | The same widget. `secrets.required` lists it, therefore the deploy stops without it. Without it, siteverify answers `missing-input-secret` and the handler answers 403 to each signup that uses JavaScript. |

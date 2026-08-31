@@ -16,15 +16,15 @@ pnpm test:e2e   # Playwright
 
 `pnpm dev` shows only the pages. The signup form needs `pnpm preview`.
 
-## Two branches, two sites
+## One site
 
-| Branch | Site                 | Deploys                      |
-| ------ | -------------------- | ---------------------------- |
-| `main` | `beta.rupeefund.org` | On every push                |
-| `live` | `rupeefund.org`      | Only by the promote workflow |
+| Branch | Site            | Deploys                      |
+| ------ | --------------- | ---------------------------- |
+| `main` | none            | Never                        |
+| `live` | `rupeefund.org` | Only by the promote workflow |
 
-Open your pull request against `main`. A merge deploys beta, which no search engine indexes and which has its own database. Nothing you merge reaches the public site on its own.
+The repository builds no beta site and no preview URL. You prove a change on your own machine with `pnpm preview`, which serves the built site against a local database.
 
-The maintainer moves `live` forward with the **Promote to live** workflow. It refuses a commit that is not on `main`, refuses one whose checks did not pass, and waits for a reviewer.
+Open your pull request against `main`. A merge reaches no public address on its own. The maintainer moves `live` forward with the **Promote to live** workflow. It refuses a commit that is not on `main`, refuses one whose checks did not pass, and waits for a reviewer.
 
 [Architecture](docs/architecture.md) · [Deployment](docs/deploy.md) · [Contributing](CONTRIBUTING.md)

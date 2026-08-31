@@ -1,11 +1,12 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
+import { OUT } from "./dist.ts";
 
 let html = "";
 let bundle = "";
 beforeAll(() => {
-  html = readFileSync("dist/subscribe.html", "utf8");
+  html = readFileSync(`${OUT}/subscribe.html`, "utf8");
   bundle = [...inlineModules(), ...externalModules()].join("\n");
 });
 
@@ -18,7 +19,7 @@ function inlineModules(): string[] {
 function externalModules(): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
-  const queue = [...html.matchAll(/\/_astro\/[^"']+\.js/g)].map((m) => resolve("dist", `.${m[0]}`));
+  const queue = [...html.matchAll(/\/_astro\/[^"']+\.js/g)].map((m) => resolve(OUT, `.${m[0]}`));
   while (queue.length > 0) {
     const path = queue.pop()!;
     if (seen.has(path)) continue;

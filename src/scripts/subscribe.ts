@@ -45,7 +45,7 @@ export async function submitWaitlist(
   try {
     const turnstileToken = await awaitTurnstileToken(form, deps.tokenTimeoutMs ?? 20000);
     if (turnstileToken.length === 0) {
-      showError(err, "The bot check is not ready. Complete it above, then submit again.");
+      showError(err, "The bot check did not finish. Reload the page, then try again.");
       return;
     }
     const res = await deps.fetchImpl("/api/waitlist", {

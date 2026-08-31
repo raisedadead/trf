@@ -4,7 +4,7 @@ const TEST_SITEKEY = "1x00000000000000000000AA";
 
 export default function setup(): void {
   try {
-    execSync("pnpm exec astro build", {
+    execSync("./node_modules/.bin/astro build --outDir dist-preview", {
       stdio: "pipe",
       env: {
         ...process.env,

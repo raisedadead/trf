@@ -5,6 +5,8 @@
   "compatibility_date": "2026-06-20",
   "compatibility_flags": ["nodejs_compat"],
   "routes": [{ "pattern": "rupeefund.org", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist",
@@ -46,55 +48,6 @@
       "enabled": true,
       "persist": true,
       "head_sampling_rate": 1,
-    },
-  },
-  "env": {
-    "beta": {
-      "name": "trf-beta",
-      "routes": [{ "pattern": "beta.rupeefund.org", "custom_domain": true }],
-      "vars": {
-        "TURNSTILE_HOSTNAMES": "beta.rupeefund.org",
-        "TURNSTILE_ACTION": "waitlist_signup",
-      },
-      "assets": {
-        "binding": "ASSETS",
-        "directory": "./dist",
-        "not_found_handling": "404-page",
-        "run_worker_first": ["/api/*"],
-      },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "trf-rupeefund-beta",
-          "database_id": "78bd0018-1908-47ce-94f4-9161d7f9a5fc",
-          "migrations_dir": "migrations",
-        },
-      ],
-      "secrets": {
-        "required": ["TURNSTILE_SECRET"],
-      },
-      "ratelimits": [
-        {
-          "name": "SIGNUP_LIMITER",
-          "namespace_id": "7302",
-          "simple": { "limit": 30, "period": 60 },
-        },
-      ],
-      "observability": {
-        "enabled": true,
-        "head_sampling_rate": 1,
-        "logs": {
-          "enabled": true,
-          "head_sampling_rate": 1,
-          "persist": true,
-          "invocation_logs": true,
-        },
-        "traces": {
-          "enabled": true,
-          "persist": true,
-          "head_sampling_rate": 1,
-        },
-      },
     },
   },
 }

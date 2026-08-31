@@ -7,8 +7,15 @@ export default defineConfig({
         test: {
           name: "web",
           environment: "jsdom",
-          include: ["src/**/*.test.tsx", "src/lib/**/*.test.ts", "src/scripts/**/*.test.ts"],
+          include: ["src/**/*.test.tsx", "src/scripts/**/*.test.ts"],
           css: false,
+        },
+      },
+      {
+        test: {
+          name: "lib",
+          environment: "node",
+          include: ["src/lib/**/*.test.ts"],
         },
       },
       {

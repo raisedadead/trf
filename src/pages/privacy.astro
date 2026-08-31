@@ -1,0 +1,67 @@
+---
+import Base from "../layouts/Base.astro";
+import { REMOVAL_ADDRESS } from "../lib/launch.ts";
+---
+
+<Base>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-2xl font-bold text-ink tracking-tight mb-3">Privacy</h1>
+    <p class="text-sm text-ink-2 mb-8">
+      The Rupee Fund is a programme of the FOSS United Foundation. The fund adopts the <a
+        href="https://fossunited.org/privacy-policy"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-link">FOSS United privacy policy</a
+      >.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">What we collect</h2>
+    <ul class="text-sm text-ink-2 mb-4 list-disc pl-5 space-y-1">
+      <li>Your name.</li>
+      <li>Your email address.</li>
+      <li>The time of your consent.</li>
+      <li>The page that you used to join.</li>
+    </ul>
+    <p class="text-sm text-ink-2 mb-6">
+      We keep this data to send you one email when the fund opens. We take no payment. We hold no
+      payment details.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">Your IP address</h2>
+    <p class="text-sm text-ink-2 mb-6">
+      We read your IP address when you send the form. We use it to prevent abuse. When your browser
+      runs JavaScript, we also send it to Cloudflare with the bot check below. We do not keep it.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">Bot protection</h2>
+    <p class="text-sm text-ink-2 mb-6">
+      When your browser runs JavaScript, the form uses Cloudflare Turnstile to tell a person apart
+      from a bot. Cloudflare states what Turnstile collects in the <a
+        href="https://www.cloudflare.com/turnstile-privacy-policy/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-link">Turnstile Privacy Addendum</a
+      >.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">Fonts</h2>
+    <p class="text-sm text-ink-2 mb-6">
+      Each page loads fonts from <a
+        href="https://fonts.google.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-link">Google Fonts</a
+      >. Google receives your IP address.
+    </p>
+
+    <h2 class="text-lg font-bold text-ink tracking-tight mb-2">How to leave the list</h2>
+    <p class="text-sm text-ink-2 mb-8">
+      Send an email to <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link"
+        >{REMOVAL_ADDRESS}</a
+      >. We take you off the list. We keep your entry, and we mark it as removed, so that a later
+      signup cannot add you again. Ask at any time.
+    </p>
+
+    <a href="/" class="btn btn-primary">Back to home</a>
+  </div>
+</Base>

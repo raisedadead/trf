@@ -8,7 +8,7 @@ function policy(): Record<string, string[]> {
     .split("\n")
     .map((l) => l.trim())
     .find((l) => l.startsWith("Content-Security-Policy:"));
-  if (line === undefined) throw new Error("no enforced Content-Security-Policy in dist/_headers");
+  if (line === undefined) throw new Error("no enforced Content-Security-Policy in _headers");
   const out: Record<string, string[]> = {};
   for (const part of line.slice("Content-Security-Policy:".length).split(";")) {
     const [name, ...values] = part.trim().split(/\s+/);

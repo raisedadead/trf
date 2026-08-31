@@ -1,15 +1,10 @@
 import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { read } from "./dist.ts";
+import { OUT, read } from "./dist.ts";
 
 describe("sitemap", () => {
   it("generates the sitemap index", () => {
-    expect(existsSync("dist/sitemap-index.xml")).toBe(true);
-  });
-
-  it("includes indexable routes", () => {
-    const xml = read("sitemap-0.xml");
-    expect(xml).toContain("https://rupeefund.org/subscribe");
+    expect(existsSync(`${OUT}/sitemap-index.xml`)).toBe(true);
   });
 
   it("excludes every route the sitemap filter names", () => {
@@ -19,8 +14,12 @@ describe("sitemap", () => {
     }
   });
 
-  it("lists the two indexable pages and nothing else", () => {
-    expect(read("sitemap-0.xml").match(/<loc>/g)).toHaveLength(2);
+  it("lists the four indexable pages and nothing else", () => {
+    const xml = read("sitemap-0.xml");
+    expect(xml.match(/<loc>/g)).toHaveLength(4);
+    for (const path of ["/privacy", "/refunds", "/subscribe"]) {
+      expect(xml, `sitemap is missing ${path}`).toContain(`https://rupeefund.org${path}`);
+    }
   });
 });
 
@@ -28,10 +27,19 @@ describe("robots.txt", () => {
   it("points at the generated sitemap index", () => {
     expect(read("robots.txt")).toContain("Sitemap: https://rupeefund.org/sitemap-index.xml");
   });
+
+  it("permits crawlers, because the one deployed site is the public one", () => {
+    expect(read("robots.txt")).toContain("Allow: /");
+    expect(read("robots.txt")).not.toContain("Disallow: /");
+  });
 });
 
 describe("_headers", () => {
   const headers = read("_headers");
+
+  it("carries no sitewide noindex, which would hide rupeefund.org from every engine", () => {
+    expect(headers).not.toContain("X-Robots-Tag");
+  });
 
   it("caches hashed assets immutably", () => {
     expect(headers).toContain("/_astro/*");

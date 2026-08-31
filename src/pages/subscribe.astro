@@ -62,7 +62,6 @@ const TURNSTILE_SITEKEY = getSitekey();
           class="cf-turnstile flex justify-center"
           data-sitekey={TURNSTILE_SITEKEY}
           data-action={TURNSTILE_ACTION}
-          data-appearance="interaction-only"
         >
         </div>
         <p id="waitlist-error" class="text-xs text-red-600 text-center" role="alert"></p>
@@ -71,14 +70,9 @@ const TURNSTILE_SITEKEY = getSitekey();
         </button>
         <p class="text-xs text-ink-3 text-center">
           By joining you agree we may email you about the launch — nothing else, and no payment is
-          taken now. See our <a
-            href="https://fossunited.org/privacy-policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-link">Privacy Policy</a
-          >. To be removed at any time, email <a
-            href={`mailto:${REMOVAL_ADDRESS}`}
-            class="inline-link">{REMOVAL_ADDRESS}</a
+          taken now. See our <a href="/privacy" class="inline-link">Privacy</a> page. To be removed at
+          any time, email <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link"
+            >{REMOVAL_ADDRESS}</a
           >.
         </p>
       </form>

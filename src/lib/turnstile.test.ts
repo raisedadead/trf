@@ -1,21 +1,33 @@
 import { describe, expect, it } from "vitest";
-import { TURNSTILE_TEST_SITEKEY, getSitekey, resolveSitekey } from "./turnstile.ts";
+import {
+  TURNSTILE_SITEKEY,
+  TURNSTILE_TEST_SITEKEY,
+  getSitekey,
+  resolveSitekey,
+} from "./turnstile.ts";
+
+describe("the sitekey lives in the repository, not in a dashboard field", () => {
+  it("has the exact length of a sitekey, so a longer secret cannot pass for one", () => {
+    expect(TURNSTILE_SITEKEY).toMatch(/^0x4[A-Za-z0-9_-]{21}$/);
+    expect(TURNSTILE_SITEKEY).toHaveLength(24);
+  });
+
+  it("is not the always-pass test sitekey", () => {
+    expect(TURNSTILE_SITEKEY).not.toBe(TURNSTILE_TEST_SITEKEY);
+  });
+});
 
 describe("resolveSitekey", () => {
-  it("refuses an unset sitekey instead of falling back to the test key", () => {
-    expect(() => resolveSitekey(undefined, false)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
+  it("falls back to the committed sitekey when nothing overrides it", () => {
+    expect(resolveSitekey(undefined, false)).toBe(TURNSTILE_SITEKEY);
   });
 
-  it("refuses an empty sitekey", () => {
-    expect(() => resolveSitekey("", false)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
+  it("treats an empty override the same as an absent one", () => {
+    expect(resolveSitekey("", false)).toBe(TURNSTILE_SITEKEY);
   });
 
-  it("names the failing variable so a build log explains itself", () => {
-    expect(() => resolveSitekey(undefined, false)).toThrow(/unset/);
-  });
-
-  it("returns a real sitekey unchanged", () => {
-    expect(resolveSitekey("0x4AAAAAAEQqCldZbFvXQvQr", false)).toBe("0x4AAAAAAEQqCldZbFvXQvQr");
+  it("returns another real sitekey unchanged, so a rotation can be tried locally", () => {
+    expect(resolveSitekey("0x4AAAAAAEnotTheRealOne", false)).toBe("0x4AAAAAAEnotTheRealOne");
   });
 
   it("refuses the test sitekey when nothing opted in, whatever script ran the build", () => {
@@ -27,14 +39,10 @@ describe("resolveSitekey", () => {
   it("accepts the test sitekey only behind the explicit opt-in", () => {
     expect(resolveSitekey(TURNSTILE_TEST_SITEKEY, true)).toBe(TURNSTILE_TEST_SITEKEY);
   });
-
-  it("still refuses an unset sitekey even with the opt-in on", () => {
-    expect(() => resolveSitekey(undefined, true)).toThrow(/PUBLIC_TURNSTILE_SITEKEY/);
-  });
 });
 
 describe("getSitekey", () => {
-  it("is a function, not a module-level constant that throws on import", () => {
-    expect(typeof getSitekey).toBe("function");
+  it("answers with the committed sitekey when the build sets no override", () => {
+    expect(getSitekey()).toBe(TURNSTILE_SITEKEY);
   });
 });
