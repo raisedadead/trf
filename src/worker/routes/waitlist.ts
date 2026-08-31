@@ -64,13 +64,7 @@ async function readBodyWithin(request: Request, limit: number): Promise<string> 
     }
     chunks.push(value);
   }
-  const joined = new Uint8Array(total);
-  let at = 0;
-  for (const chunk of chunks) {
-    joined.set(chunk, at);
-    at += chunk.byteLength;
-  }
-  return new TextDecoder().decode(joined);
+  return new Blob(chunks).text();
 }
 
 function parseFields(raw: string, isForm: boolean): Record<string, unknown> {

@@ -7,42 +7,36 @@ export default defineConfig({
         test: {
           name: "web",
           environment: "jsdom",
-          include: ["src/**/*.test.tsx", "src/scripts/**/*.test.ts"],
-          css: false,
+          include: ["src/scripts/**/*.test.ts"],
         },
       },
       {
         test: {
           name: "lib",
-          environment: "node",
           include: ["src/lib/**/*.test.ts"],
         },
       },
       {
         test: {
           name: "worker",
-          environment: "node",
           include: ["src/worker/**/*.test.ts"],
         },
       },
       {
         test: {
           name: "migrations",
-          environment: "node",
           include: ["tests/migrations/**/*.test.ts"],
         },
       },
       {
         test: {
           name: "deploy",
-          environment: "node",
           include: ["tests/deploy/**/*.test.ts"],
         },
       },
       {
         test: {
           name: "site",
-          environment: "node",
           include: ["tests/site/**/*.test.ts"],
           globalSetup: ["./tests/site/build.setup.ts"],
         },

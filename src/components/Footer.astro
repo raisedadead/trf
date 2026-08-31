@@ -1,5 +1,6 @@
 ---
 import SocialIcon from "./SocialIcon.astro";
+import { REMOVAL_ADDRESS } from "../lib/launch.ts";
 import type { SocialIconName } from "./SocialIcon.astro";
 
 interface Social {
@@ -71,9 +72,7 @@ const SOCIALS: readonly Social[] = [
       <div>
         <h2 class="font-semibold text-white mb-3 text-sm">Contact</h2>
         <p class="text-xs mb-2 text-gray-400">
-          <a href="mailto:foundation@fossunited.org" class="foot-link -mx-2"
-            >foundation@fossunited.org</a
-          >
+          <a href={`mailto:${REMOVAL_ADDRESS}`} class="foot-link -mx-2">{REMOVAL_ADDRESS}</a>
         </p>
         <p class="text-xs mb-2 leading-relaxed text-gray-400">
           FOSS United Foundation<br />

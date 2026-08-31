@@ -9,6 +9,7 @@ const SITEKEY_SHAPE = /^0x4[A-Za-z0-9_-]{21}$/;
 const problems = [];
 const lib = readFileSync(new URL("../src/lib/turnstile.ts", import.meta.url), "utf8");
 const declared = /export const TURNSTILE_SITEKEY = "([^"]*)"/.exec(lib)?.[1];
+const declaredAction = /export const TURNSTILE_ACTION = "([^"]*)"/.exec(lib)?.[1];
 
 if (declared === undefined || declared.length === 0) {
   problems.push(
@@ -63,6 +64,13 @@ if (hostnames.length === 0) {
 if (String(vars.TURNSTILE_ACTION ?? "").length === 0) {
   problems.push(
     "TURNSTILE_ACTION is not set in wrangler.jsonc. An empty value turns the action check off.",
+  );
+} else if (vars.TURNSTILE_ACTION !== declaredAction) {
+  // The widget mints a token for the action in src/lib/turnstile.ts; the Worker
+  // demands the action in wrangler.jsonc. If they differ, every signup that runs
+  // JavaScript gets a 403 and the build stays green.
+  problems.push(
+    `TURNSTILE_ACTION is "${declaredAction}" in src/lib/turnstile.ts and "${vars.TURNSTILE_ACTION}" in wrangler.jsonc. The widget and the Worker must name one action.`,
   );
 }
 

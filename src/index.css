@@ -2,7 +2,7 @@
 
 @theme {
   --font-sans: "InterVariable", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Space Mono", ui-monospace, monospace;
+  --font-mono: ui-monospace, monospace;
 
   /* Type scale tuned to fossunited.org: 16px body, large editorial headings */
   --text-xs: 1rem;
@@ -23,19 +23,10 @@
   --text-4xl--line-height: 1.12;
   --text-5xl: 3.25rem;
   --text-5xl--line-height: 1.08;
-  --text-6xl: 4rem;
-  --text-6xl--line-height: 1.05;
 
   --color-brand: #08b74f;
   --color-brand-50: #e7f8ee;
-  --color-brand-100: #b3e8ca;
   --color-brand-200: #8eddb0;
-  --color-brand-300: #5fcd8f;
-  --color-brand-400: #39c47b;
-  --color-brand-500: #08b74f;
-  --color-brand-600: #08b74f;
-  --color-brand-700: #07a849;
-  --color-brand-800: #06853a;
   --color-brand-900: #044f20;
   --color-brand-fg: #057a33;
 
@@ -44,9 +35,6 @@
   --color-ink-3: #595959;
   --color-paper: #f0f0f0;
   --color-card: #fafafa;
-  --color-line: #e6e6e6;
-
-  --radius: 0.5rem;
 
   --shadow-card: 0 4px 32px 0 rgba(0, 0, 0, 0.06);
   --shadow-soft: 0 2px 8px 0 rgba(0, 0, 0, 0.06);
@@ -123,10 +111,6 @@
     @apply bg-white rounded-lg border border-ink/10 shadow-soft p-6;
   }
 
-  .tile {
-    @apply bg-card rounded-lg border border-ink/10 p-4;
-  }
-
   .note {
     @apply bg-card border-l-4 border-brand rounded-r-lg;
   }
@@ -156,26 +140,6 @@
      pointer, which is what the two hand-written class strings used to do. */
   .nav-link[aria-current="page"] {
     @apply text-ink shadow-[inset_0_-2px_0_0_var(--color-brand)];
-  }
-
-  /* A tier button and a vote option are the same control. `aria-pressed` says
-     which one is chosen, so no script has to repaint six classes per button. */
-  .choice {
-    @apply px-3 py-2 border rounded-md transition duration-150 ease-out;
-    @apply border-ink/20 hover:border-brand hover:text-brand-fg;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-fg;
-  }
-
-  .choice[aria-pressed="true"] {
-    @apply border-brand bg-brand-50 text-brand-900;
-  }
-
-  #vote-results-list p:first-child {
-    @apply font-semibold text-ink;
-  }
-
-  #vote-results-list ul {
-    @apply list-disc list-inside;
   }
 
   .foot-link {

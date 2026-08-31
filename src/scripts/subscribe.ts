@@ -38,12 +38,13 @@ export async function submitWaitlist(
 
   showError(err, "");
   const fd = new FormData(form);
+  const idleLabel = submit?.textContent ?? "";
   if (submit) {
     submit.disabled = true;
     submit.textContent = "Joining…";
   }
   try {
-    const turnstileToken = await awaitTurnstileToken(form, deps.tokenTimeoutMs ?? 20000);
+    const turnstileToken = await awaitTurnstileToken(form, deps.tokenTimeoutMs);
     if (turnstileToken.length === 0) {
       showError(err, "The bot check did not finish. Reload the page, then try again.");
       return;
@@ -72,7 +73,7 @@ export async function submitWaitlist(
   } finally {
     if (submit) {
       submit.disabled = false;
-      submit.textContent = "Join the Waitlist";
+      submit.textContent = idleLabel;
     }
   }
 }

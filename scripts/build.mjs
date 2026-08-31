@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 
 const steps = [
   ["node", ["scripts/assert-deploy-env.mjs"]],
-  ["pnpm", ["exec", "astro", "build"]],
+  ["./node_modules/.bin/astro", ["build"]],
   ["node", ["scripts/assert-dist-sitekey.mjs"]],
 ];
 

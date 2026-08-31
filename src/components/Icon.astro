@@ -1,5 +1,5 @@
 ---
-type IconName = "heart" | "bell" | "menu" | "alert";
+type IconName = "heart" | "bell" | "menu";
 
 interface Props {
   name: IconName;
@@ -43,15 +43,6 @@ const { name, size = 24, class: cls, fill = "none" } = Astro.props;
         <line x1="4" x2="20" y1="6" y2="6" />
         <line x1="4" x2="20" y1="12" y2="12" />
         <line x1="4" x2="20" y1="18" y2="18" />
-      </Fragment>
-    )
-  }
-  {
-    name === "alert" && (
-      <Fragment>
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" x2="12" y1="8" y2="12" />
-        <line x1="12" x2="12.01" y1="16" y2="16" />
       </Fragment>
     )
   }

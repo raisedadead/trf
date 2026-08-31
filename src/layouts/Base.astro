@@ -4,12 +4,6 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { seoForPath, OG_IMAGE, SITE_URL } from "../lib/seo.ts";
 
-interface Props {
-  withHeader?: boolean;
-  withFooter?: boolean;
-}
-
-const { withHeader = true, withFooter = true } = Astro.props;
 const seo = seoForPath(Astro.url.pathname);
 
 const orgLd = {
@@ -37,7 +31,7 @@ const orgLd = {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     />
     <title>{seo.title}</title>
     <meta name="description" content={seo.description} />
@@ -58,10 +52,10 @@ const orgLd = {
     >
       Skip to content
     </a>
-    {withHeader && <Header />}
+    <Header />
     <main id="main" tabindex="-1" class="flex-1 screen-enter">
       <slot />
     </main>
-    {withFooter && <Footer />}
+    <Footer />
   </body>
 </html>

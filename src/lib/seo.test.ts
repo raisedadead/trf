@@ -32,7 +32,12 @@ describe("seoForPath", () => {
     expect(seoForPath("/waitlist-confirmed.html").indexable).toBe(false);
   });
 
-  it("falls back to home for an unknown path", () => {
-    expect(seoForPath("/does-not-exist").canonical).toBe("https://rupeefund.org");
+  it("refuses an unknown path, because the home canonical would deduplicate the page away", () => {
+    expect(() => seoForPath("/does-not-exist")).toThrow(/No SEO entry/);
+  });
+
+  it("derives each canonical from the path, so the two cannot disagree", () => {
+    expect(seoForPath("/").canonical).toBe("https://rupeefund.org");
+    expect(seoForPath("/privacy").canonical).toBe("https://rupeefund.org/privacy");
   });
 });

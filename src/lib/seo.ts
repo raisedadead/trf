@@ -9,7 +9,6 @@ export interface RouteSeo {
   readonly description: string;
   readonly ogTitle: string;
   readonly ogDescription: string;
-  readonly canonical: string;
   readonly indexable: boolean;
 }
 
@@ -22,7 +21,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     ogTitle: "The Rupee Fund — by FOSS United",
     ogDescription:
       "Support Indian FOSS contributors with small periodic contributions. A FOSS United Foundation initiative.",
-    canonical: SITE_URL,
     indexable: true,
   },
   {
@@ -33,7 +31,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     ogTitle: "Get notified when the Rupee Fund opens",
     ogDescription:
       "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
-    canonical: `${SITE_URL}/subscribe`,
     indexable: true,
   },
   {
@@ -43,7 +40,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
       "What The Rupee Fund collects, what it does with your IP address, and how to leave the list.",
     ogTitle: "Privacy — The Rupee Fund",
     ogDescription: "What we collect, and how to leave the list.",
-    canonical: `${SITE_URL}/privacy`,
     indexable: true,
   },
   {
@@ -53,7 +49,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
       "How to claim a refund from The Rupee Fund, the address that takes the claim, and the time limit.",
     ogTitle: "Refunds — The Rupee Fund",
     ogDescription: "How to claim a refund, and the time limit that applies.",
-    canonical: `${SITE_URL}/refunds`,
     indexable: true,
   },
   {
@@ -62,7 +57,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     description: "You'll hear from us the day The Rupee Fund opens.",
     ogTitle: "You're on the list — The Rupee Fund",
     ogDescription: "You'll hear from us the day The Rupee Fund opens.",
-    canonical: `${SITE_URL}/waitlist-confirmed`,
     indexable: false,
   },
   {
@@ -71,7 +65,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     description: "We couldn't add you to the list.",
     ogTitle: "That didn't go through — The Rupee Fund",
     ogDescription: "We couldn't add you to the list.",
-    canonical: `${SITE_URL}/waitlist-problem`,
     indexable: false,
   },
   {
@@ -80,7 +73,6 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     description: "That page doesn't exist.",
     ogTitle: "Page not found — The Rupee Fund",
     ogDescription: "That page doesn't exist.",
-    canonical: `${SITE_URL}/404`,
     indexable: false,
   },
 ];
@@ -91,7 +83,17 @@ export function normalizePath(path: string): string {
   return normalized === "" ? "/" : normalized;
 }
 
-export function seoForPath(path: string): RouteSeo {
+export function seoForPath(path: string): RouteSeo & { readonly canonical: string } {
   const normalized = normalizePath(path);
-  return ROUTE_SEO.find((route) => route.path === normalized) ?? ROUTE_SEO[0];
+  const route = ROUTE_SEO.find((entry) => entry.path === normalized);
+  if (route === undefined) {
+    // Falling back to the home entry gave the page the home canonical, which
+    // tells a crawler the two are one page. Fail the build instead.
+    throw new Error(`No SEO entry for ${normalized}. Add one to ROUTE_SEO in src/lib/seo.ts.`);
+  }
+  return { ...route, canonical: normalized === "/" ? SITE_URL : `${SITE_URL}${normalized}` };
 }
+
+export const NON_INDEXABLE_PATHS: readonly string[] = ROUTE_SEO.filter(
+  (route) => !route.indexable,
+).map((route) => route.path);

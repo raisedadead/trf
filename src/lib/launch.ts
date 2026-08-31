@@ -1,7 +1,7 @@
 export const LAUNCH_EVENT = "IndiaFOSS 2026";
 export const LAUNCH_EVENT_URL = "https://fossunited.org/indiafoss/2026";
-export const LAUNCH_DATES = "26–27 September";
-export const LAUNCH_CITY = "Bengaluru";
+const LAUNCH_DATES = "26–27 September";
+const LAUNCH_CITY = "Bengaluru";
 
 export const LAUNCH_WHEN = `${LAUNCH_EVENT}, ${LAUNCH_DATES}, ${LAUNCH_CITY}`;
 
@@ -11,7 +11,7 @@ export const REMOVAL_ADDRESS = "foundation@fossunited.org";
 
 export const REFUND_ADDRESS = "audit@fossunited.org";
 
-export interface Season {
+interface Season {
   spriteSlug: string;
   name: string;
   months: string;
