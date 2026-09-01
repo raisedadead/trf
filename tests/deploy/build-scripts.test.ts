@@ -30,6 +30,26 @@ describe("one build chain serves the one environment", () => {
   });
 });
 
+describe("each command has one owner, and check calls the owners", () => {
+  it("delegates every step it shares with another script", () => {
+    for (const step of ["typecheck", "lint", "test"]) {
+      expect(scripts.check).toContain(`pnpm run ${step}`);
+    }
+  });
+
+  it("restates no tool another script already owns", () => {
+    for (const tool of ["tsc", "oxlint", "vitest", "wrangler"]) {
+      expect(scripts.check, `check restates ${tool}`).not.toMatch(
+        new RegExp(`(^|&&\\s*)${tool}\\b`),
+      );
+    }
+  });
+
+  it("stops at the first failing step, so a green line means every step ran", () => {
+    expect(scripts.check).toContain("&&");
+  });
+});
+
 describe("Workers Builds is the only path to the live site", () => {
   it("declares no deploy script, so the release path is not a local habit", () => {
     const deployScripts = Object.keys(scripts).filter((name) => /^deploy/.test(name));

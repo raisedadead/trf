@@ -22,12 +22,11 @@
     "typecheck": "pnpm run cf-typegen && tsc -b tsconfig.build.json",
     "test": "vitest run",
     "test:e2e": "playwright test --project live --project live-no-js",
-    "test:e2e:ui": "playwright test --ui",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --ignore-path .gitignore && prettier --write .",
     "format:check": "oxfmt --ignore-path .gitignore --check && prettier --check .",
-    "check": "pnpm run cf-typegen && oxlint && tsc -b tsconfig.build.json && astro check && vitest run",
+    "check": "pnpm run typecheck && pnpm run lint && astro check && pnpm run test",
     "list:export": "node scripts/list-export.mts"
   },
   "dependencies": {

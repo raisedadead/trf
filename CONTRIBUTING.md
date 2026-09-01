@@ -16,20 +16,22 @@ pnpm dev
 All of these commands must pass before a merge. CI runs them again:
 
 ```sh
-pnpm check                    # wrangler types + oxlint + tsc + astro check + vitest
+pnpm check                    # typecheck + lint + astro check + test
 pnpm format                   # oxfmt, then Prettier for .astro — run this before you commit
 pnpm test:e2e                 # Playwright, against the launch build
 ```
 
 `pnpm check` runs five steps, and each one covers a different part of the code:
 
-| Step                         | What it examines                                                     |
-| ---------------------------- | -------------------------------------------------------------------- |
-| `wrangler types`             | Writes `worker-configuration.d.ts`, which `tsc` then reads.          |
-| `oxlint`                     | All TypeScript. Configuration is in `.oxlintrc.json`.                |
-| `tsc -b tsconfig.build.json` | Three projects: `src/lib`, `src/worker`, and `tests` with `scripts`. |
-| `astro check`                | The TypeScript inside `.astro` files, which `tsc` does not examine.  |
-| `vitest`                     | Five projects: `web`, `worker`, `site`, `migrations` and `deploy`.   |
+| Step             | What it runs                 | What it examines                                                      |
+| ---------------- | ---------------------------- | --------------------------------------------------------------------- |
+| `pnpm typecheck` | `wrangler types`             | Writes `worker-configuration.d.ts`, which `tsc` then reads.           |
+| `pnpm typecheck` | `tsc -b tsconfig.build.json` | Three projects: `src/lib`, `src/worker`, and `tests` with `scripts`.  |
+| `pnpm lint`      | `oxlint`                     | All TypeScript. Configuration is in `.oxlintrc.json`.                 |
+| —                | `astro check`                | The TypeScript inside `.astro` files, which `tsc` does not examine.   |
+| `pnpm test`      | `vitest`                     | Six projects: `web`, `lib`, `worker`, `site`, `migrations`, `deploy`. |
+
+`check` calls those scripts rather than restating their commands, so each tool has one owner. `tests/deploy/build-scripts.test.ts` holds that true.
 
 Git ignores `worker-configuration.d.ts`, so a fresh checkout does not have it. `tsc -b tsconfig.build.json` reads different types when the file is absent. Therefore `check` and `typecheck` write the file first. Do not call it on its own.
 
