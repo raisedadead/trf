@@ -124,6 +124,13 @@
     @apply block text-xs font-semibold text-ink-2 mb-1;
   }
 
+  .choice {
+    @apply flex items-center gap-2 min-h-11 px-3 rounded-lg border border-ink/15;
+    @apply text-sm cursor-pointer transition-colors duration-150 ease-out;
+    @apply hover:border-brand has-checked:border-brand has-checked:bg-brand-50;
+    @apply has-focus-visible:ring-2 has-focus-visible:ring-brand-fg;
+  }
+
   .nav-link {
     @apply inline-flex items-center min-h-11 font-medium;
     @apply transition-[color,box-shadow] duration-150 ease-out text-sm px-2 rounded-sm;

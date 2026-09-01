@@ -126,6 +126,9 @@ export async function handleWaitlist(request: Request, deps: WaitlistDeps): Prom
       name: result.value.name,
       consent_at: at,
       source: result.value.source,
+      amount: result.value.amount,
+      months: result.value.months,
+      question: result.value.question,
       created_at: at,
       updated_at: at,
     });

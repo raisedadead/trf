@@ -14,6 +14,9 @@ export interface WaitlistEntry {
   name: string;
   consent_at: number;
   source: string;
+  amount: string;
+  months: string;
+  question: string;
   created_at: number;
   updated_at: number;
 }

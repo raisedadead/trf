@@ -46,6 +46,9 @@ function entry(over: Partial<WaitlistEntry> = {}): WaitlistEntry {
     source: "subscribe",
     created_at: 1000,
     updated_at: 1000,
+    amount: "100",
+    months: "12",
+    question: "Who audits this?",
     ...over,
   };
 }
@@ -72,6 +75,30 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     await repo.addToWaitlist(entry({ name: "Asha Again", consent_at: 2000, updated_at: 2000 }));
     expect(rowsOf(raw, "SELECT name, consent_at FROM waitlist")).toEqual([
       { name: "Asha Again", consent_at: 2000 },
+    ]);
+  });
+
+  it("stores the contribution answers beside the signup", async () => {
+    await repo.addToWaitlist(entry());
+    expect(rowsOf(raw, "SELECT amount, months, question FROM waitlist")).toEqual([
+      { amount: "100", months: "12", question: "Who audits this?" },
+    ]);
+  });
+
+  it("replaces the answers when the same address signs up again", async () => {
+    await repo.addToWaitlist(entry());
+    await repo.addToWaitlist(
+      entry({ amount: "500", months: "24", question: "", consent_at: 2000, updated_at: 2000 }),
+    );
+    expect(rowsOf(raw, "SELECT amount, months, question FROM waitlist")).toEqual([
+      { amount: "500", months: "24", question: "" },
+    ]);
+  });
+
+  it("writes an empty optional answer as an empty string, not as the word undefined", async () => {
+    await repo.addToWaitlist(entry({ months: "", question: "" }));
+    expect(rowsOf(raw, "SELECT months, question FROM waitlist")).toEqual([
+      { months: "", question: "" },
     ]);
   });
 
@@ -138,6 +165,13 @@ describe("the export SQL that scripts/list-export.mts itself runs, against a mig
     expect(pending(raw)).toEqual([]);
   });
 
+  it("leaves an unsubscribed row's answers alone, which the same guard protects", async () => {
+    await repo.addToWaitlist(entry());
+    markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 6000);
+    await repo.addToWaitlist(entry({ amount: "500", consent_at: 7000, updated_at: 7000 }));
+    expect(rowsOf(raw, "SELECT amount FROM waitlist")).toEqual([{ amount: "100" }]);
+  });
+
   it("keeps the removal on record, so the operator can still see one was requested", async () => {
     await repo.addToWaitlist(entry());
     markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 6000);
@@ -155,6 +189,12 @@ describe("the export SQL that scripts/list-export.mts itself runs, against a mig
     await repo.addToWaitlist(entry({ consent_at: 7000, updated_at: 7000 }));
 
     expect(rowsOf(raw, "SELECT exported_at FROM waitlist")).toEqual([{ exported_at: 5000 }]);
+  });
+
+  it("hands the mailing-list exporter no contribution answer, which it has no reason to hold", () => {
+    for (const column of ["amount", "months", "question"]) {
+      expect(SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT).not.toContain(column);
+    }
   });
 
   it("reports nothing pending once every row is stamped", async () => {

@@ -6,12 +6,16 @@ export function createRepo(db: D1Database): Repo {
     async addToWaitlist(entry) {
       await db
         .prepare(
-          `INSERT INTO waitlist (email, name, consent_at, source, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?)
+          `INSERT INTO waitlist
+             (email, name, consent_at, source, amount, months, question, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT (email) DO UPDATE SET
              name = excluded.name,
              consent_at = excluded.consent_at,
              source = excluded.source,
+             amount = excluded.amount,
+             months = excluded.months,
+             question = excluded.question,
              updated_at = excluded.updated_at
            WHERE waitlist.unsubscribed_at IS NULL`,
         )
@@ -20,6 +24,9 @@ export function createRepo(db: D1Database): Repo {
           entry.name,
           entry.consent_at,
           entry.source,
+          entry.amount,
+          entry.months,
+          entry.question,
           entry.created_at,
           entry.updated_at,
         )

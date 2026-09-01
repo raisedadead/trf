@@ -45,6 +45,43 @@ describe("Subscribe page (/subscribe)", () => {
     expect(html).toContain('id="waitlist-email"');
   });
 
+  it("offers three fixed amounts and an other option, all as radios", () => {
+    const radios = [...html.matchAll(/<input[^>]*name="amount"[^>]*>/g)].map((m) => m[0]);
+    expect(radios).toHaveLength(4);
+    for (const radio of radios) expect(radio).toContain('type="radio"');
+    for (const value of ["10", "100", "500", "other"]) {
+      expect(radios.some((r) => r.includes(`value="${value}"`))).toBe(true);
+    }
+  });
+
+  it("marks the amount required, so the browser asks before it posts", () => {
+    const radios = [...html.matchAll(/<input[^>]*name="amount"[^>]*>/g)].map((m) => m[0]);
+    for (const radio of radios) expect(radio).toContain("required");
+  });
+
+  it("asks the amount without JavaScript, so the no-script post carries one", () => {
+    expect(bundle).not.toContain("amount-other-choice");
+    expect(html).toContain('name="amount_other"');
+  });
+
+  it("renders the months and question fields inside the same form", () => {
+    expect(html).toContain('id="waitlist-months"');
+    expect(html).toContain('id="waitlist-question"');
+  });
+
+  it("keeps the other amount inside the amount group, not as a question of its own", () => {
+    expect(html).not.toContain("Another amount, if you chose it");
+    const group = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
+    expect(group).toContain('name="amount_other"');
+    expect(group).toContain('value="other"');
+  });
+
+  it("caps the free-text answers at the lengths the columns hold", () => {
+    expect(html).toMatch(/id="waitlist-amount-other"[^>]*maxlength="20"/);
+    expect(html).toMatch(/id="waitlist-months"[^>]*maxlength="20"/);
+    expect(html).toMatch(/id="waitlist-question"[^>]*maxlength="100"/);
+  });
+
   it("renders no payment form and asks for no PAN or address", () => {
     expect(html).not.toContain('id="autopay-form"');
     expect(html).not.toContain('id="autopay-pan"');

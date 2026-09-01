@@ -2,6 +2,12 @@
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import { REMOVAL_ADDRESS, SUBSCRIBE_CTA } from "../lib/launch.ts";
+import {
+  AMOUNT_OPTIONS,
+  MAX_AMOUNT_LENGTH,
+  MAX_MONTHS_LENGTH,
+  MAX_QUESTION_LENGTH,
+} from "../worker/lib/validation.ts";
 import { TURNSTILE_ACTION, getSitekey } from "../lib/turnstile.ts";
 
 const TURNSTILE_SITEKEY = getSitekey();
@@ -44,6 +50,63 @@ const TURNSTILE_SITEKEY = getSitekey();
             placeholder="your.email@example.com"
             class="field"
             required
+          />
+        </div>
+        <fieldset>
+          <legend class="field-label">Monthly Amount *</legend>
+          <div class="grid grid-cols-3 gap-2">
+            {
+              AMOUNT_OPTIONS.map((option) => (
+                <label class="choice justify-center">
+                  <input type="radio" name="amount" value={option} required />
+                  <span>₹{option}</span>
+                </label>
+              ))
+            }
+          </div>
+          <div class="choice mt-2">
+            <label class="flex shrink-0 items-center gap-2">
+              <input
+                id="amount-other-choice"
+                type="radio"
+                name="amount"
+                value="other"
+                required
+                aria-label="Another amount"
+              />
+              <span aria-hidden="true" class="text-ink-3">₹</span>
+            </label>
+            <input
+              id="waitlist-amount-other"
+              name="amount_other"
+              type="text"
+              placeholder="Another amount"
+              aria-label="Another amount in rupees each month"
+              maxlength={MAX_AMOUNT_LENGTH}
+              class="flex-1 min-w-0 bg-transparent text-sm outline-none"
+            />
+          </div>
+        </fieldset>
+        <div>
+          <label for="waitlist-months" class="field-label">Number of Months</label>
+          <input
+            id="waitlist-months"
+            name="months"
+            type="text"
+            placeholder="e.g. 12, or as long as it helps"
+            maxlength={MAX_MONTHS_LENGTH}
+            class="field"
+          />
+        </div>
+        <div>
+          <label for="waitlist-question" class="field-label">Question for the Team</label>
+          <input
+            id="waitlist-question"
+            name="question"
+            type="text"
+            placeholder="Ask us anything"
+            maxlength={MAX_QUESTION_LENGTH}
+            class="field"
           />
         </div>
         <div class="hidden" aria-hidden="true">

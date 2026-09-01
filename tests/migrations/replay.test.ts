@@ -37,6 +37,7 @@ function replay(alreadyRecorded: string[] = []): DatabaseSync {
   const db = new DatabaseSync(":memory:");
   db.exec(LEDGER_DDL);
   for (const name of alreadyRecorded) {
+    db.exec(readFileSync(`${DIR}/${name}`, "utf8"));
     db.prepare("INSERT INTO d1_migrations (name) VALUES (?)").run(name);
   }
   for (const name of migrationFiles()) {
@@ -66,7 +67,7 @@ function tablesOf(db: DatabaseSync): string[] {
 
 describe("one migrations directory feeds both databases", () => {
   it("ships exactly one migration file", () => {
-    expect(migrationFiles()).toEqual(["0001_init.sql"]);
+    expect(migrationFiles()).toEqual(["0001_init.sql", "0002_contribution_intent.sql"]);
   });
 
   it("holds no per-environment subdirectory, which is what let the two copies drift", () => {
@@ -78,8 +79,15 @@ describe("one migrations directory feeds both databases", () => {
     expect(tablesOf(replay())).toEqual(EXPECTED_TABLES);
   });
 
-  it("applies nothing to a database that already recorded it", () => {
-    expect(tablesOf(replay(["0001_init.sql"]))).toEqual([]);
+  it("applies nothing to a database that already recorded every file", () => {
+    const files = migrationFiles();
+    const db = replay(files);
+    const ledger = db
+      .prepare("SELECT name FROM d1_migrations ORDER BY name")
+      .all()
+      .map((r) => (r as { name: string }).name);
+    expect(ledger).toEqual(files);
+    expect(tablesOf(db)).toEqual(EXPECTED_TABLES);
   });
 
   it("creates no payment or voting table, which this repository no longer ships", () => {
@@ -121,11 +129,33 @@ describe("the waitlist table records consent and export state", () => {
     "unsubscribed_at",
     "created_at",
     "updated_at",
+    "amount",
+    "months",
+    "question",
   ]) {
     it(`has ${column}`, () => {
       expect(columns()).toContain(column);
     });
   }
+
+  for (const column of ["amount", "months", "question"]) {
+    it(`leaves ${column} nullable, because the rows written before 0002 have no answer`, () => {
+      const info = replay()
+        .prepare("PRAGMA table_info(waitlist)")
+        .all()
+        .find((r) => (r as { name: string }).name === column);
+      expect((info as { notnull: number }).notnull).toBe(0);
+    });
+  }
+
+  it("accepts an insert that names no answer, which a pre-0002 Worker still sends", () => {
+    const db = replay();
+    db.prepare(
+      "INSERT INTO waitlist (email, name, consent_at, source, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+    ).run("old@example.com", "O", 1000, "subscribe", 1000, 1000);
+    const row = db.prepare("SELECT amount FROM waitlist WHERE email = ?").get("old@example.com");
+    expect((row as { amount: string | null }).amount).toBe(null);
+  });
 
   it("requires a consent timestamp, because consent cannot be backfilled", () => {
     const info = replay()

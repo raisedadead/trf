@@ -57,6 +57,10 @@ export async function submitWaitlist(
         email: String(fd.get("email") ?? ""),
         source: String(fd.get("source") ?? ""),
         company: String(fd.get("company") ?? ""),
+        amount: String(fd.get("amount") ?? ""),
+        amount_other: String(fd.get("amount_other") ?? ""),
+        months: String(fd.get("months") ?? ""),
+        question: String(fd.get("question") ?? ""),
         turnstileToken,
       }),
     });
@@ -78,9 +82,21 @@ export async function submitWaitlist(
   }
 }
 
+export function linkOtherAmount(form: HTMLFormElement): void {
+  const typed = form.querySelector('input[name="amount_other"]') as HTMLInputElement | null;
+  const choice = form.querySelector(
+    'input[name="amount"][value="other"]',
+  ) as HTMLInputElement | null;
+  if (typed === null || choice === null) return;
+  typed.addEventListener("input", () => {
+    if (typed.value.trim().length > 0) choice.checked = true;
+  });
+}
+
 function initWaitlistForm(doc: Document, deps: { fetchImpl: typeof fetch }): void {
   const form = doc.getElementById("waitlist-form") as HTMLFormElement | null;
   if (!form) return;
+  linkOtherAmount(form);
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     void submitWaitlist(form, deps);

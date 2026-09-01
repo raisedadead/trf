@@ -29,7 +29,8 @@ function formReq(fields: Record<string, string>, headers: Record<string, string>
   });
 }
 
-const VALID = { name: "Asha", email: "asha@example.com", turnstileToken: "tok" };
+const VALID = { name: "Asha", email: "asha@example.com", amount: "100", turnstileToken: "tok" };
+const FORM = { name: "Asha", email: "asha@example.com", amount: "100" };
 
 describe("handleWaitlist over fetch (JavaScript enabled)", () => {
   it("stores a valid signup and reports success", async () => {
@@ -69,10 +70,7 @@ describe("handleWaitlist over fetch (JavaScript enabled)", () => {
   it("rejects when no bot-check token was sent at all", async () => {
     const repo = makeRepo();
     const verifyToken = makeVerifier({ pass: false });
-    const res = await handleWaitlist(
-      jsonReq({ name: "Asha", email: "asha@example.com" }),
-      deps({ repo, verifyToken }),
-    );
+    const res = await handleWaitlist(jsonReq(FORM), deps({ repo, verifyToken }));
     expect(res.status).toBe(403);
     expect(verifyToken.calls[0]?.token).toBe("");
   });
@@ -125,6 +123,7 @@ describe("handleWaitlist over fetch (JavaScript enabled)", () => {
       jsonReq({
         name: "Asha Kulkarni",
         email: "asha.kulkarni@example.com",
+        amount: "100",
         turnstileToken: "x".repeat(2048),
       }),
       deps({ repo }),
@@ -139,6 +138,8 @@ describe("handleWaitlist over fetch (JavaScript enabled)", () => {
       jsonReq({
         name: "\u0906".repeat(100),
         email: `${"a".repeat(240)}@example.com`,
+        amount: "other",
+        amount_other: "9".repeat(20),
         turnstileToken: "x".repeat(2048),
       }),
       deps({ repo }),
@@ -238,10 +239,7 @@ describe("handleWaitlist over fetch (JavaScript enabled)", () => {
 describe("handleWaitlist over a plain form post (JavaScript disabled)", () => {
   it("stores the signup and redirects to a confirmation page", async () => {
     const repo = makeRepo();
-    const res = await handleWaitlist(
-      formReq({ name: "Asha", email: "asha@example.com" }),
-      deps({ repo }),
-    );
+    const res = await handleWaitlist(formReq(FORM), deps({ repo }));
     expect(res.status).toBe(303);
     expect(res.headers.get("location")).toBe(CONFIRMED_PATH);
     expect(repo.waitlist.map((w) => w.email)).toEqual(["asha@example.com"]);
@@ -249,10 +247,7 @@ describe("handleWaitlist over a plain form post (JavaScript disabled)", () => {
 
   it("does not demand a bot-check token it has no way to obtain", async () => {
     const verifyToken = makeVerifier({ pass: false });
-    const res = await handleWaitlist(
-      formReq({ name: "Asha", email: "asha@example.com" }),
-      deps({ verifyToken }),
-    );
+    const res = await handleWaitlist(formReq(FORM), deps({ verifyToken }));
     expect(res.status).toBe(303);
     expect(res.headers.get("location")).toBe(CONFIRMED_PATH);
     expect(verifyToken.calls).toEqual([]);
@@ -261,7 +256,7 @@ describe("handleWaitlist over a plain form post (JavaScript disabled)", () => {
   it("still enforces the rate limit, redirecting rather than returning JSON", async () => {
     const repo = makeRepo();
     const res = await handleWaitlist(
-      formReq({ name: "Asha", email: "asha@example.com" }),
+      formReq(FORM),
       deps({ repo, limiter: makeLimiter({ allow: false }) }),
     );
     expect(res.status).toBe(303);
@@ -270,14 +265,14 @@ describe("handleWaitlist over a plain form post (JavaScript disabled)", () => {
   });
 
   it("sends an invalid address to the problem page, not the confirmation page", async () => {
-    const res = await handleWaitlist(formReq({ name: "Asha", email: "nope" }), deps());
+    const res = await handleWaitlist(formReq({ ...FORM, email: "nope" }), deps());
     expect(res.headers.get("location")).toBe(`${PROBLEM_PATH}?reason=invalid_input`);
   });
 
   it("rejects a cross-origin form post", async () => {
     const repo = makeRepo();
     const res = await handleWaitlist(
-      formReq({ name: "Asha", email: "asha@example.com" }, { origin: "https://evil.example" }),
+      formReq(FORM, { origin: "https://evil.example" }),
       deps({ repo }),
     );
     expect(res.headers.get("location")).toBe(`${PROBLEM_PATH}?reason=origin`);
@@ -285,10 +280,7 @@ describe("handleWaitlist over a plain form post (JavaScript disabled)", () => {
   });
 
   it("accepts a same-origin form post that carries an Origin header", async () => {
-    const res = await handleWaitlist(
-      formReq({ name: "Asha", email: "asha@example.com" }, { origin: "https://rupeefund.org" }),
-      deps(),
-    );
+    const res = await handleWaitlist(formReq(FORM, { origin: "https://rupeefund.org" }), deps());
     expect(res.headers.get("location")).toBe(CONFIRMED_PATH);
   });
 });
@@ -304,10 +296,7 @@ describe("the honeypot absorbs bots without telling them", () => {
 
   it("looks exactly like success over a form post while writing nothing", async () => {
     const repo = makeRepo();
-    const res = await handleWaitlist(
-      formReq({ name: "Asha", email: "asha@example.com", company: "Acme" }),
-      deps({ repo }),
-    );
+    const res = await handleWaitlist(formReq({ ...FORM, company: "Acme" }), deps({ repo }));
     expect(res.headers.get("location")).toBe(CONFIRMED_PATH);
     expect(repo.waitlist).toEqual([]);
   });
@@ -354,5 +343,31 @@ describe("consent and provenance are recorded on every stored signup", () => {
     const res = await handleWaitlist(jsonReq({ ...VALID, name: "x".repeat(101) }), deps({ repo }));
     expect(res.status).toBe(400);
     expect(repo.waitlist).toEqual([]);
+  });
+
+  it("stores the contribution answers the subscriber gave", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(
+      jsonReq({ ...VALID, amount: "other", amount_other: "250", months: "12+", question: "Why?" }),
+      deps({ repo }),
+    );
+    expect(repo.waitlist[0]).toMatchObject({ amount: "250", months: "12+", question: "Why?" });
+  });
+
+  it("rejects a signup that names no amount, with no write", async () => {
+    const repo = makeRepo();
+    const { amount: _drop, ...noAmount } = VALID;
+    const res = await handleWaitlist(jsonReq(noAmount), deps({ repo }));
+    expect(res.status).toBe(400);
+    expect(repo.waitlist).toEqual([]);
+  });
+
+  it("carries the answers through a plain form post as well", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(
+      formReq({ ...FORM, amount: "other", amount_other: "42", months: "6", question: "Hi" }),
+      deps({ repo }),
+    );
+    expect(repo.waitlist[0]).toMatchObject({ amount: "42", months: "6", question: "Hi" });
   });
 });
