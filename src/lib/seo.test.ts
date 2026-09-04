@@ -28,6 +28,14 @@ describe("seoForPath", () => {
     expect(seoForPath("/waitlist-confirmed/").title).toBe("You're on the list — The Rupee Fund");
   });
 
+  it("matches the team route", () => {
+    expect(seoForPath("/team")).toMatchObject({
+      title: "Team — The Rupee Fund",
+      canonical: "https://rupeefund.org/team",
+      indexable: true,
+    });
+  });
+
   it("marks a waitlist outcome page as non-indexable", () => {
     expect(seoForPath("/waitlist-confirmed.html").indexable).toBe(false);
   });

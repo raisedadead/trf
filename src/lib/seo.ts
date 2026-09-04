@@ -52,6 +52,15 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     indexable: true,
   },
   {
+    path: "/team",
+    title: "Team — The Rupee Fund",
+    description:
+      "Meet the founding team, website maintainers, and FOSS United staff behind The Rupee Fund.",
+    ogTitle: "Team — The Rupee Fund",
+    ogDescription: "Meet the people behind The Rupee Fund.",
+    indexable: true,
+  },
+  {
     path: "/waitlist-confirmed",
     title: "You're on the list — The Rupee Fund",
     description: "You'll hear from us the day The Rupee Fund opens.",

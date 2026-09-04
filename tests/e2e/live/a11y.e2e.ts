@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const PATHS = ["/", "/subscribe", "/waitlist-confirmed"] as const;
+const PATHS = ["/", "/subscribe", "/team", "/waitlist-confirmed"] as const;
 
 test.describe("baseline accessibility", () => {
   for (const path of PATHS) {
