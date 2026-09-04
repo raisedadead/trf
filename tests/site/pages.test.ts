@@ -10,6 +10,11 @@ describe("Home page (/)", () => {
     expect(html).toContain("Keep Indian open source alive, one rupee at a time");
   });
 
+  it("centers the launch label without a square marker", () => {
+    expect(html).toContain('class="mb-12 flex justify-center"');
+    expect(html).not.toContain('class="w-2 h-2 bg-brand inline-block"');
+  });
+
   it("renders the How It Works section", () => {
     expect(html).toContain("How It Works");
   });

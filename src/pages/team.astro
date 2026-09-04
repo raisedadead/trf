@@ -1,0 +1,75 @@
+---
+import Base from "../layouts/Base.astro";
+import { FOSS_UNITED_STAFF, FOUNDING_TEAM } from "../data/team.ts";
+
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2);
+---
+
+<Base>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <header class="mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-ink tracking-tight mb-3">Team</h1>
+      <p class="text-sm text-ink-2">
+        The Rupee Fund is built by people from the Indian free and open source software community.
+      </p>
+    </header>
+
+    <section aria-labelledby="founding-team" class="mb-14">
+      <h2 id="founding-team" class="text-xl font-bold text-ink tracking-tight mb-2">
+        Founding team
+      </h2>
+      <p class="text-sm text-ink-2 mb-6">The founding team currently maintains this website.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {
+          FOUNDING_TEAM.map((member) => (
+            <article class="card flex flex-col">
+              <div
+                class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 font-mono text-lg font-bold text-brand-fg"
+                aria-hidden="true"
+              >
+                {initials(member.name)}
+              </div>
+              <h3 class="text-lg font-bold text-ink">{member.name}</h3>
+              <p class="text-xs font-medium text-brand-fg mb-4">{member.role}</p>
+              <p class="text-sm text-ink-2 mb-5">Bio to follow.</p>
+              <p class="mt-auto border-t border-ink/10 pt-4 text-xs text-ink-3">
+                Profile link to follow.
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="foss-united-staff">
+      <div class="mb-6">
+        <h2 id="foss-united-staff" class="text-xl font-bold text-ink tracking-tight mb-2">
+          FOSS United staff
+        </h2>
+        <p class="text-sm text-ink-2">
+          The wider FOSS United team supports the foundation and its programmes. See the current <a
+            href="https://fossunited.org/team"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-link">FOSS United team</a
+          >.
+        </p>
+      </div>
+      <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {
+          FOSS_UNITED_STAFF.map((member) => (
+            <li class="rounded-lg border border-ink/10 bg-card p-4">
+              <h3 class="text-sm font-semibold text-ink">{member.name}</h3>
+              <p class="text-xs text-ink-3">{member.role}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Base>
