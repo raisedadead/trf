@@ -1,6 +1,6 @@
 # The Rupee Fund
 
-The Rupee Fund collects small monthly donations for Indian open source software. [FOSS United Foundation](https://fossunited.org) operates the fund.
+The Rupee Fund collects small monthly donations for FOSS in India. It is a FOSS United community initiative run by community members, supported by the [FOSS United Foundation](https://fossunited.org).
 
 Astro (static site) + Hono (Cloudflare Worker) + D1.
 

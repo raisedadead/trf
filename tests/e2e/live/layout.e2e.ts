@@ -2,6 +2,24 @@
 // The evaluate callbacks read layout in the browser. The DOM lib stays scoped
 // to the files that need it rather than widening tsconfig.node.json.
 import { expect, test } from "@playwright/test";
+import { readdirSync } from "node:fs";
+
+const routes = readdirSync("src/pages")
+  .filter((file) => file.endsWith(".astro"))
+  .map((file) => (file === "index.astro" ? "/" : `/${file.slice(0, -6)}`));
+
+for (const width of [320, 768, 1440]) {
+  test(`pages fit a ${width}px viewport`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of routes) {
+      await page.goto(route);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      expect(overflow, route).toBeLessThanOrEqual(1);
+    }
+  });
+}
 
 const LEGAL_PAGES = ["/privacy", "/refunds"] as const;
 const TALL = { width: 1280, height: 1600 };

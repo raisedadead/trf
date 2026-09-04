@@ -14,10 +14,17 @@ describe("sitemap", () => {
     }
   });
 
-  it("lists the four indexable pages and nothing else", () => {
+  it("lists the public pages", () => {
     const xml = read("sitemap-0.xml");
-    expect(xml.match(/<loc>/g)).toHaveLength(4);
-    for (const path of ["/privacy", "/refunds", "/subscribe"]) {
+    expect(xml.match(/<loc>/g)).toHaveLength(7);
+    for (const path of [
+      "/privacy",
+      "/refunds",
+      "/subscribe",
+      "/team",
+      "/terms",
+      "/code-of-conduct",
+    ]) {
       expect(xml, `sitemap is missing ${path}`).toContain(`https://rupeefund.org${path}`);
     }
   });

@@ -1,7 +1,7 @@
 import { SUBSCRIBE_CTA } from "./launch.ts";
 
 export const SITE_URL = "https://rupeefund.org";
-export const OG_IMAGE = `${SITE_URL}/logo-foss-united-rupee-fund.png`;
+export const OG_IMAGE = `${SITE_URL}/logo-rupee-fund.png`;
 
 export interface RouteSeo {
   readonly path: string;
@@ -15,22 +15,38 @@ export interface RouteSeo {
 const ROUTE_SEO: readonly RouteSeo[] = [
   {
     path: "/",
-    title: "The Rupee Fund — by FOSS United",
+    title: "The Rupee Fund — A FOSS United Community Initiative",
     description:
-      "The Rupee Fund — a FOSS United Community initiative making Indian open source sustainable through small monthly contributions starting at ₹10.",
-    ogTitle: "The Rupee Fund — by FOSS United Community",
+      "The Rupee Fund — a FOSS United community initiative making FOSS in India sustainable through small monthly contributions.",
+    ogTitle: "The Rupee Fund — A FOSS United Community Initiative",
     ogDescription:
-      "Support Indian FOSS contributors with small periodic contributions. A FOSS United Community initiative.",
+      "The Rupee Fund — a FOSS United community initiative making FOSS in India sustainable through small monthly contributions.",
     indexable: true,
   },
   {
     path: "/subscribe",
     title: `${SUBSCRIBE_CTA} — The Rupee Fund`,
     description:
-      "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United Community initiative.",
+      "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United community initiative.",
     ogTitle: "Get notified when the Rupee Fund opens",
     ogDescription:
       "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
+    indexable: true,
+  },
+  {
+    path: "/terms",
+    title: "Terms — The Rupee Fund",
+    description: "Terms for the community-run Rupee Fund and its launch notification list.",
+    ogTitle: "Terms — The Rupee Fund",
+    ogDescription: "Terms for the community-run Rupee Fund and its launch notification list.",
+    indexable: true,
+  },
+  {
+    path: "/code-of-conduct",
+    title: "Code of Conduct — The Rupee Fund",
+    description: "Conduct standards for The Rupee Fund community.",
+    ogTitle: "Code of Conduct — The Rupee Fund",
+    ogDescription: "Conduct standards for The Rupee Fund community.",
     indexable: true,
   },
   {
@@ -49,6 +65,14 @@ const ROUTE_SEO: readonly RouteSeo[] = [
       "How to claim a refund from The Rupee Fund, the address that takes the claim, and the time limit.",
     ogTitle: "Refunds — The Rupee Fund",
     ogDescription: "How to claim a refund, and the time limit that applies.",
+    indexable: true,
+  },
+  {
+    path: "/team",
+    title: "Team — The Rupee Fund",
+    description: "Meet the community members who run The Rupee Fund and maintain its website.",
+    ogTitle: "Team — The Rupee Fund",
+    ogDescription: "Meet the people behind The Rupee Fund.",
     indexable: true,
   },
   {

@@ -180,7 +180,7 @@ pnpm wrangler d1 execute trf-rupeefund --remote --command "SELECT email, consent
 
 ## 9. How to remove a person from the list
 
-The build has no sender. Therefore a request for removal comes by email to `foundation@fossunited.org`. The signup form shows this address. There is no automatic endpoint for removal. A person does this work.
+The build has no sender. Therefore a request for removal comes by email to `rupeefund@fossunited.org`. The signup form shows this address. There is no automatic endpoint for removal. A person does this work.
 
 ```sh
 pnpm wrangler d1 execute trf-rupeefund --remote --command \

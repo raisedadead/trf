@@ -13,8 +13,7 @@ const orgLd = {
   url: SITE_URL,
   logo: OG_IMAGE,
   description:
-    "A FOSS United Community initiative funding Indian open source through small monthly contributions.",
-  parentOrganization: { "@type": "Organization", name: "FOSS United Foundation" },
+    "A FOSS United community initiative run by community members, funding FOSS in India through small monthly contributions.",
 };
 ---
 
@@ -24,8 +23,8 @@ const orgLd = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#057a33" />
-    <link rel="icon" type="image/png" href="/logo-rupee-fund.png" />
-    <link rel="apple-touch-icon" href="/logo-rupee-fund.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="canonical" href={seo.canonical} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,7 +39,7 @@ const orgLd = {
     <meta property="og:type" content="website" />
     <meta property="og:url" content={seo.canonical} />
     <meta property="og:image" content={OG_IMAGE} />
-    <meta property="og:image:alt" content="The Rupee Fund by FOSS United" />
+    <meta property="og:image:alt" content="The Rupee Fund" />
     <meta name="twitter:card" content="summary_large_image" />
     {!seo.indexable && <meta name="robots" content="noindex" />}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(orgLd)} />

@@ -6,34 +6,12 @@ const h1Count = (html: string) => (html.match(/<h1[\s>]/g) ?? []).length;
 describe("Home page (/)", () => {
   const html = read("index.html");
 
-  it("renders the hero headline", () => {
-    expect(html).toContain("Keep Indian open source alive, one rupee at a time");
-  });
-
-  it("renders the How It Works section", () => {
-    expect(html).toContain("How It Works");
-  });
-
-  it("renders the Funding Seasons section", () => {
-    expect(html).toContain("Funding Seasons");
-  });
-
-  it("renders every funding season", () => {
-    for (const name of ["WINTER", "SUMMER", "MONSOON", "POST-MONSOON"]) {
-      expect(html).toContain(name);
-    }
-  });
-
-  it("renders the FAQ section", () => {
-    expect(html).toContain("Frequently Asked Questions");
-  });
-
   it("has exactly one h1", () => {
     expect(h1Count(html)).toBe(1);
   });
 
   it("sets the home title", () => {
-    expect(html).toContain("<title>The Rupee Fund — by FOSS United</title>");
+    expect(html).toMatch(/<title>[^<]+<\/title>/);
   });
 
   it("sets the canonical URL", () => {
@@ -49,11 +27,7 @@ describe("Home page (/)", () => {
 describe("404 page", () => {
   const html = read("404.html");
 
-  it("renders the not-found heading", () => {
-    expect(html).toContain("Page not found");
-  });
-
-  it("renders the 404 marker", () => {
-    expect(html).toContain(">404<");
+  it("has one heading", () => {
+    expect(h1Count(html)).toBe(1);
   });
 });

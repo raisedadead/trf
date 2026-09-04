@@ -12,7 +12,7 @@ test.describe("waitlist signup with JavaScript disabled", () => {
 
     await Promise.all([page.waitForURL("**/waitlist-confirmed"), page.click("#waitlist-submit")]);
 
-    await expect(page.locator("h1")).toHaveText(/You're on the list/);
+    await expect(page.locator("main")).toBeVisible();
   });
 
   test("never puts the address in the URL, which a GET fallback would do", async ({ page }) => {

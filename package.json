@@ -2,7 +2,7 @@
   "name": "trf",
   "version": "0.0.0",
   "private": true,
-  "description": "Recurring UPI AutoPay donations for The Rupee Fund — a FOSS United Foundation program, on Cloudflare Workers + D1.",
+  "description": "Recurring UPI AutoPay donations for The Rupee Fund — a FOSS United community initiative run by community members, on Cloudflare Workers + D1.",
   "keywords": [
     "cloudflare-workers",
     "d1",

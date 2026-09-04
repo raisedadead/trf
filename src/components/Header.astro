@@ -4,7 +4,10 @@ import { normalizePath } from "../lib/seo.ts";
 
 const path = normalizePath(Astro.url.pathname);
 
-const links = [{ href: "/", label: "Home" }];
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/team", label: "Team" },
+];
 
 const subscribeCta = { href: "/subscribe", label: "Notify me" };
 ---
@@ -14,9 +17,9 @@ const subscribeCta = { href: "/subscribe", label: "Notify me" };
     <div class="flex justify-between items-center">
       <a href="/" class="flex items-center gap-2 min-h-11" aria-label="The Rupee Fund — home">
         <img
-          src="/logo-foss-united-rupee-fund.png"
-          alt="The Rupee Fund by FOSS United"
-          width="109"
+          src="/logo-rupee-fund.png"
+          alt="The Rupee Fund"
+          width="69"
           height="36"
           class="h-9 w-auto"
         />

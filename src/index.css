@@ -264,8 +264,8 @@
 
 @utility footer-glow {
   background-image:
-    linear-gradient(to bottom, oklch(0.84 0.18 152 / 0.14) 0%, oklch(0.84 0.18 152 / 0) 55%),
-    linear-gradient(to bottom, oklch(0.27 0 0) 0%, oklch(0.2 0 0) 100%);
+    linear-gradient(to bottom, oklch(0.84 0.18 152 / 0.22) 0%, oklch(0.84 0.18 152 / 0) 55%),
+    linear-gradient(to bottom, oklch(0.33 0 0) 0%, oklch(0.2 0 0) 100%);
 }
 
 @keyframes screen-enter {

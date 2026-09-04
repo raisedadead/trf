@@ -12,7 +12,11 @@ test.describe("the external-link arrow on a wrapped link", () => {
     await page.setViewportSize(NARROW);
     await page.goto("/privacy");
 
-    const link = page.getByRole("link", { name: /FOSS United privacy policy/ });
+    const link = page.locator('main a[target="_blank"]').first();
+    await link.evaluate((el) => {
+      el.textContent = "External resource link";
+      el.parentElement!.style.width = "100px";
+    });
     const seen = await link.evaluate((el) => ({
       lines: el.getClientRects().length,
       arrow: getComputedStyle(el, "::after").position,

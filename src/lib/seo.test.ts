@@ -21,11 +21,18 @@ describe("seoForPath", () => {
   });
 
   it("matches a route from a build-format .html pathname", () => {
-    expect(seoForPath("/subscribe.html").title).toBe("Get notified at launch — The Rupee Fund");
+    expect(seoForPath("/subscribe.html")).toEqual(seoForPath("/subscribe"));
   });
 
   it("matches a route from a trailing-slash pathname", () => {
-    expect(seoForPath("/waitlist-confirmed/").title).toBe("You're on the list — The Rupee Fund");
+    expect(seoForPath("/waitlist-confirmed/")).toEqual(seoForPath("/waitlist-confirmed"));
+  });
+
+  it("matches the team route", () => {
+    expect(seoForPath("/team")).toMatchObject({
+      canonical: "https://rupeefund.org/team",
+      indexable: true,
+    });
   });
 
   it("marks a waitlist outcome page as non-indexable", () => {

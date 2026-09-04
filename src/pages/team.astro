@@ -1,0 +1,137 @@
+---
+import Base from "../layouts/Base.astro";
+import { COMMUNITY_TEAM } from "../data/team.ts";
+import { REMOVAL_ADDRESS } from "../lib/launch.ts";
+
+const invitations = [
+  {
+    id: "join-the-team",
+    title: "You?",
+    username: "@yourname",
+    bio: "Help shape The Rupee Fund. Bring your ideas, skills, and a little time to the community team.",
+    action: "Let’s talk",
+    subject: "Joining The Rupee Fund community team",
+  },
+  {
+    id: "invite-a-member",
+    title: "Someone you know?",
+    username: "@theirname",
+    bio: "Know someone who cares about FOSS in India? There’s room for them to help build this with us.",
+    action: "Introduce us",
+    subject: "An introduction for The Rupee Fund community team",
+  },
+];
+
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2);
+---
+
+<Base>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <header class="mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-ink tracking-tight mb-3">Team</h1>
+      <p class="text-sm text-ink-2">
+        Meet the community members who run The Rupee Fund and maintain this website.
+      </p>
+    </header>
+
+    <section aria-labelledby="community-team" class="mb-14">
+      <h2 id="community-team" class="text-xl font-bold text-ink tracking-tight mb-6">
+        Community Team
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {
+          COMMUNITY_TEAM.filter((member) => !member.hidden).map((member) => (
+            <article class="flex items-start gap-4 rounded-xl border border-ink/10 bg-card p-5 sm:p-6">
+              {member.photoUrl ? (
+                <img
+                  src={member.photoUrl}
+                  alt=""
+                  width="64"
+                  height="64"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-16 w-16 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div
+                  class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-50 font-mono text-lg font-bold text-brand-fg"
+                  aria-hidden="true"
+                >
+                  {initials(member.name)}
+                </div>
+              )}
+              <div class="min-w-0">
+                <h3 class="text-lg font-bold text-ink mb-1">{member.name}</h3>
+                {member.profileUrl ? (
+                  <a
+                    href={member.profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-link text-sm break-words"
+                    aria-label={`${member.username ? `@${member.username}` : "FOSS United profile"} — ${member.name}`}
+                  >
+                    {member.username ? `@${member.username}` : "FOSS United profile"}
+                  </a>
+                ) : (
+                  "Profile link to follow."
+                )}
+                <p class="mt-3 text-sm text-ink-2 leading-relaxed">
+                  {member.bio ?? "Bio to follow."}
+                </p>
+              </div>
+            </article>
+          ))
+        }
+        {
+          invitations.map((invitation) => (
+            <aside
+              aria-labelledby={invitation.id}
+              class="flex items-start gap-4 rounded-xl border border-dashed border-ink/20 bg-ink/3 p-5 sm:p-6"
+            >
+              <div
+                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-ink/8 text-2xl text-ink-3"
+                aria-hidden="true"
+              >
+                ?
+              </div>
+              <div class="min-w-0">
+                <h3 id={invitation.id} class="text-lg font-bold text-ink-3 mb-1">
+                  {invitation.title}
+                </h3>
+                <span class="text-sm text-ink-3">{invitation.username}</span>
+                <p class="mt-3 text-sm text-ink-3 leading-relaxed">{invitation.bio}</p>
+                <a
+                  href={`mailto:${REMOVAL_ADDRESS}?subject=${encodeURIComponent(invitation.subject)}`}
+                  class="inline-link mt-3 inline-block text-sm"
+                >
+                  {invitation.action}
+                </a>
+              </div>
+            </aside>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="foss-united-staff">
+      <div class="mb-6">
+        <h2 id="foss-united-staff" class="text-xl font-bold text-ink tracking-tight mb-2">
+          FOSS United Foundation
+        </h2>
+        <p class="text-sm text-ink-2">
+          The Foundation supports the wider FOSS United community. Meet the <a
+            href="https://fossunited.org/team"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-link">FOSS United team</a
+          >.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
