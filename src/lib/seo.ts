@@ -17,17 +17,17 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     path: "/",
     title: "The Rupee Fund — by FOSS United",
     description:
-      "The Rupee Fund — a FOSS United Foundation initiative making Indian open source sustainable through small monthly contributions starting at ₹10.",
-    ogTitle: "The Rupee Fund — by FOSS United",
+      "The Rupee Fund — a FOSS United Community initiative making Indian open source sustainable through small monthly contributions starting at ₹10.",
+    ogTitle: "The Rupee Fund — by FOSS United Community",
     ogDescription:
-      "Support Indian FOSS contributors with small periodic contributions. A FOSS United Foundation initiative.",
+      "Support Indian FOSS contributors with small periodic contributions. A FOSS United Community initiative.",
     indexable: true,
   },
   {
     path: "/subscribe",
     title: `${SUBSCRIBE_CTA} — The Rupee Fund`,
     description:
-      "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United Foundation initiative.",
+      "Leave your email and hear first when monthly contributions from ₹10 open. A FOSS United Community initiative.",
     ogTitle: "Get notified when the Rupee Fund opens",
     ogDescription:
       "Hear first when monthly contributions from ₹10 open for Indian FOSS maintainers.",
