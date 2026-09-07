@@ -52,9 +52,9 @@ const TURNSTILE_SITEKEY = getSitekey();
             required
           />
         </div>
-        <fieldset>
+        <fieldset class="min-w-0">
           <legend class="field-label">Monthly Amount *</legend>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-1 min-[400px]:grid-cols-3 gap-2">
             {
               AMOUNT_OPTIONS.map((option) => (
                 <label class="choice justify-center">

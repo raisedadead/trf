@@ -8,6 +8,17 @@ const routes = readdirSync("src/pages")
   .filter((file) => file.endsWith(".astro"))
   .map((file) => (file === "index.astro" ? "/" : `/${file.slice(0, -6)}`));
 
+test("amount choices stay inside the narrow form with fallback fonts", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/subscribe");
+  await page.addStyleTag({ content: "fieldset { font-family: monospace; }" });
+  const widths = await page.locator("fieldset").evaluate((fieldset) => ({
+    available: fieldset.closest("form")!.clientWidth,
+    content: fieldset.scrollWidth,
+  }));
+  expect(widths.content).toBeLessThanOrEqual(widths.available + 1);
+});
+
 for (const width of [320, 768, 1440]) {
   test(`pages fit a ${width}px viewport`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
