@@ -13,14 +13,14 @@ export const COMMUNITY_TEAM: readonly TeamMember[] = [
     bio: "Shree (Kumar) is an active volunteer at FOSS United and an elected member of its Governance Board.",
     profileUrl: "https://fossunited.org/u/shreekumar3d",
     username: "shreekumar3d",
-    photoUrl: "/team/shree.jpg",
+    photoUrl: "https://github.com/shreekumar3d.png",
   },
   {
     name: "Mrugesh Mohapatra",
     bio: "Mrugesh is an active member of the FOSS United community and organises meetups for the Agentic AI Foundation's Bengaluru Chapter.",
     profileUrl: "https://fossunited.org/u/mrugesh",
     username: "mrugesh",
-    photoUrl: "/team/mrugesh.png",
+    photoUrl: "https://github.com/raisedadead.png",
   },
   { name: "Khitab", hidden: true },
 ];

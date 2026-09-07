@@ -62,6 +62,12 @@ describe("the shipped Content-Security-Policy is enforced, not advisory", () => 
 });
 
 describe("the policy permits everything the built pages actually load", () => {
+  it("allows GitHub profile images and their avatar redirect", () => {
+    for (const origin of ["https://github.com", "https://avatars.githubusercontent.com"]) {
+      expect(allows("img-src", origin)).toBe(true);
+    }
+  });
+
   it("allows every external script origin the build references", () => {
     for (const origin of externalOrigins("src")) {
       expect(allows("script-src", origin), `script-src must allow ${origin}`).toBe(true);
