@@ -19,7 +19,7 @@ test.describe("waitlist signup with JavaScript disabled", () => {
     await page.goto("/subscribe");
     await page.fill("#waitlist-name", "No Script");
     await page.fill("#waitlist-email", `leak+${process.env.E2E_STAMP ?? "2"}@example.com`);
-    await page.check('input[name="amount"][value="10"]');
+    await page.check('input[name="amount"][value="15"]');
 
     await Promise.all([page.waitForURL("**/waitlist-confirmed"), page.click("#waitlist-submit")]);
 
