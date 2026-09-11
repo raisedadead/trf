@@ -83,7 +83,7 @@ Both formatters use a print width of 100. `.editorconfig` states the same width,
 | `build` | The same command Cloudflare Workers Builds runs on `live`.                   |
 | `e2e`   | Playwright against the live build. A failed run keeps its report for 7 days. |
 
-The `build` job matters most. Workers Builds runs `pnpm run build`, so CI runs that exact command rather than an approximation. `promote.yml` names `build` among the checks it requires, so a job that stops running blocks every promote. If you add a job, add its name there too.
+The `build` job matters most. Workers Builds runs `pnpm run build`, so CI runs that exact command rather than an approximation. A job that stops running hides a broken build until it reaches the live site.
 
 `pnpm run build` is `node scripts/build.mjs`, and that module runs two guards around `astro build`:
 
@@ -104,7 +104,7 @@ Open your pull request against `main`. A merge into `main` deploys nothing. Noth
 1. Open a pull request against `main`. GitHub CI runs the gate.
 1. Get a review. Then merge.
 
-Only the maintainer promotes to the live site, by running the **Promote to live** workflow. That workflow refuses a commit that is not on `main` and a commit whose checks did not pass, and the `production` environment holds it until a reviewer approves. Refer to `docs/deploy.md` section 3.
+Only the maintainer promotes to the live site, by a fast-forward of `live` to a commit on `main` whose checks passed. Refer to `docs/deploy.md` section 3.
 
 `live` moves forward only. It is always a prefix of the history of `main`, so a promote takes a commit and everything before it. There is no cherry-pick, and no way to hold one commit back while a later one goes out.
 

@@ -139,7 +139,7 @@ Refer to `docs/deploy.md` for the full procedure and the commands.
 
 Cloudflare Workers Builds watches one branch. A push to `live` deploys `rupeefund.org`, and `main` deploys nothing. The repository declares no deploy script.
 
-Only the workflow `.github/workflows/promote.yml` writes to `live`. It takes a commit that is on `main`, refuses a commit whose checks did not pass, and moves `live` forward. The GitHub environment `production` holds the run until a reviewer approves it. The update uses the GitHub API with `force: false`, so GitHub itself refuses anything that is not a fast-forward.
+Only the maintainer writes to `live`. The maintainer takes a commit that is on `main` with passed checks and fast-forwards `live` to it.
 
 **Rehearse a migration on a local copy of the database, then apply it to `trf-rupeefund`, then promote.** `wrangler d1 export` gives you the copy. The promote is the only step that puts new code in front of the public, so you control the sequence.
 

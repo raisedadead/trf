@@ -21,10 +21,10 @@ pnpm test:e2e   # Playwright
 | Branch | Site            | Deploys                      |
 | ------ | --------------- | ---------------------------- |
 | `main` | none            | Never                        |
-| `live` | `rupeefund.org` | Only by the promote workflow |
+| `live` | `rupeefund.org` | When the maintainer moves it |
 
 The repository builds no beta site and no preview URL. You prove a change on your own machine with `pnpm preview`, which serves the built site against a local database.
 
-Open your pull request against `main`. A merge reaches no public address on its own. The maintainer moves `live` forward with the **Promote to live** workflow. It refuses a commit that is not on `main`, refuses one whose checks did not pass, and waits for a reviewer.
+Open your pull request against `main`. A merge reaches no public address on its own. The maintainer moves `live` forward to a commit on `main` after CI passes.
 
 [Architecture](docs/architecture.md) · [Deployment](docs/deploy.md) · [Contributing](CONTRIBUTING.md)

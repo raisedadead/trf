@@ -8,10 +8,10 @@ The system runs on the Workers Free plan. A paid plan is not necessary. Refer to
 
 One branch feeds one site. Cloudflare Workers Builds watches it.
 
-| Branch | Site            | Worker | Trigger                    |
-| ------ | --------------- | ------ | -------------------------- |
-| `main` | none            | none   | Never                      |
-| `live` | `rupeefund.org` | `trf`  | The promote workflow, only |
+| Branch | Site            | Worker | Trigger                 |
+| ------ | --------------- | ------ | ----------------------- |
+| `main` | none            | none   | Never                   |
+| `live` | `rupeefund.org` | `trf`  | The maintainer, by hand |
 
 | Setting                      | Value on `live`       |
 | ---------------------------- | --------------------- |
@@ -21,7 +21,7 @@ One branch feeds one site. Cloudflare Workers Builds watches it.
 
 Collaborators open a pull request against `main`. CI runs the gate. A merge into `main` deploys nothing.
 
-**Workers Builds is the supported way code reaches the live site.** The repository declares no deploy script, so the promote workflow is the release gate. A hand-run `wrangler deploy` is unsupported: it uploads whatever `dist` holds and runs neither sitekey guard. `pnpm wrangler rollback` stays available for an incident, because a rollback ships no new code.
+**Workers Builds is the supported way code reaches the live site.** The repository declares no deploy script, so the fast-forward of `live` is the release gate. A hand-run `wrangler deploy` is unsupported: it uploads whatever `dist` holds and runs neither sitekey guard. `pnpm wrangler rollback` stays available for an incident, because a rollback ships no new code.
 
 Leave non-production branch builds off. Turning them on uploads a Worker version for every branch, and every version keeps the production bindings.
 
@@ -50,18 +50,14 @@ pnpm wrangler d1 execute trf-rupeefund --local --command "SELECT email, consent_
 
 ## 3. How to promote to the live site
 
-Run the workflow **Promote to live** from the Actions tab. Give it a commit, or leave the field empty to take the tip of `main`.
+Make sure CI passed on the commit. Then fast-forward `live` to it:
 
-The workflow refuses the promote when any of these is true:
+```sh
+git fetch origin
+git push origin <sha>:live
+```
 
-- The commit is not on `main`.
-- The commit has no check run, or one of its check runs did not pass.
-- The `live` branch does not exist.
-- The move is not a fast-forward. GitHub refuses this itself, because the workflow sends `force: false`.
-
-The GitHub environment `production` holds the run until a reviewer approves it. That approval is the gate.
-
-The environment carries `can_admins_bypass: true`, which is the GitHub default. A repository administrator can therefore waive the approval. That is acceptable while the reviewer and the administrator are the same person. To make the gate bind everybody, set the field to `false`.
+Leave `<sha>` as `main` to take the tip of `main`. The push must be a fast-forward. Do not force it. Workers Builds deploys the new tip of `live`.
 
 `live` is always a prefix of the history of `main`. You promote a commit and everything before it, or nothing. There is no cherry-pick. Keep the gap small, and promote often.
 
@@ -76,7 +72,7 @@ The deployment applies no migration. You apply each one by hand, and the sequenc
 1. Export the live database. Apply the migration to that copy. Prove the change against it.
 1. Merge the code into `main`.
 1. Apply the migration to the live database.
-1. Run the promote workflow.
+1. Fast-forward `live`.
 
 ```sh
 pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-backup.sql
