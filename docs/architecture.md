@@ -4,7 +4,7 @@ This document uses ASD-STE100 Simplified Technical English.
 
 ## 1. What the system does
 
-The Rupee Fund collects small monthly donations for FOSS in India. It is a FOSS United community initiative run by community members, supported by the FOSS United Foundation.
+The Rupee Fund collects small monthly donations for FOSS in India. It is a community initiative from FOSS United, run by volunteers. The FOSS United Foundation is the fiscal host.
 
 The system does two things:
 

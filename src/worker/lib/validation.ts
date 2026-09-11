@@ -4,7 +4,7 @@ export const WAITLIST_SOURCES = ["subscribe", "landing", "footer"] as const;
 export type WaitlistSource = (typeof WAITLIST_SOURCES)[number];
 const DEFAULT_WAITLIST_SOURCE: WaitlistSource = "subscribe";
 
-export const AMOUNT_OPTIONS = ["10", "100", "500"] as const;
+export const AMOUNT_OPTIONS = ["15", "128", "512"] as const;
 export const AMOUNT_OTHER = "other";
 
 export const MAX_NAME_LENGTH = 100;

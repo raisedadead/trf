@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
-import { REMOVAL_ADDRESS, SUBSCRIBE_CTA } from "../lib/launch.ts";
+import { REMOVAL_ADDRESS, SUBSCRIBE_HEADING } from "../lib/launch.ts";
 import {
   AMOUNT_OPTIONS,
   MAX_AMOUNT_LENGTH,
@@ -21,11 +21,11 @@ const TURNSTILE_SITEKEY = getSitekey();
           <Icon name="heart" class="text-brand-fg" size={28} fill="currentColor" />
         </div>
         <h1 class="text-2xl font-bold text-ink mb-2 tracking-tight">
-          {SUBSCRIBE_CTA}
+          {SUBSCRIBE_HEADING}
         </h1>
         <p class="text-ink-2 text-sm">
-          Support FOSS in India, from ₹10/month. We will send you an email to set up your UPI
-          AutoPay mandate when Season 1 opens.
+          Nothing to pay today. Your pledge helps open the fund. Leave your email and the amount you
+          have in mind, and you hear first when it opens.
         </p>
       </div>
 

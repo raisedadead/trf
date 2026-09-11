@@ -2,7 +2,7 @@
 import "../index.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { seoForPath, OG_IMAGE, SITE_URL } from "../lib/seo.ts";
+import { seoForPath, OG_IMAGE, SITE_URL, INITIATIVE } from "../lib/seo.ts";
 
 const seo = seoForPath(Astro.url.pathname);
 
@@ -12,8 +12,8 @@ const orgLd = {
   name: "The Rupee Fund",
   url: SITE_URL,
   logo: OG_IMAGE,
-  description:
-    "A FOSS United community initiative run by community members, funding FOSS in India through small monthly contributions.",
+  description: `${INITIATIVE}, run by volunteers, funding FOSS in India through small monthly contributions.`,
+  disambiguatingDescription: `${INITIATIVE}. Run by community volunteers.`,
 };
 ---
 
@@ -39,7 +39,10 @@ const orgLd = {
     <meta property="og:type" content="website" />
     <meta property="og:url" content={seo.canonical} />
     <meta property="og:image" content={OG_IMAGE} />
-    <meta property="og:image:alt" content="The Rupee Fund" />
+    <meta
+      property="og:image:alt"
+      content="The Rupee Fund — a community initiative from FOSS United"
+    />
     <meta name="twitter:card" content="summary_large_image" />
     {!seo.indexable && <meta name="robots" content="noindex" />}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(orgLd)} />

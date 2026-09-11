@@ -11,8 +11,8 @@ describe("submitWaitlist", () => {
       <form id="waitlist-form">
         <input name="name" value="Ada" />
         <input name="email" value="ada@example.com" />
-        <input type="radio" name="amount" value="10" />
-        <input type="radio" name="amount" value="100" checked />
+        <input type="radio" name="amount" value="15" />
+        <input type="radio" name="amount" value="128" checked />
         <input type="radio" name="amount" value="other" />
         <input name="amount_other" value="" />
         <input name="months" value="12+" />
@@ -52,7 +52,7 @@ describe("submitWaitlist", () => {
 
     const body = JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body));
     expect(body).toMatchObject({
-      amount: "100",
+      amount: "128",
       amount_other: "",
       months: "12+",
       question: "Who audits this?",
@@ -93,7 +93,7 @@ describe("submitWaitlist", () => {
     typed.dispatchEvent(new Event("input"));
 
     expect(choice.checked).toBe(false);
-    expect((form.querySelector('input[value="100"]') as HTMLInputElement).checked).toBe(true);
+    expect((form.querySelector('input[value="128"]') as HTMLInputElement).checked).toBe(true);
   });
 
   it("waits for a token that the widget supplies late, instead of giving up immediately", async () => {

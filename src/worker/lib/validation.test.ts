@@ -8,7 +8,7 @@ import {
   validateWaitlist,
 } from "./validation.ts";
 
-const base = { name: "Asha", email: "Asha@Example.com", source: "subscribe", amount: "100" };
+const base = { name: "Asha", email: "Asha@Example.com", source: "subscribe", amount: "128" };
 
 describe("validateWaitlist", () => {
   it("accepts a well-formed entry and lowercases the address", () => {
@@ -19,7 +19,7 @@ describe("validateWaitlist", () => {
         name: "Asha",
         email: "asha@example.com",
         source: "subscribe",
-        amount: "100",
+        amount: "128",
         months: "",
         question: "",
       },
@@ -74,9 +74,9 @@ describe("validateWaitlist reads the contribution answers", () => {
   });
 
   it("keeps a fixed option as the string the form sends", () => {
-    expect(validateWaitlist({ ...base, amount: "10" })).toMatchObject({
+    expect(validateWaitlist({ ...base, amount: "15" })).toMatchObject({
       ok: true,
-      value: { amount: "10" },
+      value: { amount: "15" },
     });
   });
 
@@ -91,8 +91,8 @@ describe("validateWaitlist reads the contribution answers", () => {
   });
 
   it("ignores a typed amount when a fixed option is chosen", () => {
-    const result = validateWaitlist({ ...base, amount: "500", amount_other: "9999" });
-    expect(result).toMatchObject({ ok: true, value: { amount: "500" } });
+    const result = validateWaitlist({ ...base, amount: "512", amount_other: "9999" });
+    expect(result).toMatchObject({ ok: true, value: { amount: "512" } });
   });
 
   it("rejects an amount past the column budget", () => {

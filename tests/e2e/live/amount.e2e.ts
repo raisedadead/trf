@@ -16,11 +16,11 @@ test.describe("choosing a monthly amount", () => {
   });
 
   test("typing after a fixed option moves the choice to what was typed", async ({ page }) => {
-    await page.check('input[name="amount"][value="100"]');
+    await page.check('input[name="amount"][value="128"]');
     await page.fill("#waitlist-amount-other", "250");
 
     await expect(page.locator(OTHER)).toBeChecked();
-    await expect(page.locator('input[name="amount"][value="100"]')).not.toBeChecked();
+    await expect(page.locator('input[name="amount"][value="128"]')).not.toBeChecked();
   });
 
   test("names the other option on its own, not by concatenating the rupee sign", async ({
@@ -35,10 +35,10 @@ test.describe("choosing a monthly amount", () => {
   test("the arrow key moves between the fixed options, as one radio group must", async ({
     page,
   }) => {
-    await page.focus('input[name="amount"][value="10"]');
+    await page.focus('input[name="amount"][value="15"]');
     await page.keyboard.press("ArrowRight");
 
-    await expect(page.locator('input[name="amount"][value="100"]')).toBeChecked();
+    await expect(page.locator('input[name="amount"][value="128"]')).toBeChecked();
   });
 
   test("a typed amount reaches the success state", async ({ page }) => {
@@ -57,7 +57,7 @@ test.describe("choosing a monthly amount", () => {
 
     await expect(page.locator("#waitlist-success")).toBeHidden();
     const invalid = await page
-      .locator('input[name="amount"][value="10"]')
+      .locator('input[name="amount"][value="15"]')
       .evaluate((el) => (el as HTMLInputElement).validity.valueMissing);
     expect(invalid).toBe(true);
   });

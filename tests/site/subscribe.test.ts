@@ -44,7 +44,7 @@ describe("Subscribe page (/subscribe)", () => {
     const radios = [...html.matchAll(/<input[^>]*name="amount"[^>]*>/g)].map((m) => m[0]);
     expect(radios).toHaveLength(4);
     for (const radio of radios) expect(radio).toContain('type="radio"');
-    for (const value of ["10", "100", "500", "other"]) {
+    for (const value of ["15", "128", "512", "other"]) {
       expect(radios.some((r) => r.includes(`value="${value}"`))).toBe(true);
     }
   });

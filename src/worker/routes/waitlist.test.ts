@@ -29,8 +29,8 @@ function formReq(fields: Record<string, string>, headers: Record<string, string>
   });
 }
 
-const VALID = { name: "Asha", email: "asha@example.com", amount: "100", turnstileToken: "tok" };
-const FORM = { name: "Asha", email: "asha@example.com", amount: "100" };
+const VALID = { name: "Asha", email: "asha@example.com", amount: "128", turnstileToken: "tok" };
+const FORM = { name: "Asha", email: "asha@example.com", amount: "128" };
 
 describe("handleWaitlist over fetch (JavaScript enabled)", () => {
   it("stores a valid signup and reports success", async () => {
@@ -123,7 +123,7 @@ describe("handleWaitlist over fetch (JavaScript enabled)", () => {
       jsonReq({
         name: "Asha Kulkarni",
         email: "asha.kulkarni@example.com",
-        amount: "100",
+        amount: "128",
         turnstileToken: "x".repeat(2048),
       }),
       deps({ repo }),
