@@ -370,4 +370,22 @@ describe("consent and provenance are recorded on every stored signup", () => {
     );
     expect(repo.waitlist[0]).toMatchObject({ amount: "42", months: "6", question: "Hi" });
   });
+
+  it("stores the updates choice from the fetch body", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(jsonReq({ ...VALID, updates: "1" }), deps({ repo }));
+    expect(repo.waitlist[0]).toMatchObject({ updates_opt_in: 1 });
+  });
+
+  it("stores no updates choice when a form post omits the unticked box", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(formReq(FORM), deps({ repo }));
+    expect(repo.waitlist[0]).toMatchObject({ updates_opt_in: 0 });
+  });
+
+  it("stores the updates choice a ticked form post carries", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(formReq({ ...FORM, updates: "1" }), deps({ repo }));
+    expect(repo.waitlist[0]).toMatchObject({ updates_opt_in: 1 });
+  });
 });

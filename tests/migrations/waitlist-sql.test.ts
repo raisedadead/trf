@@ -49,6 +49,7 @@ function entry(over: Partial<WaitlistEntry> = {}): WaitlistEntry {
     amount: "100",
     months: "12",
     question: "Who audits this?",
+    updates_opt_in: 1,
     ...over,
   };
 }
@@ -93,6 +94,17 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     expect(rowsOf(raw, "SELECT amount, months, question FROM waitlist")).toEqual([
       { amount: "500", months: "24", question: "" },
     ]);
+  });
+
+  it("stores the updates choice beside the signup", async () => {
+    await repo.addToWaitlist(entry({ updates_opt_in: 0 }));
+    expect(rowsOf(raw, "SELECT updates_opt_in FROM waitlist")).toEqual([{ updates_opt_in: 0 }]);
+  });
+
+  it("replaces the updates choice when the same address signs up again", async () => {
+    await repo.addToWaitlist(entry({ updates_opt_in: 1 }));
+    await repo.addToWaitlist(entry({ updates_opt_in: 0, consent_at: 2000, updated_at: 2000 }));
+    expect(rowsOf(raw, "SELECT updates_opt_in FROM waitlist")).toEqual([{ updates_opt_in: 0 }]);
   });
 
   it("writes an empty optional answer as an empty string, not as the word undefined", async () => {

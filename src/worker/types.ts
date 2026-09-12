@@ -17,6 +17,7 @@ export interface WaitlistEntry {
   amount: string;
   months: string;
   question: string;
+  updates_opt_in: 0 | 1;
   created_at: number;
   updated_at: number;
 }

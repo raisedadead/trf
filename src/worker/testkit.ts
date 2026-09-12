@@ -23,6 +23,7 @@ export function makeRepo(): FakeRepo {
       existing.name = entry.name;
       existing.consent_at = entry.consent_at;
       existing.source = entry.source;
+      existing.updates_opt_in = entry.updates_opt_in;
       existing.updated_at = entry.updated_at;
     },
   };

@@ -129,6 +129,7 @@ export async function handleWaitlist(request: Request, deps: WaitlistDeps): Prom
       amount: result.value.amount,
       months: result.value.months,
       question: result.value.question,
+      updates_opt_in: result.value.updates_opt_in,
       created_at: at,
       updated_at: at,
     });
