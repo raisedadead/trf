@@ -52,9 +52,11 @@ The deployment applies no migration. You apply each one by hand, in this order:
 1. Fast-forward `live`.
 
 ```sh
-pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-backup.sql
-pnpm wrangler d1 migrations apply trf-rupeefund --remote
+pnpm wrangler d1 export trf-rupeefund --remote --output /tmp/trf-backup.sql &&
+  pnpm wrangler d1 migrations apply trf-rupeefund --remote
 ```
+
+Keep the `&&`. It stops the apply when the export fails.
 
 **Make each migration additive.** During a promote two Worker versions read the one live database. Add a column with a default or with NULL permitted. A change that removes a column needs two promotes: one that stops the code from reading it, and a later one that drops it.
 
