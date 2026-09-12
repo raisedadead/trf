@@ -16,6 +16,8 @@ const SOCIALS: readonly Social[] = [
   { slug: "youtube", name: "YouTube", href: "https://www.youtube.com/c/fossunited" },
   { slug: "telegram", name: "Telegram", href: "https://t.me/fossunited" },
 ];
+
+const SHOW_REFUNDS_LINK = false;
 ---
 
 <footer class="bg-ink footer-glow text-gray-300 py-10 border-t-2 border-brand">
@@ -101,7 +103,13 @@ const SOCIALS: readonly Social[] = [
     <div class="border-t border-white/10 pt-6 text-center text-[0.875rem] text-gray-300">
       <div class="mb-3 flex flex-wrap justify-center gap-x-1 gap-y-1">
         <a href="/privacy" class="foot-link">Privacy</a>
-        {/* <a href="/refunds" class="foot-link">Refunds</a> */}
+        {
+          SHOW_REFUNDS_LINK && (
+            <a href="/refunds" class="foot-link">
+              Refunds
+            </a>
+          )
+        }
         <a href="/terms" class="foot-link">Terms</a>
         <a href="/code-of-conduct" class="foot-link">Code of Conduct</a>
       </div>
