@@ -17,6 +17,7 @@ describe("submitWaitlist", () => {
         <input name="amount_other" value="" />
         <input name="months" value="12+" />
         <input name="question" value="Who audits this?" />
+        <input type="checkbox" name="updates" value="1" />
         <input name="cf-turnstile-response" value="tok" />
         <button id="waitlist-submit">Sign up</button>
         <p id="waitlist-error"></p>
@@ -57,6 +58,27 @@ describe("submitWaitlist", () => {
       months: "12+",
       question: "Who audits this?",
     });
+  });
+
+  it("sends an empty updates value when the box is unticked", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(okJson({ ok: true }));
+    const form = document.getElementById("waitlist-form") as HTMLFormElement;
+
+    await submitWaitlist(form, { fetchImpl });
+
+    const body = JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body));
+    expect(body.updates).toBe("");
+  });
+
+  it("sends the updates value when the box is ticked", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(okJson({ ok: true }));
+    const form = document.getElementById("waitlist-form") as HTMLFormElement;
+    (form.querySelector('input[name="updates"]') as HTMLInputElement).checked = true;
+
+    await submitWaitlist(form, { fetchImpl });
+
+    const body = JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body));
+    expect(body.updates).toBe("1");
   });
 
   it("sends the typed amount beside the other option, so the server can resolve it", async () => {

@@ -61,6 +61,7 @@ export async function submitWaitlist(
         amount_other: String(fd.get("amount_other") ?? ""),
         months: String(fd.get("months") ?? ""),
         question: String(fd.get("question") ?? ""),
+        updates: String(fd.get("updates") ?? ""),
         turnstileToken,
       }),
     });

@@ -109,6 +109,10 @@ const TURNSTILE_SITEKEY = getSitekey();
             class="field"
           />
         </div>
+        <label class="choice">
+          <input id="waitlist-updates" type="checkbox" name="updates" value="1" />
+          <span>Send me updates. A low-volume monthly email.</span>
+        </label>
         <div class="hidden" aria-hidden="true">
           <label for="waitlist-company">Company</label>
           <input
@@ -132,17 +136,18 @@ const TURNSTILE_SITEKEY = getSitekey();
           Sign up
         </button>
         <p class="text-xs text-ink-3 text-center">
-          By joining you agree we may email you about the launch — nothing else, and no payment is
-          taken now. See our <a href="/privacy" class="inline-link">Privacy</a> page. To be removed at
-          any time, email <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link"
-            >{REMOVAL_ADDRESS}</a
-          >.
+          By joining you agree we may email you about the launch, and monthly updates only if you
+          tick the box. No payment is taken now. See our{" "}
+          <a href="/privacy" class="inline-link">Privacy</a> page. To be removed at any time, email{
+            " "
+          }
+          <a href={`mailto:${REMOVAL_ADDRESS}`} class="inline-link">{REMOVAL_ADDRESS}</a>.
         </p>
       </form>
 
       <div id="waitlist-success" class="hidden note p-4 text-sm text-ink-2" aria-live="polite">
         <p class="font-semibold text-ink mb-1">You're on the list</p>
-        <p>One email when we open. Nothing else.</p>
+        <p>One email when we open, and monthly updates if you asked for them.</p>
       </div>
     </div>
   </div>

@@ -64,6 +64,16 @@ describe("Subscribe page (/subscribe)", () => {
     expect(html).toContain('id="waitlist-question"');
   });
 
+  it("renders the updates checkbox unticked, so a signup opts in only by choice", () => {
+    expect(html).toMatch(/<input[^>]*type="checkbox"[^>]*name="updates"[^>]*value="1"/);
+    expect(html).not.toMatch(/<input[^>]*name="updates"[^>]*checked/);
+  });
+
+  it("promises no longer that the launch email is the only email", () => {
+    expect(html).not.toContain("nothing else");
+    expect(html).not.toContain("Nothing else");
+  });
+
   it("keeps the other amount inside the amount group, not as a question of its own", () => {
     const group = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
     expect(group).toContain('name="amount_other"');
