@@ -23,6 +23,7 @@ export type WaitlistResult =
         amount: string;
         months: string;
         question: string;
+        updates_opt_in: 0 | 1;
       };
     }
   | { ok: false; errors: string[] };
@@ -32,6 +33,12 @@ function toSource(value: unknown): WaitlistSource {
   return (WAITLIST_SOURCES as readonly string[]).includes(raw)
     ? (raw as WaitlistSource)
     : DEFAULT_WAITLIST_SOURCE;
+}
+
+const CHECKBOX_ON = ["1", "on"] as const;
+
+function checkbox(value: unknown): 0 | 1 {
+  return (CHECKBOX_ON as readonly string[]).includes(text(value)) ? 1 : 0;
 }
 
 function text(value: unknown): string {
@@ -65,6 +72,11 @@ export function validateWaitlist(body: unknown): WaitlistResult {
   const question = text(b.question);
   if (question.length > MAX_QUESTION_LENGTH) errors.push("question");
 
+  const updates_opt_in = checkbox(b.updates);
+
   if (errors.length > 0) return { ok: false, errors };
-  return { ok: true, value: { name, email, source: toSource(b.source), amount, months, question } };
+  return {
+    ok: true,
+    value: { name, email, source: toSource(b.source), amount, months, question, updates_opt_in },
+  };
 }

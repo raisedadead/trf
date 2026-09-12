@@ -22,6 +22,7 @@ describe("validateWaitlist", () => {
         amount: "128",
         months: "",
         question: "",
+        updates_opt_in: 0,
       },
     });
   });
@@ -130,5 +131,32 @@ describe("validateWaitlist reads the contribution answers", () => {
   it("rejects a question past the column budget", () => {
     const result = validateWaitlist({ ...base, question: "a".repeat(MAX_QUESTION_LENGTH + 1) });
     expect(result).toEqual({ ok: false, errors: ["question"] });
+  });
+});
+
+describe("validateWaitlist reads the updates checkbox", () => {
+  it("stores 0 when the checkbox is absent, which is how a form posts an unticked box", () => {
+    expect(validateWaitlist(base)).toMatchObject({ ok: true, value: { updates_opt_in: 0 } });
+  });
+
+  it("stores 1 for the value the checkbox sends", () => {
+    expect(validateWaitlist({ ...base, updates: "1" })).toMatchObject({
+      ok: true,
+      value: { updates_opt_in: 1 },
+    });
+  });
+
+  it("stores 1 for the browser default value of a checkbox without a value attribute", () => {
+    expect(validateWaitlist({ ...base, updates: "on" })).toMatchObject({
+      ok: true,
+      value: { updates_opt_in: 1 },
+    });
+  });
+
+  it("stores 0 for any other string, so a crafted body cannot opt someone in", () => {
+    expect(validateWaitlist({ ...base, updates: "yes" })).toMatchObject({
+      ok: true,
+      value: { updates_opt_in: 0 },
+    });
   });
 });
