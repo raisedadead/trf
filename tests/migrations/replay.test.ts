@@ -25,6 +25,9 @@ const GONE_TABLES = [
 const LEDGER_DDL =
   "CREATE TABLE IF NOT EXISTS d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
 
+const PRE_0002_INSERT = `INSERT INTO waitlist
+  (email, name, consent_at, source, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`;
+
 const DIR = fileURLToPath(new URL("../../migrations", import.meta.url));
 
 function migrationFiles(): string[] {
@@ -66,8 +69,12 @@ function tablesOf(db: DatabaseSync): string[] {
 }
 
 describe("one migrations directory feeds both databases", () => {
-  it("ships exactly one migration file", () => {
-    expect(migrationFiles()).toEqual(["0001_init.sql", "0002_contribution_intent.sql"]);
+  it("ships the migration files in order", () => {
+    expect(migrationFiles()).toEqual([
+      "0001_init.sql",
+      "0002_contribution_intent.sql",
+      "0003_updates_opt_in.sql",
+    ]);
   });
 
   it("holds no per-environment subdirectory, which is what let the two copies drift", () => {
@@ -132,6 +139,7 @@ describe("the waitlist table records consent and export state", () => {
     "amount",
     "months",
     "question",
+    "updates_opt_in",
   ]) {
     it(`has ${column}`, () => {
       expect(columns()).toContain(column);
@@ -150,11 +158,18 @@ describe("the waitlist table records consent and export state", () => {
 
   it("accepts an insert that names no answer, which a pre-0002 Worker still sends", () => {
     const db = replay();
-    db.prepare(
-      "INSERT INTO waitlist (email, name, consent_at, source, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-    ).run("old@example.com", "O", 1000, "subscribe", 1000, 1000);
+    db.prepare(PRE_0002_INSERT).run("old@example.com", "O", 1000, "subscribe", 1000, 1000);
     const row = db.prepare("SELECT amount FROM waitlist WHERE email = ?").get("old@example.com");
     expect((row as { amount: string | null }).amount).toBe(null);
+  });
+
+  it("opts in a row that names no answer, because every row before 0003 is opted in", () => {
+    const db = replay();
+    db.prepare(PRE_0002_INSERT).run("old@example.com", "O", 1000, "subscribe", 1000, 1000);
+    const row = db
+      .prepare("SELECT updates_opt_in FROM waitlist WHERE email = ?")
+      .get("old@example.com");
+    expect((row as { updates_opt_in: number }).updates_opt_in).toBe(1);
   });
 
   it("requires a consent timestamp, because consent cannot be backfilled", () => {
