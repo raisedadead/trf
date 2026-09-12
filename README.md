@@ -1,30 +1,28 @@
 # The Rupee Fund
 
-The Rupee Fund collects small monthly donations for FOSS in India. It is a community initiative from FOSS United, run by volunteers. The [FOSS United Foundation](https://fossunited.org) is the fiscal host.
+The Rupee Fund collects small monthly contributions for FOSS in India. It is a community initiative from FOSS United, run by volunteers. The [FOSS United Foundation](https://fossunited.org) is the fiscal host.
 
-Astro (static site) + Hono (Cloudflare Worker) + D1.
+The site is static HTML from Astro. A Cloudflare Worker, written with Hono, answers the signup form and writes to a D1 database. The site takes no payment. It collects a mailing list and the intent of each person: an amount, a duration, a question, and a yes or no for monthly updates.
 
-The site shows two public pages and collects email addresses for a mailing list. It takes no payment. That code comes later, written from zero.
+## Quick start
 
 ```sh
 pnpm install
-pnpm db:reset   # makes the local database
-pnpm preview    # http://localhost:8787
-pnpm check      # types, lint, tests
-pnpm test:e2e   # Playwright
+pnpm db:reset    # makes the local database
+pnpm preview     # http://localhost:8787, with the signup form
+pnpm check       # types, lint, tests
+pnpm test:e2e    # Playwright
 ```
 
-`pnpm dev` shows only the pages. The signup form needs `pnpm preview`.
+`pnpm dev` shows the pages only. The signup form needs `pnpm preview`.
 
 ## One site
 
 | Branch | Site            | Deploys                      |
 | ------ | --------------- | ---------------------------- |
-| `main` | none            | Never                        |
-| `live` | `rupeefund.org` | When the maintainer moves it |
+| `main` | none            | never                        |
+| `live` | `rupeefund.org` | when the maintainer moves it |
 
-The repository builds no beta site and no preview URL. You prove a change on your own machine with `pnpm preview`, which serves the built site against a local database.
-
-Open your pull request against `main`. A merge reaches no public address on its own. The maintainer moves `live` forward to a commit on `main` after CI passes.
+Open a pull request against `main`. A merge deploys nothing. The maintainer fast-forwards `live` to a commit on `main` after CI passes. There is no beta site and no preview URL. You prove a change on your own machine.
 
 [Architecture](docs/architecture.md) · [Deployment](docs/deploy.md) · [Contributing](CONTRIBUTING.md)
