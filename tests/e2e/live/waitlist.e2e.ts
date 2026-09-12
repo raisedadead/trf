@@ -10,6 +10,7 @@ test.describe("waitlist signup (pre-launch build)", () => {
     await page.check('input[name="amount"][value="128"]');
     await page.fill("#waitlist-months", "12+");
     await page.fill("#waitlist-question", "Who audits the fund?");
+    await page.check("#waitlist-updates");
     await page.click("#waitlist-submit");
 
     await expect(page.locator("#waitlist-success")).toBeVisible();
