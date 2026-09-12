@@ -129,7 +129,7 @@ pnpm list:export --remote > list.csv             # prints the CSV, then stamps e
 
 The first line of the file is `email,name,attributes`. The `attributes` column is JSON with `source`, `consent_at`, `signed_up_at`, and `updates_opt_in`. The amount, the months, and the question stay in the database.
 
-The export is incremental. Each row goes out one time. A person who changes an answer or the updates box on a second signup does not go out again. The command needs Node 22.18 or later, and wrangler login for `--remote`.
+The export is incremental. Each row goes out one time. A row that an operator edits by hand after its export does not go out again. The command needs Node 22.18 or later, and wrangler login for `--remote`.
 
 ## 9. How to move to a different account
 

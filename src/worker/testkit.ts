@@ -19,12 +19,6 @@ export function makeRepo(): FakeRepo {
         });
         return;
       }
-      if (existing.unsubscribed_at !== null) return;
-      existing.name = entry.name;
-      existing.consent_at = entry.consent_at;
-      existing.source = entry.source;
-      existing.updates_opt_in = entry.updates_opt_in;
-      existing.updated_at = entry.updated_at;
     },
   };
   return self;

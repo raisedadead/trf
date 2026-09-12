@@ -39,7 +39,7 @@ There is no second environment and no preview URL. A second address for `trf` wo
 1. The name, the email address, or the amount is not valid.
 1. For a JSON request, Turnstile refuses the token, or fails.
 
-Then the Worker writes the row with an upsert on the email address.
+Then the Worker inserts the row. If the email address already has a row, the insert does nothing.
 
 The `Content-Type` header selects the path:
 
@@ -67,9 +67,9 @@ The `waitlist` table:
 | `updates_opt_in`           | 1 when the person ticked the monthly updates box, else 0                |
 | `exported_at`              | The time of the export. Empty means the exporter has not sent the row.  |
 | `unsubscribed_at`          | The time of a removal request                                           |
-| `created_at`, `updated_at` | The times of the first write and the last write                         |
+| `created_at`, `updated_at` | The time of the signup, and the time of the last change                 |
 
-A second signup with the same email address updates the name, the answers, and the updates flag. It does not touch a row that has `unsubscribed_at` set. The form cannot prove who owns an address, so a removal is permanent until an operator clears it by hand.
+A second signup with the same email address changes nothing. The first row stands, and the person sees the normal confirmation. The form cannot prove who owns an address, so it never rewrites a row and never reveals that one exists. To change an answer or to return after a removal, a person writes to the team, and an operator edits the row by hand.
 
 ## 6. The export
 

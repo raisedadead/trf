@@ -325,6 +325,17 @@ describe("consent and provenance are recorded on every stored signup", () => {
     expect(repo.waitlist.map((w) => w.source)).toEqual(["footer", "subscribe"]);
   });
 
+  it("answers success and keeps the first row when the same address posts again", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(jsonReq(VALID), deps({ repo, now: () => 1 }));
+
+    const res = await handleWaitlist(jsonReq({ ...VALID, name: "Someone Else" }), deps({ repo }));
+
+    expect(res.status).toBe(200);
+    expect(repo.waitlist).toHaveLength(1);
+    expect(repo.waitlist[0]?.name).toBe("Asha");
+  });
+
   it("does not let an unauthenticated post undo a removal somebody asked for", async () => {
     const repo = makeRepo();
     await handleWaitlist(jsonReq(VALID), deps({ repo, now: () => 1 }));

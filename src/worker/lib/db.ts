@@ -10,16 +10,7 @@ export function createRepo(db: D1Database): Repo {
              (email, name, consent_at, source, amount, months, question, updates_opt_in,
               created_at, updated_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT (email) DO UPDATE SET
-             name = excluded.name,
-             consent_at = excluded.consent_at,
-             source = excluded.source,
-             amount = excluded.amount,
-             months = excluded.months,
-             question = excluded.question,
-             updates_opt_in = excluded.updates_opt_in,
-             updated_at = excluded.updated_at
-           WHERE waitlist.unsubscribed_at IS NULL`,
+           ON CONFLICT (email) DO NOTHING`,
         )
         .bind(
           entry.email,

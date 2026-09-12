@@ -72,11 +72,11 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     ]);
   });
 
-  it("writes exactly one row for a repeated address, not a duplicate and not a silent drop", async () => {
+  it("keeps the first row when the same address signs up again", async () => {
     await repo.addToWaitlist(entry());
     await repo.addToWaitlist(entry({ name: "Asha Again", consent_at: 2000, updated_at: 2000 }));
-    expect(rowsOf(raw, "SELECT name, consent_at FROM waitlist")).toEqual([
-      { name: "Asha Again", consent_at: 2000 },
+    expect(rowsOf(raw, "SELECT name, consent_at, updated_at FROM waitlist")).toEqual([
+      { name: "Asha", consent_at: 1000, updated_at: 1000 },
     ]);
   });
 
@@ -87,13 +87,13 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     ]);
   });
 
-  it("replaces the answers when the same address signs up again", async () => {
+  it("keeps the first answers when the same address signs up again", async () => {
     await repo.addToWaitlist(entry());
     await repo.addToWaitlist(
       entry({ amount: "500", months: "24", question: "", consent_at: 2000, updated_at: 2000 }),
     );
     expect(rowsOf(raw, "SELECT amount, months, question FROM waitlist")).toEqual([
-      { amount: "500", months: "24", question: "" },
+      { amount: "100", months: "12", question: "Who audits this?" },
     ]);
   });
 
@@ -102,10 +102,10 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     expect(rowsOf(raw, "SELECT updates_opt_in FROM waitlist")).toEqual([{ updates_opt_in: 0 }]);
   });
 
-  it("replaces the updates choice when the same address signs up again", async () => {
+  it("keeps the first updates choice when the same address signs up again", async () => {
     await repo.addToWaitlist(entry({ updates_opt_in: 1 }));
     await repo.addToWaitlist(entry({ updates_opt_in: 0, consent_at: 2000, updated_at: 2000 }));
-    expect(rowsOf(raw, "SELECT updates_opt_in FROM waitlist")).toEqual([{ updates_opt_in: 0 }]);
+    expect(rowsOf(raw, "SELECT updates_opt_in FROM waitlist")).toEqual([{ updates_opt_in: 1 }]);
   });
 
   it("writes an empty optional answer as an empty string, not as the word undefined", async () => {
@@ -176,32 +176,6 @@ describe("the export SQL that scripts/list-export.mts itself runs, against a mig
       rowsOf(raw, "SELECT name, exported_at, unsubscribed_at, consent_at FROM waitlist"),
     ).toEqual([{ name: "Asha", exported_at: 5000, unsubscribed_at: 6000, consent_at: 1000 }]);
     expect(pending(raw)).toEqual([]);
-  });
-
-  it("leaves an unsubscribed row's answers alone, which the same guard protects", async () => {
-    await repo.addToWaitlist(entry());
-    markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 6000);
-    await repo.addToWaitlist(entry({ amount: "500", consent_at: 7000, updated_at: 7000 }));
-    expect(rowsOf(raw, "SELECT amount FROM waitlist")).toEqual([{ amount: "100" }]);
-  });
-
-  it("keeps the removal on record, so the operator can still see one was requested", async () => {
-    await repo.addToWaitlist(entry());
-    markUnsubscribedAsTheOperatorRunsIt(raw, "asha@example.com", 6000);
-    await repo.addToWaitlist(entry({ consent_at: 7000, updated_at: 7000 }));
-    expect(
-      rowsOf(raw, "SELECT COUNT(*) AS n FROM waitlist WHERE unsubscribed_at IS NOT NULL"),
-    ).toEqual([{ n: 1 }]);
-  });
-
-  it("leaves an already-exported subscriber alone when they simply sign up twice", async () => {
-    await repo.addToWaitlist(entry());
-    const [row] = pending(raw);
-    stampExportedAsTheExporterRunsIt(raw, [row!.id], 5000);
-
-    await repo.addToWaitlist(entry({ consent_at: 7000, updated_at: 7000 }));
-
-    expect(rowsOf(raw, "SELECT exported_at FROM waitlist")).toEqual([{ exported_at: 5000 }]);
   });
 
   it("hands the mailing-list exporter no contribution answer, which it has no reason to hold", () => {
