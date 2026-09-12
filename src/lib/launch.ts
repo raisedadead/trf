@@ -1,10 +1,5 @@
 export const LAUNCH_EVENT = "IndiaFOSS 2026";
 export const LAUNCH_EVENT_URL = "https://fossunited.org/indiafoss/2026";
-const LAUNCH_DATES = "26–27 September";
-const LAUNCH_CITY = "Bengaluru";
-
-export const LAUNCH_WHEN = `${LAUNCH_EVENT}, ${LAUNCH_DATES}, ${LAUNCH_CITY}`;
-
 export const SUBSCRIBE_CTA = "I am interested";
 export const SUBSCRIBE_HEADING = "I am interested!";
 

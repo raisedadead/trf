@@ -146,13 +146,6 @@ describe("validateWaitlist reads the updates checkbox", () => {
     });
   });
 
-  it("stores 1 for the browser default value of a checkbox without a value attribute", () => {
-    expect(validateWaitlist({ ...base, updates: "on" })).toMatchObject({
-      ok: true,
-      value: { updates_opt_in: 1 },
-    });
-  });
-
   it("stores 0 for any other string, so a crafted body cannot opt someone in", () => {
     expect(validateWaitlist({ ...base, updates: "yes" })).toMatchObject({
       ok: true,

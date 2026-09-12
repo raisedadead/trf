@@ -35,10 +35,8 @@ function toSource(value: unknown): WaitlistSource {
     : DEFAULT_WAITLIST_SOURCE;
 }
 
-const CHECKBOX_ON = ["1", "on"] as const;
-
 function checkbox(value: unknown): 0 | 1 {
-  return (CHECKBOX_ON as readonly string[]).includes(text(value)) ? 1 : 0;
+  return text(value) === "1" ? 1 : 0;
 }
 
 function text(value: unknown): string {

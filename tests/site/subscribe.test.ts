@@ -69,9 +69,11 @@ describe("Subscribe page (/subscribe)", () => {
     expect(html).not.toMatch(/<input[^>]*name="updates"[^>]*checked/);
   });
 
-  it("promises no longer that the launch email is the only email", () => {
-    expect(html).not.toContain("nothing else");
-    expect(html).not.toContain("Nothing else");
+  it("promises no longer that the launch email is the only email, on either outcome page", () => {
+    const confirmed = readFileSync(`${OUT}/waitlist-confirmed.html`, "utf8");
+    for (const page of [html, confirmed]) {
+      expect(page.toLowerCase()).not.toContain("nothing else");
+    }
   });
 
   it("keeps the other amount inside the amount group, not as a question of its own", () => {

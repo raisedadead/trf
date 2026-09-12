@@ -163,13 +163,21 @@ describe("the waitlist table records consent and export state", () => {
     expect((row as { amount: string | null }).amount).toBe(null);
   });
 
-  it("opts in a row that names no answer, because every row before 0003 is opted in", () => {
-    const db = replay();
-    db.prepare(PRE_0002_INSERT).run("old@example.com", "O", 1000, "subscribe", 1000, 1000);
-    const row = db
-      .prepare("SELECT updates_opt_in FROM waitlist WHERE email = ?")
-      .get("old@example.com");
-    expect((row as { updates_opt_in: number }).updates_opt_in).toBe(1);
+  it("opts in every row that exists when 0003 runs, and no row written after it", () => {
+    const db = new DatabaseSync(":memory:");
+    db.exec(readFileSync(`${DIR}/0001_init.sql`, "utf8"));
+    db.exec(readFileSync(`${DIR}/0002_contribution_intent.sql`, "utf8"));
+    db.prepare(PRE_0002_INSERT).run("before@example.com", "B", 1000, "subscribe", 1000, 1000);
+    db.exec(readFileSync(`${DIR}/0003_updates_opt_in.sql`, "utf8"));
+    db.prepare(PRE_0002_INSERT).run("after@example.com", "A", 2000, "subscribe", 2000, 2000);
+    const rows = db.prepare("SELECT email, updates_opt_in FROM waitlist ORDER BY id").all() as {
+      email: string;
+      updates_opt_in: number;
+    }[];
+    expect(rows).toEqual([
+      { email: "before@example.com", updates_opt_in: 1 },
+      { email: "after@example.com", updates_opt_in: 0 },
+    ]);
   });
 
   it("requires a consent timestamp, because consent cannot be backfilled", () => {
