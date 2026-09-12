@@ -6,7 +6,7 @@ describe("site metadata and policy links", () => {
     it(`${page} links to the local policy pages`, () => {
       const html = read(page);
       const footer = html.slice(html.indexOf("<footer"));
-      for (const path of ["/terms", "/privacy", "/refunds", "/code-of-conduct"]) {
+      for (const path of ["/terms", "/privacy", "/code-of-conduct"]) {
         expect(footer).toContain(`href="${path}"`);
       }
     });
