@@ -18,7 +18,7 @@ describe("submitWaitlist", () => {
         <input name="months" value="12+" />
         <input name="question" value="Who audits this?" />
         <input name="cf-turnstile-response" value="tok" />
-        <button id="waitlist-submit">Get notified</button>
+        <button id="waitlist-submit">Sign up</button>
         <p id="waitlist-error"></p>
       </form>
       <div id="waitlist-success" class="hidden"></div>`;

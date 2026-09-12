@@ -5,8 +5,8 @@ const LAUNCH_CITY = "Bengaluru";
 
 export const LAUNCH_WHEN = `${LAUNCH_EVENT}, ${LAUNCH_DATES}, ${LAUNCH_CITY}`;
 
-export const SUBSCRIBE_CTA = "Get notified at launch";
-export const SUBSCRIBE_HEADING = "Get notified when the fund opens";
+export const SUBSCRIBE_CTA = "I am interested";
+export const SUBSCRIBE_HEADING = "I am interested!";
 
 export const REMOVAL_ADDRESS = "rupeefund@fossunited.org";
 

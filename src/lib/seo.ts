@@ -27,7 +27,7 @@ const ROUTE_SEO: readonly RouteSeo[] = [
     path: "/subscribe",
     title: `${SUBSCRIBE_HEADING} — The Rupee Fund`,
     description: `Hear first when monthly contributions open for Indian FOSS maintainers. ${INITIATIVE}.`,
-    ogTitle: "Get notified when the Rupee Fund opens",
+    ogTitle: "I am interested! — The Rupee Fund",
     ogDescription: `Hear first when monthly contributions open for Indian FOSS maintainers. ${INITIATIVE}.`,
     indexable: true,
   },
