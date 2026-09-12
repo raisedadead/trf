@@ -36,6 +36,7 @@ describe("the exported file is importable by a list manager", () => {
       source: "subscribe",
       consent_at: 10,
       created_at: 10,
+      updates_opt_in: 1,
     },
     {
       id: 2,
@@ -44,6 +45,7 @@ describe("the exported file is importable by a list manager", () => {
       source: "footer",
       consent_at: 20,
       created_at: 20,
+      updates_opt_in: 0,
     },
   ];
 
@@ -65,6 +67,12 @@ describe("the exported file is importable by a list manager", () => {
   it("carries the consent record into the attributes, not just the address", () => {
     expect(toCsv(rows)).toContain("consent_at");
     expect(toCsv(rows)).toContain("source");
+  });
+
+  it("carries the updates choice as a boolean attribute, so the list manager can segment", () => {
+    const lines = toCsv(rows).trim().split("\n");
+    expect(lines[1]).toContain('""updates_opt_in"":true');
+    expect(lines[2]).toContain('""updates_opt_in"":false');
   });
 
   it("emits only a header when nobody is pending", () => {

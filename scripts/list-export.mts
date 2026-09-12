@@ -11,6 +11,7 @@ export interface ExportableRow extends Row {
   source: string;
   consent_at: number;
   created_at: number;
+  updates_opt_in: number;
 }
 
 export function toCsvField(value: unknown): string {
@@ -26,6 +27,7 @@ export function toCsv(rows: readonly ExportableRow[]): string {
       source: row.source,
       consent_at: row.consent_at,
       signed_up_at: row.created_at,
+      updates_opt_in: row.updates_opt_in === 1,
     });
     lines.push([row.email, row.name, attributes].map(toCsvField).join(","));
   }
@@ -60,7 +62,8 @@ function main() {
   const dryRun = argv.includes("--dry-run");
 
   const rows = query<ExportableRow>(
-    `SELECT id, email, name, source, consent_at, created_at FROM waitlist
+    `SELECT id, email, name, source, consent_at,
+     created_at, updates_opt_in FROM waitlist
      WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${BATCH}`,
     remote,
   );

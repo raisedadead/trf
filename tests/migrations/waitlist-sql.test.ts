@@ -6,7 +6,8 @@ import type { DatabaseSync } from "node:sqlite";
 
 const EXPORT_BATCH = 500;
 
-const SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT = `SELECT id, email, name, source, consent_at, created_at FROM waitlist
+const SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT = `SELECT id, email, name, source, consent_at,
+     created_at, updates_opt_in FROM waitlist
      WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${EXPORT_BATCH}`;
 
 const COUNT_PENDING_AS_THE_EXPORTER_RUNS_IT =
