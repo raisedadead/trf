@@ -221,6 +221,11 @@
   .faq-answer {
     @apply mt-3 text-ink-2 text-xs leading-relaxed border-t border-ink/10 pt-3;
   }
+
+  .faq-ghost {
+    @apply min-h-11 p-4 rounded-lg border border-dashed border-ink/20 bg-ink/3;
+    @apply flex justify-between items-center gap-3 font-semibold text-sm text-ink-3;
+  }
 }
 
 /* Two variants, two sizes, one block modifier. `btn btn-primary` is already a

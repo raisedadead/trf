@@ -4,7 +4,7 @@ import Icon from "../components/Icon.astro";
 import {
   LAUNCH_EVENT,
   LAUNCH_EVENT_URL,
-  LAUNCH_WHEN,
+  REMOVAL_ADDRESS,
   SEASONS,
   SUBSCRIBE_CTA,
 } from "../lib/launch.ts";
@@ -201,31 +201,12 @@ import {
       <div class="space-y-2">
         <details class="faq group">
           <summary class="faq-summary">
-            <span>Is the fund live yet?</span>
-            <span aria-hidden="true" class="faq-plus">+</span>
-          </summary>
-          <p class="faq-answer">
-            Not yet — we open at{" "}
-            <a
-              href={LAUNCH_EVENT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-link"
-            >
-              {LAUNCH_WHEN}
-            </a>. Leave your email and you'll hear the day contributions open. Nothing is collected
-            until then.
-          </p>
-        </details>
-
-        <details class="faq group">
-          <summary class="faq-summary">
             <span>Why this fund?</span>
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
             Free software can be inexpensive and sustainable when a large pool of users pays for it.
-            Contributions start at a very accessible level, ensuring broad participation.
+            Contributions start at a very accessible level, so that anyone can take part.
           </p>
         </details>
 
@@ -235,8 +216,8 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Those are large, foundation- and company-funded grants (₹3cr+ from FOSS United; $1M a
-            year from Zerodha's FLOSS/fund). The Rupee Fund is the volunteer-run community layer
+            Those are large grants funded by foundations and companies (₹3cr+ from FOSS United; $1M
+            a year from Zerodha's FLOSS/fund). The Rupee Fund is the volunteer-run community layer
             beneath them.
           </p>
         </details>
@@ -247,7 +228,20 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Funding based on community voting. Regular contributors earn voting rights each season.
+            The community votes on who is funded. Regular contributors earn voting rights each
+            season.
+          </p>
+        </details>
+
+        <details class="faq group">
+          <summary class="faq-summary">
+            <span>When do contributions start?</span>
+            <span aria-hidden="true" class="faq-plus">+</span>
+          </summary>
+          <p class="faq-answer">
+            As soon as we can.{" "}
+            <a href="/subscribe" class="inline-link">Sign up</a> to help us gauge interest, and we will
+            keep you posted.
           </p>
         </details>
 
@@ -257,7 +251,7 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            No, but you can fund Indian contributors of international projects.
+            No. It funds Indian contributors, including those who work on international projects.
           </p>
         </details>
 
@@ -277,10 +271,17 @@ import {
             <span aria-hidden="true" class="faq-plus">+</span>
           </summary>
           <p class="faq-answer">
-            Total fund minus administrative overheads equals the funding pool. All costs documented
-            transparently.
+            The funding pool is the total collected minus administrative costs. All costs are
+            documented publicly.
           </p>
         </details>
+
+        <div class="faq-ghost">
+          <span>More questions?</span>
+          <a href={`mailto:${REMOVAL_ADDRESS}?subject=Rupee%20Fund%20question`} class="inline-link">
+            Email us
+          </a>
+        </div>
       </div>
     </div>
   </section>
