@@ -49,6 +49,8 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+    env:
+      WRANGLER_LOG_PATH: ${{ github.workspace }}/.wrangler/logs
     steps:
       - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
         with:
@@ -57,7 +59,13 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - name: Create the local D1 schema the signup path writes to
         run: pnpm wrangler d1 migrations apply trf-rupeefund --local
-      - run: pnpm test:e2e
+      # workaround: cloudflare/workers-sdk#15317
+      - name: Run the browser suite, and retry once if the dev server dies
+        run: |
+          pnpm test:e2e || {
+            echo "::warning::e2e retried once, see cloudflare/workers-sdk#15317"
+            pnpm test:e2e
+          }
       - name: Keep the Playwright report when a run fails
         if: failure()
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -66,4 +74,5 @@ jobs:
           path: |
             playwright-report
             test-results
+            .wrangler/logs
           retention-days: 7
