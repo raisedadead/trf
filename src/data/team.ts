@@ -22,5 +22,11 @@ export const COMMUNITY_TEAM: readonly TeamMember[] = [
     username: "mrugesh",
     photoUrl: "https://github.com/raisedadead.png",
   },
-  { name: "Khitab", hidden: true },
+  {
+    name: "Khitab",
+    bio: "Khitab is a FOSS United volunteer who builds and maintains The Rupee Fund's website. He's a data engineer drawn to how open source underpins India's digital public infrastructure and public goods.",
+    profileUrl: "https://www.linkedin.com/in/khitab/",
+    username: "khitab",
+    photoUrl: "https://github.com/khitab.png",
+  },
 ];
