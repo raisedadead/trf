@@ -21,3 +21,4 @@ test-results
 
 # Shared editor settings. A global ignore usually excludes .vscode/.
 !.vscode/
+.idea/

@@ -81,7 +81,7 @@ describe("the sitekey comes from the repository, so no dashboard field can be mi
 
   it("refuses a repository that declares no sitekey at all", () => {
     const dir = repoWith({
-      lib: (src) => src.replace(/export const TURNSTILE_SITEKEY = "[^"]*";\n/, ""),
+      lib: (src) => src.replace(/export const TURNSTILE_SITEKEY = "[^"]*";\r?\n/, ""),
     });
     const { code, stderr } = run({}, dir);
     expect(code).toBe(1);
