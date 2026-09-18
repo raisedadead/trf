@@ -6,6 +6,7 @@ const TEST_SITEKEY = "1x00000000000000000000AA";
 const CARRIERS = [
   "src/lib/turnstile.ts",
   "scripts/turnstile-dummy-keys.mjs",
+  "scripts/preview.mjs",
   "tests/site/build.setup.ts",
   "tests/deploy/assert-deploy-env.test.ts",
   "tests/deploy/assert-dist-sitekey.test.ts",
@@ -23,13 +24,23 @@ describe("the test sitekey literal", () => {
   }
 });
 
+// A pnpm script that only delegates to a node wrapper (e.g. "node scripts/preview.mjs")
+// carries none of its own literals, so the actual gate must be found in that file.
+function scriptSource(body: string): string {
+  const delegate = /^node (\S+)$/.exec(body)?.[1];
+  return delegate ? read(delegate) : body;
+}
+
 describe("every build path that uses the test sitekey opts in explicitly", () => {
   const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
+  const sources = Object.fromEntries(
+    Object.entries(scripts).map(([name, body]) => [name, scriptSource(body)]),
+  );
 
-  for (const [name, body] of Object.entries(scripts)) {
-    if (!body.includes(TEST_SITEKEY)) continue;
+  for (const [name, source] of Object.entries(sources)) {
+    if (!source.includes(TEST_SITEKEY)) continue;
     it(`pnpm ${name} sets PUBLIC_ALLOW_TEST_SITEKEY`, () => {
-      expect(body).toContain("PUBLIC_ALLOW_TEST_SITEKEY=true");
+      expect(source).toMatch(/PUBLIC_ALLOW_TEST_SITEKEY(=|:\s*)"true"?/);
     });
   }
 
@@ -46,7 +57,7 @@ describe("every build path that uses the test sitekey opts in explicitly", () =>
   });
 
   it("finds at least one such build path, so the suite cannot pass vacuously", () => {
-    const paths = Object.values(scripts).filter((body) => body.includes(TEST_SITEKEY));
+    const paths = Object.values(sources).filter((source) => source.includes(TEST_SITEKEY));
     expect(paths.length).toBeGreaterThan(0);
   });
 });
