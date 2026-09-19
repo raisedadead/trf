@@ -13,6 +13,8 @@ const RETIRED = [
   "0003_voting_post_launch.sql",
 ];
 
+const ROLE_COLUMNS = ["is_foss_user", "is_foss_contributor", "is_student"];
+
 const GONE_TABLES = [
   "ballots",
   "contributors",
@@ -74,6 +76,7 @@ describe("one migrations directory feeds both databases", () => {
       "0001_init.sql",
       "0002_contribution_intent.sql",
       "0003_updates_opt_in.sql",
+      "0004_audience_roles.sql",
     ]);
   });
 
@@ -140,6 +143,7 @@ describe("the waitlist table records consent and export state", () => {
     "months",
     "question",
     "updates_opt_in",
+    ...ROLE_COLUMNS,
   ]) {
     it(`has ${column}`, () => {
       expect(columns()).toContain(column);
@@ -153,6 +157,17 @@ describe("the waitlist table records consent and export state", () => {
         .all()
         .find((r) => (r as { name: string }).name === column);
       expect((info as { notnull: number }).notnull).toBe(0);
+    });
+  }
+
+  for (const column of ROLE_COLUMNS) {
+    it(`leaves ${column} nullable, so an unasked row differs from an empty answer`, () => {
+      const info = replay()
+        .prepare("PRAGMA table_info(waitlist)")
+        .all()
+        .find((r) => (r as { name: string }).name === column);
+      expect((info as { notnull: number }).notnull).toBe(0);
+      expect((info as { dflt_value: string | null }).dflt_value).toBe(null);
     });
   }
 
@@ -177,6 +192,39 @@ describe("the waitlist table records consent and export state", () => {
     expect(rows).toEqual([
       { email: "before@example.com", updates_opt_in: 1 },
       { email: "after@example.com", updates_opt_in: 0 },
+    ]);
+  });
+
+  it("0004 asks no role of an older row, and reads a tick apart from a blank", () => {
+    const db = new DatabaseSync(":memory:");
+    for (const name of [
+      "0001_init.sql",
+      "0002_contribution_intent.sql",
+      "0003_updates_opt_in.sql",
+    ]) {
+      db.exec(readFileSync(`${DIR}/${name}`, "utf8"));
+    }
+    db.prepare(PRE_0002_INSERT).run("before@example.com", "B", 1000, "subscribe", 1000, 1000);
+    db.exec(readFileSync(`${DIR}/0004_audience_roles.sql`, "utf8"));
+    db.prepare(
+      `INSERT INTO waitlist (email, name, consent_at, source, created_at, updated_at,
+         is_foss_user, is_foss_contributor, is_student) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run("after@example.com", "A", 2000, "subscribe", 2000, 2000, 1, 0, 0);
+
+    expect(
+      db
+        .prepare(
+          "SELECT email, is_foss_user, is_foss_contributor, is_student FROM waitlist ORDER BY id",
+        )
+        .all(),
+    ).toEqual([
+      {
+        email: "before@example.com",
+        is_foss_user: null,
+        is_foss_contributor: null,
+        is_student: null,
+      },
+      { email: "after@example.com", is_foss_user: 1, is_foss_contributor: 0, is_student: 0 },
     ]);
   });
 
