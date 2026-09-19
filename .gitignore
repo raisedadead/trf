@@ -22,3 +22,6 @@ test-results
 # Shared editor settings. A global ignore usually excludes .vscode/.
 !.vscode/
 .idea/
+
+# Agent instructions are checked in. A global ignore usually excludes AGENTS.md.
+!AGENTS.md
