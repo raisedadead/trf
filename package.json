@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "node scripts/build.mjs",
-    "preview": "node scripts/preview.mjs",
+    "preview": "PUBLIC_ALLOW_TEST_SITEKEY=true PUBLIC_TURNSTILE_SITEKEY=1x00000000000000000000AA astro build --outDir dist-preview && TURNSTILE_SECRET=1x0000000000000000000000000000000AA wrangler dev --assets dist-preview --var TURNSTILE_HOSTNAMES:example.com --var TURNSTILE_ACTION:",
     "db:reset": "node scripts/db-reset.mjs",
     "cf-typegen": "wrangler types",
     "typecheck": "pnpm run cf-typegen && tsc -b tsconfig.build.json",

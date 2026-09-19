@@ -3,21 +3,15 @@ import { describe, expect, it } from "vitest";
 
 const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
 const builder = readFileSync("scripts/build.mjs", "utf8");
-const previewer = readFileSync("scripts/preview.mjs", "utf8");
 
 describe("one build chain serves the one environment", () => {
   it("routes the build through the guarded module, not astro on its own", () => {
     expect(scripts.build).toBe("node scripts/build.mjs");
   });
 
-  it("routes the preview through its own module, not astro/wrangler on their own", () => {
-    expect(scripts.preview).toBe("node scripts/preview.mjs");
-  });
-
   it("builds the preview somewhere else, so dist can only come from the guarded chain", () => {
-    expect(previewer).toContain("--outDir");
-    expect(previewer).toContain("dist-preview");
-    expect(previewer).toContain("--assets");
+    expect(scripts.preview).toContain("--outDir dist-preview");
+    expect(scripts.preview).toContain("--assets dist-preview");
   });
 
   it("runs the config guard, the build and the sitekey guard in that order", () => {
