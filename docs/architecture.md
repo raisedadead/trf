@@ -4,7 +4,7 @@
 
 The system shows public pages and collects a mailing list. It takes no payment and holds no vote.
 
-For each person on the list, the system stores a name, an email address, the time of consent, the amount and the duration the person intends to contribute, a free-text question, and a yes or no for monthly updates. It stores no payment instrument.
+For each person on the list, the system stores a name, an email address, the time of consent, the amount and the duration the person intends to contribute, a free-text question, a yes or no for monthly updates, and which of FOSS user, FOSS contributor and student the person ticked. It stores no payment instrument.
 
 ## 2. The parts
 
@@ -56,18 +56,19 @@ The `Content-Type` header selects the path:
 
 The `waitlist` table:
 
-| Column                     | Function                                                                |
-| -------------------------- | ----------------------------------------------------------------------- |
-| `email`                    | Unique, lower case                                                      |
-| `name`                     | The name the person gave                                                |
-| `consent_at`               | The time of consent. Required. It cannot be added later.                |
-| `source`                   | The form the person used                                                |
-| `amount`, `months`         | The intended contribution and its duration. Empty for rows before 0002. |
-| `question`                 | A free-text question for the team                                       |
-| `updates_opt_in`           | 1 when the person ticked the monthly updates box, else 0                |
-| `exported_at`              | The time of the export. Empty means the exporter has not sent the row.  |
-| `unsubscribed_at`          | The time of a removal request                                           |
-| `created_at`, `updated_at` | The time of the signup, and the time of the last change                 |
+| Column                                              | Function                                                                                  |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `email`                                             | Unique, lower case                                                                        |
+| `name`                                              | The name the person gave                                                                  |
+| `consent_at`                                        | The time of consent. Required. It cannot be added later.                                  |
+| `source`                                            | The form the person used                                                                  |
+| `amount`, `months`                                  | The intended contribution and its duration. Empty for rows before 0002.                   |
+| `question`                                          | A free-text question for the team                                                         |
+| `updates_opt_in`                                    | 1 when the person ticked the monthly updates box, else 0                                  |
+| `is_foss_user`, `is_foss_contributor`, `is_student` | 1 for each box the person ticked, else 0. Empty for rows before 0004, which nobody asked. |
+| `exported_at`                                       | The time of the export. Empty means the exporter has not sent the row.                    |
+| `unsubscribed_at`                                   | The time of a removal request                                                             |
+| `created_at`, `updated_at`                          | The time of the signup, and the time of the last change                                   |
 
 A second signup with the same email address changes nothing. The first row stands, and the person sees the normal confirmation. The form cannot prove who owns an address, so it never rewrites a row and never reveals that one exists. To change an answer or to return after a removal, a person writes to the team, and an operator edits the row by hand.
 
