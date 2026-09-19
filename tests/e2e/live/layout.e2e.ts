@@ -8,15 +8,20 @@ const routes = readdirSync("src/pages")
   .filter((file) => file.endsWith(".astro"))
   .map((file) => (file === "index.astro" ? "/" : `/${file.slice(0, -6)}`));
 
-test("amount choices stay inside the narrow form with fallback fonts", async ({ page }) => {
+test("every choice group stays inside the narrow form with fallback fonts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto("/subscribe");
   await page.addStyleTag({ content: "fieldset { font-family: monospace; }" });
-  const widths = await page.locator("fieldset").evaluate((fieldset) => ({
-    available: fieldset.closest("form")!.clientWidth,
-    content: fieldset.scrollWidth,
-  }));
-  expect(widths.content).toBeLessThanOrEqual(widths.available + 1);
+  const groups = await page.locator("fieldset").all();
+  expect(groups.length).toBeGreaterThan(1);
+  for (const group of groups) {
+    const { legend, available, content } = await group.evaluate((fieldset) => ({
+      legend: fieldset.querySelector("legend")?.textContent ?? "",
+      available: fieldset.closest("form")!.clientWidth,
+      content: fieldset.scrollWidth,
+    }));
+    expect(content, legend).toBeLessThanOrEqual(available + 1);
+  }
 });
 
 for (const width of [320, 768, 1440]) {

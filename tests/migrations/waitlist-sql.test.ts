@@ -118,7 +118,7 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     ).toEqual([{ is_foss_user: 1, is_foss_contributor: 1, is_student: 1 }]);
   });
 
-  it("writes a ticked box as 0, which a row that predates 0004 reads as null", async () => {
+  it("writes an unticked box as 0, which a row that predates 0004 reads as null", async () => {
     await repo.addToWaitlist(entry({ is_foss_user: 0 }));
     expect(rowsOf(raw, "SELECT is_foss_user FROM waitlist")).toEqual([{ is_foss_user: 0 }]);
   });

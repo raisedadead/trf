@@ -107,6 +107,13 @@ describe("Subscribe page (/subscribe)", () => {
     expect(amountGroup()).not.toContain('name="is_');
   });
 
+  it("labels the role group and every box, so the question reads without the field names", () => {
+    expect(html).toContain('<legend class="field-label">I am a</legend>');
+    for (const label of ["FOSS User", "FOSS Contributor", "Student"]) {
+      expect(html).toContain(`<span>${label}</span>`);
+    }
+  });
+
   it("caps the free-text answers at the lengths the columns hold", () => {
     expect(html).toMatch(/id="waitlist-amount-other"[^>]*maxlength="20"/);
     expect(html).toMatch(/id="waitlist-months"[^>]*maxlength="20"/);
