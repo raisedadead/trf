@@ -5,10 +5,12 @@ import {
   MAX_MONTHS_LENGTH,
   MAX_NAME_LENGTH,
   MAX_QUESTION_LENGTH,
+  ROLES,
   validateWaitlist,
 } from "./validation.ts";
 
 const base = { name: "Asha", email: "Asha@Example.com", source: "subscribe", amount: "128" };
+const ROLE_FIELDS = ROLES.map((r) => r.field);
 
 describe("validateWaitlist", () => {
   it("accepts a well-formed entry and lowercases the address", () => {
@@ -23,6 +25,9 @@ describe("validateWaitlist", () => {
         months: "",
         question: "",
         updates_opt_in: 0,
+        is_foss_user: 0,
+        is_foss_contributor: 0,
+        is_student: 0,
       },
     });
   });
@@ -150,6 +155,39 @@ describe("validateWaitlist reads the updates checkbox", () => {
     expect(validateWaitlist({ ...base, updates: "yes" })).toMatchObject({
       ok: true,
       value: { updates_opt_in: 0 },
+    });
+  });
+});
+
+describe("validateWaitlist reads the audience checkboxes", () => {
+  for (const field of ROLE_FIELDS) {
+    it(`stores 1 for the value the ${field} box sends`, () => {
+      expect(validateWaitlist({ ...base, [field]: "1" })).toMatchObject({
+        ok: true,
+        value: { [field]: 1 },
+      });
+    });
+
+    it(`stores 0 for any other ${field} string, so a crafted body cannot claim a role`, () => {
+      expect(validateWaitlist({ ...base, [field]: "yes" })).toMatchObject({
+        ok: true,
+        value: { [field]: 0 },
+      });
+    });
+  }
+
+  it("accepts a signup that ticks no box, because every role is optional", () => {
+    expect(validateWaitlist(base)).toMatchObject({
+      ok: true,
+      value: { is_foss_user: 0, is_foss_contributor: 0, is_student: 0 },
+    });
+  });
+
+  it("accepts a signup that ticks every box, because the roles overlap", () => {
+    const body = { ...base, is_foss_user: "1", is_foss_contributor: "1", is_student: "1" };
+    expect(validateWaitlist(body)).toMatchObject({
+      ok: true,
+      value: { is_foss_user: 1, is_foss_contributor: 1, is_student: 1 },
     });
   });
 });

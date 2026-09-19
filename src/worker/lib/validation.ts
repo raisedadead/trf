@@ -7,6 +7,14 @@ const DEFAULT_WAITLIST_SOURCE: WaitlistSource = "subscribe";
 export const AMOUNT_OPTIONS = ["15", "128", "512"] as const;
 export const AMOUNT_OTHER = "other";
 
+export const ROLES = [
+  { field: "is_foss_user", label: "FOSS User" },
+  { field: "is_foss_contributor", label: "FOSS Contributor" },
+  { field: "is_student", label: "Student" },
+] as const;
+
+export type RoleField = (typeof ROLES)[number]["field"];
+
 export const MAX_NAME_LENGTH = 100;
 export const MAX_EMAIL_LENGTH = 254;
 export const MAX_AMOUNT_LENGTH = 20;
@@ -24,7 +32,7 @@ export type WaitlistResult =
         months: string;
         question: string;
         updates_opt_in: 0 | 1;
-      };
+      } & Record<RoleField, 0 | 1>;
     }
   | { ok: false; errors: string[] };
 
@@ -75,6 +83,17 @@ export function validateWaitlist(body: unknown): WaitlistResult {
   if (errors.length > 0) return { ok: false, errors };
   return {
     ok: true,
-    value: { name, email, source: toSource(b.source), amount, months, question, updates_opt_in },
+    value: {
+      name,
+      email,
+      source: toSource(b.source),
+      amount,
+      months,
+      question,
+      updates_opt_in,
+      is_foss_user: checkbox(b.is_foss_user),
+      is_foss_contributor: checkbox(b.is_foss_contributor),
+      is_student: checkbox(b.is_student),
+    },
   };
 }
