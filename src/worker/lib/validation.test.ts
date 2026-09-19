@@ -5,12 +5,11 @@ import {
   MAX_MONTHS_LENGTH,
   MAX_NAME_LENGTH,
   MAX_QUESTION_LENGTH,
-  ROLES,
+  ROLE_FIELDS,
   validateWaitlist,
 } from "./validation.ts";
 
 const base = { name: "Asha", email: "Asha@Example.com", source: "subscribe", amount: "128" };
-const ROLE_FIELDS = ROLES.map((r) => r.field);
 
 describe("validateWaitlist", () => {
   it("accepts a well-formed entry and lowercases the address", () => {

@@ -7,13 +7,9 @@ const DEFAULT_WAITLIST_SOURCE: WaitlistSource = "subscribe";
 export const AMOUNT_OPTIONS = ["15", "128", "512"] as const;
 export const AMOUNT_OTHER = "other";
 
-export const ROLES = [
-  { field: "is_foss_user", label: "FOSS User" },
-  { field: "is_foss_contributor", label: "FOSS Contributor" },
-  { field: "is_student", label: "Student" },
-] as const;
+export const ROLE_FIELDS = ["is_foss_user", "is_foss_contributor", "is_student"] as const;
 
-export type RoleField = (typeof ROLES)[number]["field"];
+export type RoleField = (typeof ROLE_FIELDS)[number];
 
 export const MAX_NAME_LENGTH = 100;
 export const MAX_EMAIL_LENGTH = 254;

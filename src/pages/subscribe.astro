@@ -1,13 +1,13 @@
 ---
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
-import { REMOVAL_ADDRESS, SUBSCRIBE_HEADING } from "../lib/launch.ts";
+import { REMOVAL_ADDRESS, ROLE_LABELS, ROLE_LEGEND, SUBSCRIBE_HEADING } from "../lib/launch.ts";
 import {
   AMOUNT_OPTIONS,
   MAX_AMOUNT_LENGTH,
   MAX_MONTHS_LENGTH,
   MAX_QUESTION_LENGTH,
-  ROLES,
+  ROLE_FIELDS,
 } from "../worker/lib/validation.ts";
 import { TURNSTILE_ACTION, getSitekey } from "../lib/turnstile.ts";
 
@@ -54,13 +54,13 @@ const TURNSTILE_SITEKEY = getSitekey();
           />
         </div>
         <fieldset class="min-w-0">
-          <legend class="field-label">I am a</legend>
+          <legend class="field-label">{ROLE_LEGEND}</legend>
           <div class="space-y-2">
             {
-              ROLES.map((role) => (
+              ROLE_FIELDS.map((field) => (
                 <label class="choice">
-                  <input type="checkbox" name={role.field} value="1" />
-                  <span>{role.label}</span>
+                  <input type="checkbox" name={field} value="1" />
+                  <span>{ROLE_LABELS[field]}</span>
                 </label>
               ))
             }

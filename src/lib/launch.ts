@@ -1,7 +1,17 @@
+import type { RoleField } from "../worker/lib/validation.ts";
+
 export const LAUNCH_EVENT = "IndiaFOSS 2026";
 export const LAUNCH_EVENT_URL = "https://fossunited.org/indiafoss/2026";
 export const SUBSCRIBE_CTA = "I am interested";
 export const SUBSCRIBE_HEADING = "I am interested!";
+
+export const ROLE_LEGEND = "I am a";
+
+export const ROLE_LABELS: Readonly<Record<RoleField, string>> = {
+  is_foss_user: "FOSS User",
+  is_foss_contributor: "FOSS Contributor",
+  is_student: "Student",
+};
 
 export const REMOVAL_ADDRESS = "rupeefund@fossunited.org";
 
