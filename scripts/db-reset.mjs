@@ -1,12 +1,16 @@
 import { spawnSync } from "node:child_process";
 import { rmSync } from "node:fs";
+import { resolve } from "node:path";
 
 rmSync(".wrangler/state/v3/d1", { recursive: true, force: true });
 
-const shell = process.platform === "win32";
+// workaround: nodejs/node#21825 — a .cmd needs a shell, which searches CWD first
+const WIN = process.platform === "win32";
+const wrangler = resolve("node_modules", ".bin", WIN ? "wrangler.cmd" : "wrangler");
+
 const { status } = spawnSync(
-  "wrangler",
+  WIN ? `"${wrangler}"` : wrangler,
   ["d1", "migrations", "apply", "trf-rupeefund", "--local"],
-  { stdio: "inherit", env: process.env, shell },
+  { stdio: "inherit", env: process.env, shell: WIN },
 );
 process.exit(status ?? 1);
