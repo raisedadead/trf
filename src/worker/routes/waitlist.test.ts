@@ -399,4 +399,36 @@ describe("consent and provenance are recorded on every stored signup", () => {
     await handleWaitlist(formReq({ ...FORM, updates: "1" }), deps({ repo }));
     expect(repo.waitlist[0]).toMatchObject({ updates_opt_in: 1 });
   });
+
+  it("stores the audience roles from the fetch body", async () => {
+    const repo = makeRepo();
+    const body = { ...VALID, is_foss_user: "1", is_student: "1" };
+    await handleWaitlist(jsonReq(body), deps({ repo }));
+    expect(repo.waitlist[0]).toMatchObject({
+      is_foss_user: 1,
+      is_foss_contributor: 0,
+      is_student: 1,
+    });
+  });
+
+  it("stores the audience roles a ticked form post carries", async () => {
+    const repo = makeRepo();
+    await handleWaitlist(formReq({ ...FORM, is_foss_contributor: "1" }), deps({ repo }));
+    expect(repo.waitlist[0]).toMatchObject({
+      is_foss_user: 0,
+      is_foss_contributor: 1,
+      is_student: 0,
+    });
+  });
+
+  it("accepts a post that ticks no box, because every role is optional", async () => {
+    const repo = makeRepo();
+    const res = await handleWaitlist(formReq(FORM), deps({ repo }));
+    expect(res.status).toBe(303);
+    expect(repo.waitlist[0]).toMatchObject({
+      is_foss_user: 0,
+      is_foss_contributor: 0,
+      is_student: 0,
+    });
+  });
 });

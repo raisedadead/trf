@@ -130,6 +130,9 @@ export async function handleWaitlist(request: Request, deps: WaitlistDeps): Prom
       months: result.value.months,
       question: result.value.question,
       updates_opt_in: result.value.updates_opt_in,
+      is_foss_user: result.value.is_foss_user,
+      is_foss_contributor: result.value.is_foss_contributor,
+      is_student: result.value.is_student,
       created_at: at,
       updated_at: at,
     });
