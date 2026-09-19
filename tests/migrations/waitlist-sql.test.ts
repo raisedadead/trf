@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { SELECT_PENDING } from "../../scripts/list-export.mts";
 import { createRepo } from "../../src/worker/lib/db.ts";
 import type { Repo, WaitlistEntry } from "../../src/worker/types.ts";
 import { migratedD1, rowsOf } from "./d1-adapter.ts";
@@ -6,9 +7,7 @@ import type { DatabaseSync } from "node:sqlite";
 
 const EXPORT_BATCH = 500;
 
-const SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT = `SELECT id, email, name, source, consent_at,
-     created_at, updates_opt_in FROM waitlist
-     WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${EXPORT_BATCH}`;
+const SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT = SELECT_PENDING;
 
 const COUNT_PENDING_AS_THE_EXPORTER_RUNS_IT =
   "SELECT COUNT(*) AS n FROM waitlist WHERE exported_at IS NULL AND unsubscribed_at IS NULL";

@@ -3,6 +3,10 @@ import { execFileSync } from "node:child_process";
 const DB_NAME = "trf-rupeefund";
 const BATCH = 500;
 
+export const SELECT_PENDING = `SELECT id, email, name, source, consent_at,
+     created_at, updates_opt_in FROM waitlist
+     WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${BATCH}`;
+
 export type Row = Record<string, unknown>;
 
 export interface ExportableRow extends Row {
@@ -61,12 +65,7 @@ function main() {
   const remote = argv.includes("--remote");
   const dryRun = argv.includes("--dry-run");
 
-  const rows = query<ExportableRow>(
-    `SELECT id, email, name, source, consent_at,
-     created_at, updates_opt_in FROM waitlist
-     WHERE exported_at IS NULL AND unsubscribed_at IS NULL ORDER BY id LIMIT ${BATCH}`,
-    remote,
-  );
+  const rows = query<ExportableRow>(SELECT_PENDING, remote);
 
   process.stdout.write(toCsv(rows));
 
