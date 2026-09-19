@@ -51,6 +51,9 @@ function entry(over: Partial<WaitlistEntry> = {}): WaitlistEntry {
     months: "12",
     question: "Who audits this?",
     updates_opt_in: 1,
+    is_foss_user: 1,
+    is_foss_contributor: 0,
+    is_student: 0,
     ...over,
   };
 }
@@ -106,6 +109,28 @@ describe("the signup SQL the Worker runs, against a migrated database", () => {
     await repo.addToWaitlist(entry({ updates_opt_in: 1 }));
     await repo.addToWaitlist(entry({ updates_opt_in: 0, consent_at: 2000, updated_at: 2000 }));
     expect(rowsOf(raw, "SELECT updates_opt_in FROM waitlist")).toEqual([{ updates_opt_in: 1 }]);
+  });
+
+  it("stores the audience roles beside the signup", async () => {
+    await repo.addToWaitlist(entry({ is_foss_contributor: 1, is_student: 1 }));
+    expect(
+      rowsOf(raw, "SELECT is_foss_user, is_foss_contributor, is_student FROM waitlist"),
+    ).toEqual([{ is_foss_user: 1, is_foss_contributor: 1, is_student: 1 }]);
+  });
+
+  it("writes a ticked box as 0, which a row that predates 0004 reads as null", async () => {
+    await repo.addToWaitlist(entry({ is_foss_user: 0 }));
+    expect(rowsOf(raw, "SELECT is_foss_user FROM waitlist")).toEqual([{ is_foss_user: 0 }]);
+  });
+
+  it("keeps the first roles when the same address signs up again", async () => {
+    await repo.addToWaitlist(entry());
+    await repo.addToWaitlist(
+      entry({ is_foss_user: 0, is_student: 1, consent_at: 2000, updated_at: 2000 }),
+    );
+    expect(rowsOf(raw, "SELECT is_foss_user, is_student FROM waitlist")).toEqual([
+      { is_foss_user: 1, is_student: 0 },
+    ]);
   });
 
   it("writes an empty optional answer as an empty string, not as the word undefined", async () => {
@@ -180,6 +205,12 @@ describe("the export SQL that scripts/list-export.mts itself runs, against a mig
 
   it("hands the mailing-list exporter no contribution answer, which it has no reason to hold", () => {
     for (const column of ["amount", "months", "question"]) {
+      expect(SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT).not.toContain(column);
+    }
+  });
+
+  it("hands the mailing-list exporter no audience role, because no send differs by role", () => {
+    for (const column of ["is_foss_user", "is_foss_contributor", "is_student"]) {
       expect(SELECT_PENDING_AS_THE_EXPORTER_RUNS_IT).not.toContain(column);
     }
   });

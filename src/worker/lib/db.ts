@@ -8,8 +8,8 @@ export function createRepo(db: D1Database): Repo {
         .prepare(
           `INSERT INTO waitlist
              (email, name, consent_at, source, amount, months, question, updates_opt_in,
-              created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              is_foss_user, is_foss_contributor, is_student, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT (email) DO NOTHING`,
         )
         .bind(
@@ -21,6 +21,9 @@ export function createRepo(db: D1Database): Repo {
           entry.months,
           entry.question,
           entry.updates_opt_in,
+          entry.is_foss_user,
+          entry.is_foss_contributor,
+          entry.is_student,
           entry.created_at,
           entry.updated_at,
         )

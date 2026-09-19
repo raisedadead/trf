@@ -18,6 +18,9 @@ export interface WaitlistEntry {
   months: string;
   question: string;
   updates_opt_in: 0 | 1;
+  is_foss_user: 0 | 1;
+  is_foss_contributor: 0 | 1;
+  is_student: 0 | 1;
   created_at: number;
   updated_at: number;
 }
