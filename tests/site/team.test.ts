@@ -5,9 +5,8 @@ import { COMMUNITY_TEAM } from "../../src/data/team.ts";
 describe("Team page (/team)", () => {
   const html = read("team.html");
 
-  it("renders the visible team entries", () => {
-    const visible = COMMUNITY_TEAM.filter((member) => !member.hidden);
-    expect(html.match(/<article\b/g)).toHaveLength(visible.length);
+  it("renders every team entry", () => {
+    expect(html.match(/<article\b/g)).toHaveLength(COMMUNITY_TEAM.length);
   });
 
   it("links to the Foundation team", () => {

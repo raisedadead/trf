@@ -4,7 +4,6 @@ export interface TeamMember {
   readonly profileUrl?: string;
   readonly username?: string;
   readonly photoUrl?: string;
-  readonly hidden?: boolean;
 }
 
 export const COMMUNITY_TEAM: readonly TeamMember[] = [

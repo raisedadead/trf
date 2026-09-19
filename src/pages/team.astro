@@ -46,7 +46,7 @@ const initials = (name: string) =>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {
-          COMMUNITY_TEAM.filter((member) => !member.hidden).map((member) => (
+          COMMUNITY_TEAM.map((member) => (
             <article class="flex items-start gap-4 rounded-xl border border-ink/10 bg-card p-5 sm:p-6">
               {member.photoUrl ? (
                 <img
