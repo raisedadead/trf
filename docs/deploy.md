@@ -81,14 +81,9 @@ The Workers Builds settings hold no variable. One Turnstile widget serves the si
 pnpm wrangler secret put TURNSTILE_SECRET
 ```
 
-For local work, one `.env` file at the top of the repository holds the test values. Do not also make a `.dev.vars` file, or wrangler ignores `.env`.
+Local work needs no environment file. The `preview` script in `package.json` carries the always-pass test values itself, and passes them to `astro build` and to `wrangler dev`.
 
-```sh
-cp .env.example .env
-printf 'dotenv\n' > .envrc && direnv allow
-```
-
-`.env.example` ships the always-pass test sitekey with `PUBLIC_ALLOW_TEST_SITEKEY=true`. Keep it that way for local work. Never set that opt-in in the Workers Builds settings. A deployed build with the test sitekey refuses every signup, and `pnpm run build` exits 1 before and after `astro build` when it finds one.
+That script sets `PUBLIC_ALLOW_TEST_SITEKEY=true` beside the test sitekey. Never set that opt-in in the Workers Builds settings. A deployed build with the test sitekey refuses every signup, and `pnpm run build` exits 1 before and after `astro build` when it finds one. `tests/deploy/sitekey-literal.test.ts` refuses a script that names the test sitekey without the opt-in.
 
 ## 6. How to verify a deployment
 

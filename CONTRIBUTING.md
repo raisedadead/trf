@@ -4,8 +4,6 @@
 
 ```sh
 pnpm install
-cp .env.example .env
-printf 'dotenv\n' > .envrc && direnv allow
 pnpm db:reset
 pnpm preview
 ```
