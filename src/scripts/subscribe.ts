@@ -62,6 +62,9 @@ export async function submitWaitlist(
         months: String(fd.get("months") ?? ""),
         question: String(fd.get("question") ?? ""),
         updates: String(fd.get("updates") ?? ""),
+        is_foss_user: String(fd.get("is_foss_user") ?? ""),
+        is_foss_contributor: String(fd.get("is_foss_contributor") ?? ""),
+        is_student: String(fd.get("is_student") ?? ""),
         turnstileToken,
       }),
     });

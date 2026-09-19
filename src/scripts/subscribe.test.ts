@@ -18,6 +18,9 @@ describe("submitWaitlist", () => {
         <input name="months" value="12+" />
         <input name="question" value="Who audits this?" />
         <input type="checkbox" name="updates" value="1" />
+        <input type="checkbox" name="is_foss_user" value="1" />
+        <input type="checkbox" name="is_foss_contributor" value="1" />
+        <input type="checkbox" name="is_student" value="1" />
         <input name="cf-turnstile-response" value="tok" />
         <button id="waitlist-submit">Sign up</button>
         <p id="waitlist-error"></p>
@@ -79,6 +82,28 @@ describe("submitWaitlist", () => {
 
     const body = JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body));
     expect(body.updates).toBe("1");
+  });
+
+  it("sends an empty role value for every box the subscriber left unticked", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(okJson({ ok: true }));
+    const form = document.getElementById("waitlist-form") as HTMLFormElement;
+
+    await submitWaitlist(form, { fetchImpl });
+
+    const body = JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body));
+    expect(body).toMatchObject({ is_foss_user: "", is_foss_contributor: "", is_student: "" });
+  });
+
+  it("sends the role values the subscriber ticked, and only those", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(okJson({ ok: true }));
+    const form = document.getElementById("waitlist-form") as HTMLFormElement;
+    (form.querySelector('input[name="is_foss_user"]') as HTMLInputElement).checked = true;
+    (form.querySelector('input[name="is_student"]') as HTMLInputElement).checked = true;
+
+    await submitWaitlist(form, { fetchImpl });
+
+    const body = JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body));
+    expect(body).toMatchObject({ is_foss_user: "1", is_foss_contributor: "", is_student: "1" });
   });
 
   it("sends the typed amount beside the other option, so the server can resolve it", async () => {
