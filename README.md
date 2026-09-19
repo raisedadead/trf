@@ -2,7 +2,7 @@
 
 The Rupee Fund collects small monthly contributions for FOSS in India. It is a community initiative from FOSS United, run by volunteers. The [FOSS United Foundation](https://fossunited.org) is the fiscal host.
 
-The site is static HTML from Astro. A Cloudflare Worker, written with Hono, answers the signup form and writes to a D1 database. The site takes no payment. It collects a mailing list and the intent of each person: an amount, a duration, a question, and a yes or no for monthly updates.
+The site is static HTML from Astro. A Cloudflare Worker, written with Hono, answers the signup form and writes to a D1 database. The site takes no payment. It collects a mailing list and the intent of each person: an amount, a duration, a question, a yes or no for monthly updates, and which of FOSS user, FOSS contributor and student the person ticked.
 
 ## Quick start
 

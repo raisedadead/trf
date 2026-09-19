@@ -127,7 +127,7 @@ pnpm list:export --remote --dry-run > list.csv   # prints the CSV, changes nothi
 pnpm list:export --remote > list.csv             # prints the CSV, then stamps exported_at
 ```
 
-The first line of the file is `email,name,attributes`. The `attributes` column is JSON with `source`, `consent_at`, `signed_up_at`, and `updates_opt_in`. The amount, the months, and the question stay in the database.
+The first line of the file is `email,name,attributes`. The `attributes` column is JSON with `source`, `consent_at`, `signed_up_at`, and `updates_opt_in`. The amount, the months, the question, and the three audience roles stay in the database.
 
 The export is incremental. Each row goes out one time. A row that an operator edits by hand after its export does not go out again. The command needs Node 24 or later, and wrangler login for `--remote`.
 
