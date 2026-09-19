@@ -33,6 +33,11 @@ function externalModules(): string[] {
   return out;
 }
 
+function amountGroup(): string {
+  const start = html.indexOf('<legend class="field-label">Monthly Amount');
+  return html.slice(start, html.indexOf("</fieldset>", start));
+}
+
 describe("Subscribe page (/subscribe)", () => {
   it("renders the waitlist form with name and email", () => {
     expect(html).toContain('id="waitlist-form"');
@@ -77,9 +82,29 @@ describe("Subscribe page (/subscribe)", () => {
   });
 
   it("keeps the other amount inside the amount group, not as a question of its own", () => {
-    const group = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
+    const group = amountGroup();
     expect(group).toContain('name="amount_other"');
     expect(group).toContain('value="other"');
+  });
+
+  it("asks the audience roles as optional checkboxes, in the order the issue names", () => {
+    const boxes = [...html.matchAll(/<input[^>]*name="is_[a-z_]+"[^>]*>/g)].map((m) => m[0]);
+    expect(boxes).toHaveLength(3);
+    for (const box of boxes) {
+      expect(box).toContain('type="checkbox"');
+      expect(box).toContain('value="1"');
+      expect(box).not.toContain("required");
+      expect(box).not.toContain("checked");
+    }
+    expect(boxes.map((b) => /name="(is_[a-z_]+)"/.exec(b)?.[1])).toEqual([
+      "is_foss_user",
+      "is_foss_contributor",
+      "is_student",
+    ]);
+  });
+
+  it("keeps the roles out of the amount group, so each question stands alone", () => {
+    expect(amountGroup()).not.toContain('name="is_');
   });
 
   it("caps the free-text answers at the lengths the columns hold", () => {

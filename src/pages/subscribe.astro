@@ -7,6 +7,7 @@ import {
   MAX_AMOUNT_LENGTH,
   MAX_MONTHS_LENGTH,
   MAX_QUESTION_LENGTH,
+  ROLES,
 } from "../worker/lib/validation.ts";
 import { TURNSTILE_ACTION, getSitekey } from "../lib/turnstile.ts";
 
@@ -52,6 +53,19 @@ const TURNSTILE_SITEKEY = getSitekey();
             required
           />
         </div>
+        <fieldset class="min-w-0">
+          <legend class="field-label">I am a</legend>
+          <div class="space-y-2">
+            {
+              ROLES.map((role) => (
+                <label class="choice">
+                  <input type="checkbox" name={role.field} value="1" />
+                  <span>{role.label}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
         <fieldset class="min-w-0">
           <legend class="field-label">Monthly Amount *</legend>
           <div class="grid grid-cols-1 min-[400px]:grid-cols-3 gap-2">
