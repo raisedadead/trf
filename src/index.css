@@ -83,22 +83,33 @@
      `.link-plain` opts a link out. A whole row of outbound links reads as a
      group on its own, so repeating the arrow down the row only adds noise.
 
+     The colour is a gradient tile the size of the mask tile, not a
+     `background-color`. WebKit masks an inline box with one layer by drawing
+     the tile in `destination-in` and pushes no transparency layer, so the box
+     outside the tile stays unmasked. A background colour there painted a
+     solid block around a hollow arrow in Safari. With nothing painted outside
+     the tile, the mask has nothing to miss.
+
      Progressive: a browser without `mask-image` gets no arrow and no padding
-     instead of a solid rectangle. The second `content` asks the engine to name
+     instead of a solid square. The second `content` asks the engine to name
      the arrow for a screen reader. A browser that cannot parse the alt text
      syntax keeps the first declaration, which is only a space, so nothing
      reads out. */
   @supports (mask-image: linear-gradient(#000, #000)) {
     a[target="_blank"]:not(.link-plain)::after {
+      --arrow-size: 0.7em;
       content: "\00A0";
       content: "\00A0" / " (opens in a new tab)";
       padding-right: 0.85em;
-      background-color: currentColor;
+      background-image: linear-gradient(currentColor, currentColor);
+      background-position: right center;
+      background-size: var(--arrow-size) var(--arrow-size);
+      background-repeat: no-repeat;
       /* Ink spans 4→20 of this 16-unit viewBox, so the size below scales the
          arrow itself rather than the empty margin around it. */
       mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 4 16 16' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7'/%3E%3Cpath d='M7 7h10v10'/%3E%3C/svg%3E");
       mask-position: right center;
-      mask-size: 0.7em 0.7em;
+      mask-size: var(--arrow-size) var(--arrow-size);
       mask-repeat: no-repeat;
     }
   }

@@ -109,6 +109,12 @@ describe("the compiled arrow rule keeps the shape the layout depends on", () => 
     expect(rule?.[1]).toContain("mask-image");
   });
 
+  it("paints colour only inside the mask tile, because WebKit leaves an inline box unmasked outside it", () => {
+    expect(rule?.[1]).not.toContain("background-color");
+    expect(rule?.[1].match(/var\(--arrow-size\)/g)?.length).toBeGreaterThanOrEqual(4);
+    expect(rule?.[1].match(/no-repeat/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+
   it("keeps the box in flow, because an out-of-flow one strands on a wrapped link", () => {
     expect(rule?.[1]).not.toContain("position:absolute");
   });
