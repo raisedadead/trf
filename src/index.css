@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "InterVariable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
 
   /* Type scale tuned to fossunited.org: 16px body, large editorial headings */

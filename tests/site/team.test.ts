@@ -9,6 +9,24 @@ describe("Team page (/team)", () => {
     expect(html.match(/<article\b/g)).toHaveLength(COMMUNITY_TEAM.length);
   });
 
+  it("requests each GitHub avatar at twice its display width, not at full size", () => {
+    const avatars = [
+      ...html.matchAll(/<img src="(https:\/\/github\.com\/[^"]+)"[^>]*width="(\d+)"/g),
+    ];
+    expect(avatars).toHaveLength(COMMUNITY_TEAM.filter((member) => member.photoUrl).length);
+    for (const [, src, width] of avatars) {
+      expect(new URL(src!).searchParams.get("size"), `${src} sets the wrong size`).toBe(
+        String(Number(width) * 2),
+      );
+    }
+  });
+
+  it("invites new members from one card with one mail link", () => {
+    const cards = html.match(/<aside\b[\s\S]*?<\/aside>/g);
+    expect(cards).toHaveLength(1);
+    expect(cards![0]!.match(/href="mailto:/g)).toHaveLength(1);
+  });
+
   it("links to the Foundation team", () => {
     expect(html).toContain('href="https://fossunited.org/team"');
   });

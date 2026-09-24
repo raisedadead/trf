@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PAGES, read } from "./dist.ts";
+import { PAGES, read, styles } from "./dist.ts";
 
 const headers = () => read("_headers");
 
@@ -84,12 +84,20 @@ describe("the policy permits everything the built pages actually load", () => {
     }
   });
 
-  it("allows the Google Fonts stylesheet host the layout loads on every page", () => {
-    expect(allows("style-src", "https://fonts.googleapis.com")).toBe(true);
+  it("serves every font file from our own origin, the only one font-src allows", () => {
+    expect(policy()["font-src"]).toEqual(["'self'"]);
+    const sources = [...styles().matchAll(/@font-face\{[^}]*\}/g)].flatMap((face) =>
+      [...face[0].matchAll(/url\(([^)]+)\)/g)].map((m) => m[1]!),
+    );
+    expect(sources.length).toBeGreaterThan(0);
+    for (const source of sources) {
+      expect(source, `${source} is not a built asset`).toMatch(/^\/_astro\//);
+    }
   });
 
-  it("allows the Google Fonts file host, which no earlier policy did", () => {
-    expect(allows("font-src", "https://fonts.gstatic.com")).toBe(true);
+  it("names no Google Fonts host, now that the site serves Inter itself", () => {
+    expect(policy()["style-src"]).not.toContain("https://fonts.googleapis.com");
+    expect(policy()["font-src"]).not.toContain("https://fonts.gstatic.com");
   });
 
   it("allows the Turnstile script and its iframe", () => {

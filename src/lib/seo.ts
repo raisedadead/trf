@@ -1,5 +1,6 @@
 import { SUBSCRIBE_HEADING } from "./launch.ts";
 
+export const SITE_NAME = "The Rupee Fund";
 export const SITE_URL = "https://rupeefund.org";
 export const OG_IMAGE = `${SITE_URL}/logo-rupee-fund.png`;
 

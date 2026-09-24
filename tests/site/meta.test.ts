@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { OUT, read } from "./dist.ts";
+import { OUT, PAGES, read } from "./dist.ts";
 
 describe("sitemap", () => {
   it("generates the sitemap index", () => {
@@ -66,6 +66,28 @@ describe("head metadata", () => {
     expect(html).toContain('"@type":"Organization"');
   });
 
+  it("emits WebSite JSON-LD on the home page, which Google reads for the site name", () => {
+    expect(html).toContain(
+      '{"@context":"https://schema.org","@type":"WebSite","name":"The Rupee Fund","url":"https://rupeefund.org"}',
+    );
+  });
+
+  it("emits WebSite JSON-LD on no other page", () => {
+    for (const page of PAGES.filter((p) => p !== "index.html")) {
+      expect(read(page), `${page} must not carry WebSite JSON-LD`).not.toContain(
+        '"@type":"WebSite"',
+      );
+    }
+  });
+
+  it("names the site for link previews on every page", () => {
+    for (const page of PAGES) {
+      expect(read(page), `${page} is missing og:site_name`).toContain(
+        '<meta property="og:site_name" content="The Rupee Fund">',
+      );
+    }
+  });
+
   it("emits an apple-touch-icon", () => {
     expect(html).toContain('rel="apple-touch-icon"');
   });
@@ -75,7 +97,11 @@ describe("head metadata", () => {
     expect(html).toContain('name="twitter:card"');
   });
 
-  it("preconnects to the font origins", () => {
-    expect(html).toContain('rel="preconnect" href="https://fonts.gstatic.com"');
+  it("loads no font from a third party, because the site serves Inter itself", () => {
+    for (const page of PAGES) {
+      for (const host of ["fonts.googleapis.com", "fonts.gstatic.com"]) {
+        expect(read(page), `${page} loads from ${host}`).not.toContain(host);
+      }
+    }
   });
 });
